@@ -1,0 +1,18 @@
+{
+  "sprite": {
+    "frame_size": 512,
+    "view": "side",
+    "facing": "right",
+    "tile_size": 128
+  },
+  "actions": [
+    { "id": "idle", "frames": 1, "fps": 2, "tags": ["base"] },
+    { "id": "walk", "frames": 4, "fps": 8, "tags": ["move"] },
+    { "id": "trot", "frames": 4, "fps": 10, "tags": ["move"] },
+    { "id": "sleep", "frames": 1, "fps": 1, "tags": ["rest"] },
+    { "id": "laugh", "frames": 1, "fps": 2, "tags": ["emote"] },
+    { "id": "cry", "frames": 1, "fps": 2, "tags": ["emote"] },
+    { "id": "magic", "frames": 2, "fps": 6, "tags": ["fx"] },
+    { "id": "talent", "frames": 2, "fps": 6, "tags": ["signature"] }
+  ]
+}

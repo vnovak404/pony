@@ -1,0 +1,653 @@
+{
+  "defaults": {
+    "body_colors": [
+      "sunny yellow",
+      "soft lavender",
+      "buttercream"
+    ],
+    "mane_colors": [
+      "royal purple",
+      "sunshine yellow",
+      "violet"
+    ],
+    "accent_colors": [
+      "gold",
+      "lavender mist",
+      "cream"
+    ],
+    "talents": [
+      "cloud sculpting",
+      "star catching",
+      "garden growing",
+      "rainbow building",
+      "sparkle sprinkling"
+    ],
+    "personalities": [
+      "cheerful and gentle",
+      "curious and brave",
+      "kind and thoughtful"
+    ]
+  },
+  "vibes": [
+    {
+      "id": "sunshine",
+      "terms": [
+        "Sunrise",
+        "Sunbeam",
+        "Sunburst",
+        "Golden",
+        "Honey",
+        "Amber",
+        "Marigold",
+        "Buttercup",
+        "Daffodil",
+        "Citrine",
+        "Glow",
+        "Radiant",
+        "Daylight",
+        "Warmth",
+        "Sol",
+        "Saffron",
+        "Lemon",
+        "Aurora",
+        "Bright",
+        "Gleam",
+        "Halo",
+        "Spark",
+        "Ray",
+        "Sunlit"
+      ],
+      "body_colors": [
+        "sunny yellow",
+        "butter yellow",
+        "golden peach",
+        "warm cream",
+        "saffron glow"
+      ],
+      "mane_colors": [
+        "royal purple",
+        "violet",
+        "deep plum",
+        "sunset orange",
+        "golden honey"
+      ],
+      "accent_colors": [
+        "buttercream",
+        "gold",
+        "soft lilac",
+        "peach"
+      ],
+      "talents": [
+        "sunbeam painting",
+        "flower tending",
+        "picnic planning",
+        "light catching",
+        "meadow guiding"
+      ],
+      "personalities": [
+        "cheerful",
+        "bright",
+        "helpful",
+        "brave"
+      ]
+    },
+    {
+      "id": "moon",
+      "terms": [
+        "Luna",
+        "Moonbeam",
+        "Starlight",
+        "Comet",
+        "Nova",
+        "Twilight",
+        "Eclipse",
+        "Nebula",
+        "Galaxy",
+        "Orbit",
+        "Cosmo",
+        "Drift",
+        "Nightfall",
+        "Stellar",
+        "Meteor",
+        "Starfall",
+        "Midnight",
+        "Silvershine",
+        "Celeste",
+        "Astral",
+        "Nightglow",
+        "Moondrop",
+        "Skylight",
+        "Vesper"
+      ],
+      "body_colors": [
+        "pale lilac",
+        "moonlight silver",
+        "soft lavender",
+        "twilight blue",
+        "misty violet"
+      ],
+      "mane_colors": [
+        "deep purple",
+        "silver",
+        "midnight plum",
+        "starry indigo",
+        "pale yellow"
+      ],
+      "accent_colors": [
+        "starlight",
+        "frost",
+        "glow white",
+        "soft gold"
+      ],
+      "talents": [
+        "star catching",
+        "dream weaving",
+        "night gliding",
+        "moonbeam tracing",
+        "constellation spotting"
+      ],
+      "personalities": [
+        "calm",
+        "dreamy",
+        "gentle",
+        "thoughtful"
+      ]
+    },
+    {
+      "id": "sky",
+      "terms": [
+        "Sky",
+        "Cloud",
+        "Breeze",
+        "Zephyr",
+        "Gust",
+        "Nimbus",
+        "Cirrus",
+        "Azure",
+        "Horizon",
+        "Rainbow",
+        "Prism",
+        "Fluff",
+        "Updraft",
+        "Feather",
+        "Glide",
+        "Soar",
+        "Wing",
+        "Kite",
+        "Swift",
+        "Lift",
+        "Aero",
+        "Airy",
+        "Skydance",
+        "Windy"
+      ],
+      "body_colors": [
+        "sky blue",
+        "cloud white",
+        "misty lavender",
+        "cool aqua",
+        "pale periwinkle"
+      ],
+      "mane_colors": [
+        "sunshine yellow",
+        "cotton candy pink",
+        "violet breeze",
+        "storm gray",
+        "soft gold"
+      ],
+      "accent_colors": [
+        "rainbow shimmer",
+        "sky mist",
+        "bright purple",
+        "cloud cream"
+      ],
+      "talents": [
+        "cloud sculpting",
+        "rainbow building",
+        "wind surfing",
+        "kite flying",
+        "storm watching"
+      ],
+      "personalities": [
+        "playful",
+        "adventurous",
+        "curious",
+        "bold"
+      ]
+    },
+    {
+      "id": "meadow",
+      "terms": [
+        "Willow",
+        "Fern",
+        "Moss",
+        "Clover",
+        "Meadow",
+        "Grove",
+        "Aspen",
+        "Birch",
+        "Maple",
+        "Oak",
+        "Pine",
+        "Spruce",
+        "Thicket",
+        "Bramble",
+        "Acorn",
+        "Leaf",
+        "Petal",
+        "Blossom",
+        "Bloom",
+        "Thyme",
+        "Sage",
+        "Briar",
+        "Vine",
+        "Flora"
+      ],
+      "body_colors": [
+        "mint green",
+        "sage green",
+        "soft moss",
+        "spring green",
+        "pale lime"
+      ],
+      "mane_colors": [
+        "sunflower yellow",
+        "lavender",
+        "berry purple",
+        "forest brown",
+        "golden wheat"
+      ],
+      "accent_colors": [
+        "leaf gold",
+        "cream",
+        "petal pink",
+        "dew drop"
+      ],
+      "talents": [
+        "garden growing",
+        "trail guiding",
+        "leaf painting",
+        "flower weaving",
+        "herb gathering"
+      ],
+      "personalities": [
+        "kind",
+        "curious",
+        "gentle",
+        "steady"
+      ]
+    },
+    {
+      "id": "sparkle",
+      "terms": [
+        "Sparkle",
+        "Glimmer",
+        "Shimmer",
+        "Twinkle",
+        "Glitter",
+        "Magic",
+        "Wink",
+        "Dazzle",
+        "Luster",
+        "Charm",
+        "Enchanted",
+        "Wish",
+        "Wisp",
+        "Starry",
+        "Flicker",
+        "Flash",
+        "Glowbug",
+        "Shine",
+        "Glint",
+        "Spell",
+        "Wonder",
+        "Pixie",
+        "Mystic",
+        "Stardust"
+      ],
+      "body_colors": [
+        "pastel pink",
+        "glitter gold",
+        "lavender blush",
+        "pearl white",
+        "soft violet"
+      ],
+      "mane_colors": [
+        "magenta",
+        "bright purple",
+        "sunset yellow",
+        "icy blue",
+        "sparkle silver"
+      ],
+      "accent_colors": [
+        "confetti gold",
+        "starlight",
+        "bubble pink",
+        "lemon glow"
+      ],
+      "talents": [
+        "ribbon dancing",
+        "sparkle sprinkling",
+        "confetti tossing",
+        "party planning",
+        "wish making"
+      ],
+      "personalities": [
+        "energetic",
+        "joyful",
+        "bold",
+        "playful"
+      ]
+    },
+    {
+      "id": "water",
+      "terms": [
+        "River",
+        "Stream",
+        "Brook",
+        "Ocean",
+        "Wave",
+        "Foam",
+        "Splash",
+        "Dew",
+        "Mist",
+        "Rain",
+        "Puddle",
+        "Lagoon",
+        "Coral",
+        "Pearl",
+        "Tide",
+        "Harbor",
+        "Bay",
+        "Marina",
+        "Gull",
+        "Current",
+        "Spray",
+        "Ripple",
+        "Seabreeze",
+        "Drizzle"
+      ],
+      "body_colors": [
+        "aqua",
+        "teal",
+        "seafoam",
+        "misty blue",
+        "ocean green"
+      ],
+      "mane_colors": [
+        "violet",
+        "coral",
+        "sunny yellow",
+        "deep blue",
+        "sea purple"
+      ],
+      "accent_colors": [
+        "pearl",
+        "shell pink",
+        "sea glass",
+        "gold"
+      ],
+      "talents": [
+        "wave riding",
+        "shell collecting",
+        "bubble blowing",
+        "splash painting",
+        "river racing"
+      ],
+      "personalities": [
+        "gentle",
+        "brave",
+        "free",
+        "friendly"
+      ]
+    },
+    {
+      "id": "sweet",
+      "terms": [
+        "Candy",
+        "Cocoa",
+        "Sugar",
+        "Sprinkle",
+        "Cookie",
+        "Cupcake",
+        "Toffee",
+        "Caramel",
+        "Marshmallow",
+        "Fudge",
+        "Lollipop",
+        "Bubblegum",
+        "Honeybun",
+        "Shortcake",
+        "Bonbon",
+        "Pudding",
+        "Muffin",
+        "Sorbet",
+        "Gelato",
+        "Peach",
+        "Berry",
+        "Cherry",
+        "Vanilla",
+        "Waffle"
+      ],
+      "body_colors": [
+        "buttercream",
+        "peach",
+        "vanilla",
+        "soft lemon",
+        "cotton pink"
+      ],
+      "mane_colors": [
+        "grape purple",
+        "berry",
+        "caramel gold",
+        "bubblegum pink",
+        "sunny yellow"
+      ],
+      "accent_colors": [
+        "sprinkle rainbow",
+        "sugar white",
+        "cherry red",
+        "gold"
+      ],
+      "talents": [
+        "cupcake decorating",
+        "candy crafting",
+        "frosting swirling",
+        "cookie sharing",
+        "treat baking"
+      ],
+      "personalities": [
+        "sweet",
+        "friendly",
+        "cheery",
+        "playful"
+      ]
+    },
+    {
+      "id": "adventure",
+      "terms": [
+        "Trail",
+        "Path",
+        "Quest",
+        "Journey",
+        "Rover",
+        "Scout",
+        "Explorer",
+        "Compass",
+        "Map",
+        "Treasure",
+        "Bridge",
+        "Camp",
+        "Summit",
+        "Canyon",
+        "Valley",
+        "Ridge",
+        "Crest",
+        "Beacon",
+        "Lantern",
+        "Wander",
+        "Hike",
+        "Roam",
+        "Trek",
+        "Trailblazer"
+      ],
+      "body_colors": [
+        "golden tan",
+        "warm brown",
+        "sunny yellow",
+        "dusty peach",
+        "trail beige"
+      ],
+      "mane_colors": [
+        "deep purple",
+        "indigo",
+        "chestnut",
+        "sunset orange",
+        "storm gray"
+      ],
+      "accent_colors": [
+        "campfire gold",
+        "map tan",
+        "river blue",
+        "bright purple"
+      ],
+      "talents": [
+        "map drawing",
+        "treasure spotting",
+        "bridge building",
+        "campfire storytelling",
+        "trail exploring"
+      ],
+      "personalities": [
+        "brave",
+        "curious",
+        "clever",
+        "loyal"
+      ]
+    },
+    {
+      "id": "art",
+      "terms": [
+        "Melody",
+        "Harmony",
+        "Rhythm",
+        "Cadence",
+        "Tempo",
+        "Lyric",
+        "Aria",
+        "Chorus",
+        "Mural",
+        "Canvas",
+        "Palette",
+        "Color",
+        "Brush",
+        "Sketch",
+        "Ink",
+        "Tune",
+        "Chime",
+        "Bell",
+        "Paint",
+        "Muse",
+        "Strum",
+        "Doodle",
+        "Verse",
+        "Glowpaint"
+      ],
+      "body_colors": [
+        "lavender",
+        "soft yellow",
+        "peach",
+        "creamy white",
+        "pale mint"
+      ],
+      "mane_colors": [
+        "plum",
+        "royal purple",
+        "sunset pink",
+        "golden yellow",
+        "ink blue"
+      ],
+      "accent_colors": [
+        "paint splash",
+        "gold",
+        "violet glow",
+        "soft teal"
+      ],
+      "talents": [
+        "melody making",
+        "color splashing",
+        "drum tapping",
+        "sketching stories",
+        "rhythm marching"
+      ],
+      "personalities": [
+        "creative",
+        "thoughtful",
+        "gentle",
+        "joyful"
+      ]
+    },
+    {
+      "id": "cozy",
+      "terms": [
+        "Cozy",
+        "Snuggle",
+        "Blanket",
+        "Candle",
+        "Hearth",
+        "Comfy",
+        "Cuddle",
+        "Pillow",
+        "Nest",
+        "Mittens",
+        "Sweater",
+        "Teacup",
+        "Kettle",
+        "Socks",
+        "Mug",
+        "Quilt",
+        "Warmstone",
+        "Nook",
+        "Patchwork",
+        "Hug",
+        "Homey",
+        "Firelight",
+        "Restful",
+        "Lullaby"
+      ],
+      "body_colors": [
+        "cream",
+        "caramel",
+        "soft beige",
+        "warm peach",
+        "butter yellow"
+      ],
+      "mane_colors": [
+        "cocoa brown",
+        "deep purple",
+        "honey gold",
+        "soft lavender",
+        "berry"
+      ],
+      "accent_colors": [
+        "candle gold",
+        "plum",
+        "warm cream",
+        "soft lilac"
+      ],
+      "talents": [
+        "storytelling",
+        "blanket weaving",
+        "cocoa brewing",
+        "campfire cuddling",
+        "pillow stacking"
+      ],
+      "personalities": [
+        "cozy",
+        "kind",
+        "patient",
+        "sweet"
+      ]
+    }
+  ]
+}

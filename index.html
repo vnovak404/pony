@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pony Parade</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="sky">
+      <div class="glow"></div>
+    </div>
+    <header class="hero">
+      <nav class="nav">
+        <div class="logo">Pony Parade</div>
+        <div class="nav-links">
+          <a href="#ponies">Meet the Ponies</a>
+          <a href="#adventures">Adventures</a>
+          <a href="#creators">Create</a>
+        </div>
+      </nav>
+      <div class="hero-content">
+        <div class="hero-text">
+          <p class="eyebrow">Sunshine yellow + royal purple</p>
+          <h1>Welcome to the Pony Parade Playground</h1>
+          <p class="lead">
+            A cozy corner of the web filled with galloping friends, bright
+            colors, and tiny adventures. Pick a pony, make a wish, and start
+            exploring.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#ponies">Meet the Herd</a>
+            <a class="btn ghost" href="#creators">Make Your Own</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-inner">
+            <p class="card-title">Today in Ponyland</p>
+            <p class="card-copy">
+              The meadow is sparkling, the clouds are cotton candy, and the
+              ponies are learning new dances.
+            </p>
+            <div class="cloud-badges">
+              <span>Cloud Hills</span>
+              <span>Rainbow Bridge</span>
+              <span>Glitter Grove</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="ponies" class="section">
+        <div class="section-title">
+          <h2>Meet the Ponies</h2>
+          <p>Each pony has a special talent and a favorite snack.</p>
+        </div>
+        <div class="pony-grid" id="pony-grid"></div>
+      </section>
+
+      <section id="adventures" class="section">
+        <div class="section-title">
+          <h2>Adventures to Try</h2>
+          <p>Pick a quest and let the ponies guide the way.</p>
+        </div>
+        <div class="adventure-grid">
+          <div class="adventure">
+            <h3>Meadow Maze</h3>
+            <p>Find the hidden fountain by following the glittery trail.</p>
+          </div>
+          <div class="adventure">
+            <h3>Rainbow Bridge</h3>
+            <p>Count the colors and discover the secret cloud door.</p>
+          </div>
+          <div class="adventure">
+            <h3>Nightlight Camp</h3>
+            <p>Build a cozy fort and listen for twinkling stars.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="creators" class="section create">
+        <div class="section-title">
+          <h2>Create Your Own Pony</h2>
+          <p>Mix colors, pick a talent, and name your new friend.</p>
+        </div>
+        <div class="create-card">
+          <div>
+            <h3>Starter Recipe</h3>
+            <p>
+              Choose a body color, add a bright mane, and finish with one special
+              talent word.
+            </p>
+            <ul>
+              <li>Color: mint, peach, or lavender</li>
+              <li>Mane: swirl, sparkle, or zigzag</li>
+              <li>Talent: cloud sculpting, star catching, or garden growing</li>
+            </ul>
+          </div>
+          <div class="create-callout">
+            <p class="callout-title">Name Builder</p>
+            <p>Try combining two words: Sunrise + Drift, Luna + Patch, Cocoa + Skip.</p>
+            <button class="btn secondary" type="button" id="pony-name-btn">
+              Add to the Parade
+            </button>
+          </div>
+        </div>
+        <p class="create-note">
+          Use the form below while running the local Pony Lab server to create
+          new ponies and generate matching images.
+        </p>
+        <form id="pony-form" class="pony-form">
+          <div class="field">
+            <label for="pony-name">Pony name</label>
+            <input id="pony-name" name="name" placeholder="Golden Violet" required />
+          </div>
+          <div class="field">
+            <label for="pony-species">Species</label>
+            <select id="pony-species" name="species">
+              <option value="pony">Pony</option>
+              <option value="unicorn">Unicorn</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pony-body">Body color</label>
+            <input id="pony-body" name="body_color" placeholder="sunny yellow" />
+          </div>
+          <div class="field">
+            <label for="pony-mane">Mane color</label>
+            <input id="pony-mane" name="mane_color" placeholder="royal purple" />
+          </div>
+          <div class="field">
+            <label for="pony-accent">Accent color</label>
+            <input id="pony-accent" name="accent_color" placeholder="buttercream" />
+          </div>
+          <div class="field">
+            <label for="pony-talent">Talent</label>
+            <input id="pony-talent" name="talent" placeholder="cloud sculpting" />
+            <small class="field-hint">Tip: -ing phrases work great (cloud sculpting).</small>
+          </div>
+          <div class="field">
+            <label for="pony-personality">Personality</label>
+            <input id="pony-personality" name="personality" placeholder="gentle and brave" />
+          </div>
+          <div class="form-actions">
+            <button class="btn primary" type="submit">Create Pony</button>
+            <p id="pony-result" class="pony-result" role="status"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Made with imagination and a sprinkle of pony magic.</p>
+    </footer>
+    <script>
+      const ponyForm = document.getElementById("pony-form");
+      const ponyResult = document.getElementById("pony-result");
+      const ponyGrid = document.getElementById("pony-grid");
+      const ponyNameButton = document.getElementById("pony-name-btn");
+      const ponyNameInput = document.getElementById("pony-name");
+      const ponyBodyInput = document.getElementById("pony-body");
+      const ponyManeInput = document.getElementById("pony-mane");
+      const ponyAccentInput = document.getElementById("pony-accent");
+      const ponyTalentInput = document.getElementById("pony-talent");
+      const ponyPersonalityInput = document.getElementById("pony-personality");
+
+      const fallbackVibe = {
+        body_colors: ["sunny yellow", "soft lavender", "buttercream"],
+        mane_colors: ["royal purple", "sunshine yellow", "violet"],
+        accent_colors: ["gold", "lavender mist", "cream"],
+        talents: [
+          "cloud sculpting",
+          "star catching",
+          "garden growing",
+          "rainbow building",
+          "sparkle sprinkling",
+        ],
+        personalities: [
+          "cheerful and gentle",
+          "curious and brave",
+          "kind and thoughtful",
+        ],
+      };
+
+      const vibeState = {
+        defaults: fallbackVibe,
+        groups: [],
+        termMap: new Map(),
+        allTerms: [],
+      };
+
+      const normalizeTerm = (term) => term.toLowerCase();
+
+      const setVibeData = (data) => {
+        const groups = Array.isArray(data.vibes) ? data.vibes : [];
+        const defaults = data.defaults || fallbackVibe;
+        const termMap = new Map();
+        const allTerms = [];
+
+        groups.forEach((group) => {
+          (group.terms || []).forEach((term) => {
+            const key = normalizeTerm(term);
+            if (!termMap.has(key)) {
+              termMap.set(key, group);
+            }
+            allTerms.push(term);
+          });
+        });
+
+        vibeState.defaults = defaults;
+        vibeState.groups = groups;
+        vibeState.termMap = termMap;
+        vibeState.allTerms = allTerms;
+      };
+
+      const loadVibes = async () => {
+        try {
+          const response = await fetch("/data/pony_vibes.json");
+          if (!response.ok) {
+            throw new Error("Unable to load vibe data.");
+          }
+          const data = await response.json();
+          setVibeData(data);
+        } catch (error) {
+          console.warn("Using fallback vibe data.", error);
+        }
+      };
+
+      const pick = (list) => list[Math.floor(Math.random() * list.length)];
+      const unique = (list) => Array.from(new Set(list));
+
+      const gatherOptions = (vibes, key) => {
+        const options = [];
+        vibes.forEach((vibe) => {
+          (vibe[key] || []).forEach((item) => options.push(item));
+        });
+        return unique(options);
+      };
+
+      const pickFrom = (vibes, key, fallback) => {
+        const options = gatherOptions(vibes, key);
+        if (!options.length) return fallback;
+        return pick(options);
+      };
+
+      const getVibesForName = (name) => {
+        const tokens = name
+          .split(/[^a-zA-Z]+/)
+          .filter(Boolean)
+          .map((token) => normalizeTerm(token));
+        const vibes = tokens
+          .map((token) => vibeState.termMap.get(token))
+          .filter(Boolean);
+        return vibes.length ? vibes : [vibeState.defaults];
+      };
+
+      const buildSuggestions = (name) => {
+        const vibes = getVibesForName(name);
+        const defaults = vibeState.defaults;
+        return {
+          body_color: pickFrom(
+            vibes,
+            "body_colors",
+            pickFrom([defaults], "body_colors", "sunny yellow")
+          ),
+          mane_color: pickFrom(
+            vibes,
+            "mane_colors",
+            pickFrom([defaults], "mane_colors", "royal purple")
+          ),
+          accent_color: pickFrom(
+            vibes,
+            "accent_colors",
+            pickFrom([defaults], "accent_colors", "buttercream")
+          ),
+          talent: pickFrom(
+            vibes,
+            "talents",
+            pickFrom([defaults], "talents", "making friends")
+          ),
+          personality: pickFrom(
+            vibes,
+            "personalities",
+            pickFrom([defaults], "personalities", "kind and curious")
+          ),
+        };
+      };
+
+      const applySuggestions = (name, fillEmptyOnly = true) => {
+        if (!name) return;
+        const suggestions = buildSuggestions(name);
+        const fields = {
+          body_color: ponyBodyInput,
+          mane_color: ponyManeInput,
+          accent_color: ponyAccentInput,
+          talent: ponyTalentInput,
+          personality: ponyPersonalityInput,
+        };
+
+        Object.entries(fields).forEach(([key, input]) => {
+          if (!input) return;
+          if (fillEmptyOnly && input.value.trim()) return;
+          input.value = suggestions[key];
+        });
+      };
+
+      const formatTalent = (talent) => {
+        const clean = (talent || "").trim();
+        if (!clean) return "making friends";
+        const hasIng = /\\b\\w+ing\\b/i.test(clean);
+        return hasIng ? clean : `doing ${clean}`;
+      };
+
+      const formatPersonality = (personality) => {
+        return (personality || "").trim() || "kind and curious";
+      };
+
+      const renderPonyCard = (pony, imagePath, addToTop = false) => {
+        if (!ponyGrid) return;
+        const ponyId = pony.slug || "";
+        const card = document.createElement("article");
+        card.className = "pony-card pony-photo";
+        card.innerHTML = `
+          <div class="pony-art">
+            <img src="${imagePath}" alt="${pony.name} the ${pony.species}" loading="lazy" />
+          </div>
+          <div class="pony-info">
+            <h3>${pony.name}</h3>
+            <p>${formatPersonality(pony.personality)} ${pony.species} who loves ${formatTalent(pony.talent)}.</p>
+            <p class="pony-skill">Colors: ${pony.body_color} + ${pony.mane_color}</p>
+          </div>
+          ${
+            ponyId
+              ? `<div class="pony-actions">
+            <button class="btn ghost small" type="button" data-pony-action="sprites" data-pony-id="${ponyId}">
+              Generate Sprites
+            </button>
+            <button class="btn ghost small" type="button" data-pony-action="spritesheet" data-pony-id="${ponyId}">
+              Pack Sheet
+            </button>
+          </div>
+          <p class="pony-status" data-pony-status></p>`
+              : ""
+          }
+        `;
+        if (addToTop) {
+          ponyGrid.prepend(card);
+        } else {
+          ponyGrid.append(card);
+        }
+      };
+
+      const loadPonies = async () => {
+        if (!ponyGrid) return;
+        try {
+          const response = await fetch("/data/ponies.json");
+          if (!response.ok) {
+            throw new Error("Unable to load pony data.");
+          }
+          const data = await response.json();
+          ponyGrid.innerHTML = "";
+          (data.ponies || []).forEach((pony) => {
+            const imagePath = `assets/ponies/${pony.slug}.png`;
+            renderPonyCard(pony, imagePath);
+          });
+        } catch (error) {
+          ponyGrid.innerHTML = `<p class="pony-grid-note">${error.message} Run the local server to see generated images.</p>`;
+        }
+      };
+
+      const vibeReady = loadVibes();
+      loadPonies();
+
+      const buildRandomName = () => {
+        const terms = vibeState.allTerms.length
+          ? vibeState.allTerms
+          : [
+              "Sunrise",
+              "Luna",
+              "Cocoa",
+              "Golden",
+              "Sparkle",
+              "Velvet",
+              "Honey",
+              "Nova",
+              "Willow",
+              "Pepper",
+            ];
+        let first = pick(terms);
+        let second = pick(terms);
+        let guard = 0;
+        while (second === first && guard < 5) {
+          second = pick(terms);
+          guard += 1;
+        }
+        return `${first} ${second}`;
+      };
+
+      if (ponyNameButton && ponyNameInput) {
+        ponyNameButton.addEventListener("click", async () => {
+          await vibeReady;
+          const name = buildRandomName();
+          ponyNameInput.value = name;
+          applySuggestions(name, false);
+          ponyNameInput.focus();
+        });
+      }
+
+      if (ponyNameInput) {
+        ponyNameInput.addEventListener("blur", async () => {
+          await vibeReady;
+          applySuggestions(ponyNameInput.value.trim(), true);
+        });
+      }
+
+      if (ponyForm) {
+        ponyForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          ponyResult.textContent = "Creating your pony...";
+          const formData = new FormData(ponyForm);
+          const payload = Object.fromEntries(formData.entries());
+          if (!payload.name || !payload.name.trim()) {
+            ponyResult.textContent = "Please give your pony a name.";
+            return;
+          }
+
+          const submitButton = ponyForm.querySelector("button[type='submit']");
+          submitButton.disabled = true;
+
+          try {
+            const response = await fetch("/api/ponies", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.error || "Something went wrong.");
+            }
+
+            renderPonyCard(
+              data.pony,
+              `${data.image_path}?t=${Date.now()}`,
+              true
+            );
+            ponyResult.textContent = `${data.pony.name} joined the parade!`;
+            ponyForm.reset();
+          } catch (error) {
+            ponyResult.textContent = error.message;
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+      }
+
+      const updateCardStatus = (card, message) => {
+        if (!card) return;
+        const status = card.querySelector("[data-pony-status]");
+        if (status) {
+          status.textContent = message;
+        }
+      };
+
+      const toggleCardButtons = (card, disabled) => {
+        if (!card) return;
+        const buttons = card.querySelectorAll("[data-pony-action]");
+        buttons.forEach((button) => {
+          button.disabled = disabled;
+        });
+      };
+
+      if (ponyGrid) {
+        ponyGrid.addEventListener("click", async (event) => {
+          const button = event.target.closest("[data-pony-action]");
+          if (!button) return;
+          const ponyId = button.dataset.ponyId;
+          const action = button.dataset.ponyAction;
+          const card = button.closest(".pony-card");
+          if (!ponyId || !action) return;
+
+          updateCardStatus(card, "Working on sprites...");
+          toggleCardButtons(card, true);
+
+          try {
+            const body = action === "sprites" ? { use_portrait: true } : {};
+            const response = await fetch(`/api/ponies/${ponyId}/${action}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.error || "Sprite task failed.");
+            }
+            updateCardStatus(card, data.message || "Done.");
+          } catch (error) {
+            updateCardStatus(card, error.message);
+          } finally {
+            toggleCardButtons(card, false);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

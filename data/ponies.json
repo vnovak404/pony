@@ -1,0 +1,59 @@
+{
+  "style": {
+    "prompt": "Cheerful children's book illustration, bright and friendly, clean outlines, soft shading.",
+    "background": "Soft pastel meadow with a few sparkles and simple clouds.",
+    "palette": "yellow and purple"
+  },
+  "ponies": [
+    {
+      "name": "Golden Violet",
+      "slug": "golden-violet",
+      "species": "unicorn",
+      "body_color": "golden yellow",
+      "mane_color": "violet purple",
+      "accent_color": "buttercream",
+      "talent": "firefly guiding",
+      "personality": "curious and gentle"
+    },
+    {
+      "name": "Sky Sprinter",
+      "slug": "sky-sprinter",
+      "species": "pony",
+      "body_color": "soft lavender",
+      "mane_color": "sunshine yellow",
+      "accent_color": "bright purple",
+      "talent": "cloud sculpting",
+      "personality": "playful and brave"
+    },
+    {
+      "name": "Sunny Pippin",
+      "slug": "sunny-pippin",
+      "species": "pony",
+      "body_color": "butter yellow",
+      "mane_color": "deep royal purple",
+      "accent_color": "warm gold",
+      "talent": "treasure spotting",
+      "personality": "cheerful and helpful"
+    },
+    {
+      "name": "Moonbeam",
+      "slug": "moonbeam",
+      "species": "unicorn",
+      "body_color": "light lilac",
+      "mane_color": "pale yellow",
+      "accent_color": "twilight purple",
+      "talent": "star catching",
+      "personality": "calm and dreamy"
+    },
+    {
+      "name": "Raging Torrent",
+      "slug": "raging-torrent",
+      "species": "unicorn",
+      "body_color": "midnight green",
+      "mane_color": "envy green",
+      "accent_color": "emerald",
+      "talent": "tantrum master",
+      "personality": "stubborn and quarrelsome"
+    }
+  ]
+}
