@@ -46,9 +46,24 @@
       "tags": ["care", "town", "helpful"]
     },
     {
+      "id": "lemonade-bar",
+      "name": "Lemonade Bar",
+      "tags": ["snacks", "town", "cheerful"]
+    },
+    {
       "id": "moonlit-inn",
       "name": "Moonlit Inn",
       "tags": ["rest", "town", "cozy"]
+    },
+    {
+      "id": "whispering-forest",
+      "name": "Whispering Forest",
+      "tags": ["nature", "shade", "outskirts"]
+    },
+    {
+      "id": "silver-lake",
+      "name": "Silver Lake",
+      "tags": ["water", "calm", "outskirts"]
     },
     {
       "id": "songbird-pavilion",

@@ -1,27 +1,643 @@
 {
-  "meta": { "tileSize": 128, "width": 40, "height": 24 },
+  "meta": {
+    "tileSize": 128,
+    "width": 40,
+    "height": 24
+  },
   "layers": {
-    "ground": { "type": "fill", "tile": "grass" },
+    "ground": {
+      "type": "fill",
+      "tile": "grass"
+    },
     "roads": {
       "type": "segments",
       "segments": [
-        { "id": "main-road", "from": { "x": 3, "y": 12 }, "to": { "x": 36, "y": 12 } },
-        { "id": "market-road", "from": { "x": 12, "y": 6 }, "to": { "x": 12, "y": 18 } },
-        { "id": "bridge-road", "from": { "x": 26, "y": 10 }, "to": { "x": 34, "y": 6 } }
+        {
+          "id": "loop-north-a",
+          "from": {
+            "x": 6,
+            "y": 8
+          },
+          "to": {
+            "x": 10,
+            "y": 8
+          }
+        },
+        {
+          "id": "loop-north-b",
+          "from": {
+            "x": 10,
+            "y": 8
+          },
+          "to": {
+            "x": 12,
+            "y": 8
+          }
+        },
+        {
+          "id": "loop-north-c",
+          "from": {
+            "x": 12,
+            "y": 8
+          },
+          "to": {
+            "x": 15,
+            "y": 8
+          }
+        },
+        {
+          "id": "loop-north-d",
+          "from": {
+            "x": 15,
+            "y": 8
+          },
+          "to": {
+            "x": 28,
+            "y": 8
+          }
+        },
+        {
+          "id": "loop-north-e",
+          "from": {
+            "x": 28,
+            "y": 8
+          },
+          "to": {
+            "x": 34,
+            "y": 8
+          }
+        },
+        {
+          "id": "loop-east",
+          "from": {
+            "x": 34,
+            "y": 8
+          },
+          "to": {
+            "x": 34,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-south-a",
+          "from": {
+            "x": 34,
+            "y": 16
+          },
+          "to": {
+            "x": 30,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-south-b",
+          "from": {
+            "x": 30,
+            "y": 16
+          },
+          "to": {
+            "x": 26,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-south-c",
+          "from": {
+            "x": 26,
+            "y": 16
+          },
+          "to": {
+            "x": 22,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-south-d",
+          "from": {
+            "x": 22,
+            "y": 16
+          },
+          "to": {
+            "x": 15,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-south-e",
+          "from": {
+            "x": 15,
+            "y": 16
+          },
+          "to": {
+            "x": 12,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-south-f",
+          "from": {
+            "x": 12,
+            "y": 16
+          },
+          "to": {
+            "x": 6,
+            "y": 16
+          }
+        },
+        {
+          "id": "loop-west",
+          "from": {
+            "x": 6,
+            "y": 16
+          },
+          "to": {
+            "x": 6,
+            "y": 8
+          }
+        },
+        {
+          "id": "market-spine",
+          "from": {
+            "x": 12,
+            "y": 8
+          },
+          "to": {
+            "x": 12,
+            "y": 16
+          }
+        },
+        {
+          "id": "inn-spine",
+          "from": {
+            "x": 15,
+            "y": 8
+          },
+          "to": {
+            "x": 15,
+            "y": 16
+          }
+        },
+        {
+          "id": "farm-road",
+          "from": {
+            "x": 6,
+            "y": 8
+          },
+          "to": {
+            "x": 6,
+            "y": 6
+          }
+        },
+        {
+          "id": "farm-exit",
+          "from": {
+            "x": 6,
+            "y": 6
+          },
+          "to": {
+            "x": 6,
+            "y": -2
+          }
+        },
+        {
+          "id": "observatory-lane",
+          "from": {
+            "x": 28,
+            "y": 8
+          },
+          "to": {
+            "x": 28,
+            "y": 5
+          }
+        },
+        {
+          "id": "north-exit",
+          "from": {
+            "x": 28,
+            "y": 5
+          },
+          "to": {
+            "x": 28,
+            "y": -2
+          }
+        },
+        {
+          "id": "bridge-path",
+          "from": {
+            "x": 34,
+            "y": 8
+          },
+          "to": {
+            "x": 33,
+            "y": 7
+          }
+        },
+        {
+          "id": "bridge-exit",
+          "from": {
+            "x": 33,
+            "y": 7
+          },
+          "to": {
+            "x": 42,
+            "y": 2
+          }
+        },
+        {
+          "id": "forest-road",
+          "from": {
+            "x": 6,
+            "y": 16
+          },
+          "to": {
+            "x": 6,
+            "y": 20
+          }
+        },
+        {
+          "id": "forest-exit",
+          "from": {
+            "x": 6,
+            "y": 20
+          },
+          "to": {
+            "x": 6,
+            "y": 26
+          }
+        },
+        {
+          "id": "lake-road",
+          "from": {
+            "x": 26,
+            "y": 16
+          },
+          "to": {
+            "x": 26,
+            "y": 20
+          }
+        },
+        {
+          "id": "lake-exit",
+          "from": {
+            "x": 26,
+            "y": 20
+          },
+          "to": {
+            "x": 26,
+            "y": 26
+          }
+        },
+        {
+          "id": "creek-road",
+          "from": {
+            "x": 22,
+            "y": 16
+          },
+          "to": {
+            "x": 22,
+            "y": 20
+          }
+        },
+        {
+          "id": "creek-exit",
+          "from": {
+            "x": 22,
+            "y": 20
+          },
+          "to": {
+            "x": 22,
+            "y": 26
+          }
+        },
+        {
+          "id": "meadow-road",
+          "from": {
+            "x": 30,
+            "y": 16
+          },
+          "to": {
+            "x": 30,
+            "y": 19
+          }
+        },
+        {
+          "id": "meadow-exit",
+          "from": {
+            "x": 30,
+            "y": 19
+          },
+          "to": {
+            "x": 42,
+            "y": 19
+          }
+        }
       ]
     },
-      "objects": [
-        { "id": "bakery", "kind": "building", "at": { "x": 9, "y": 11 }, "sprite": "bakery_01", "locationId": "sunrise-bakery" },
-        { "id": "library", "kind": "building", "at": { "x": 14, "y": 9 }, "sprite": "library_01", "locationId": "sparkle-library" },
-        { "id": "market", "kind": "building", "at": { "x": 12, "y": 14 }, "sprite": "market_01", "locationId": "market-square" },
-        { "id": "clinic", "kind": "building", "at": { "x": 17, "y": 13 }, "sprite": "clinic_01", "locationId": "pony-clinic" },
-      { "id": "inn", "kind": "building", "at": { "x": 15, "y": 12 }, "sprite": "inn_01", "locationId": "moonlit-inn" },
-        { "id": "pavilion", "kind": "landmark", "at": { "x": 20, "y": 15 }, "sprite": "pavilion_01", "locationId": "songbird-pavilion" },
-        { "id": "farm", "kind": "location", "at": { "x": 6, "y": 6 }, "locationId": "windmill-farm" },
-        { "id": "rainbow-bridge", "kind": "landmark", "at": { "x": 33, "y": 7 }, "locationId": "rainbow-bridge" },
-      { "id": "firefly-meadow", "kind": "location", "at": { "x": 30, "y": 19 }, "locationId": "firefly-meadow" },
-      { "id": "crystal-creek", "kind": "location", "at": { "x": 22, "y": 20 }, "locationId": "crystal-creek" },
-      { "id": "observatory", "kind": "building", "at": { "x": 28, "y": 5 }, "sprite": "observatory_01", "locationId": "starlight-observatory" }
+    "decor": {
+      "items": [
+        {
+          "id": "tree-1",
+          "kind": "tree",
+          "at": {
+            "x": 3,
+            "y": 4
+          },
+          "sprite": "tree_01",
+          "scale": 0.9
+        },
+        {
+          "id": "tree-2",
+          "kind": "tree",
+          "at": {
+            "x": 4.8,
+            "y": 5.2
+          },
+          "sprite": "tree_02",
+          "scale": 0.8
+        },
+        {
+          "id": "tree-3",
+          "kind": "tree",
+          "at": {
+            "x": 5.6,
+            "y": 3.3
+          },
+          "sprite": "tree_03",
+          "scale": 0.75
+        },
+        {
+          "id": "tree-4",
+          "kind": "tree",
+          "at": {
+            "x": 36.2,
+            "y": 4.6
+          },
+          "sprite": "tree_04",
+          "scale": 0.9
+        },
+        {
+          "id": "tree-5",
+          "kind": "tree",
+          "at": {
+            "x": 34.6,
+            "y": 6.4
+          },
+          "sprite": "tree_01",
+          "scale": 0.8
+        },
+        {
+          "id": "hill-1",
+          "kind": "hill",
+          "at": {
+            "x": 4.2,
+            "y": 19.2
+          },
+          "sprite": "hill_01",
+          "scale": 1.4
+        },
+        {
+          "id": "hill-2",
+          "kind": "hill",
+          "at": {
+            "x": 34.8,
+            "y": 19.3
+          },
+          "sprite": "hill_02",
+          "scale": 1.5
+        },
+        {
+          "id": "patch-1",
+          "kind": "patch",
+          "at": {
+            "x": 18,
+            "y": 4.2
+          },
+          "sprite": "patch_01",
+          "scale": 1.2
+        },
+        {
+          "id": "patch-2",
+          "kind": "patch",
+          "at": {
+            "x": 23.5,
+            "y": 3.5
+          },
+          "sprite": "patch_02",
+          "scale": 1.1
+        },
+        {
+          "id": "patch-3",
+          "kind": "patch",
+          "at": {
+            "x": 31.5,
+            "y": 4.2
+          },
+          "sprite": "patch_03",
+          "scale": 1.2
+        },
+        {
+          "id": "patch-4",
+          "kind": "patch",
+          "at": {
+            "x": 12.2,
+            "y": 20.4
+          },
+          "sprite": "patch_04",
+          "scale": 1.1
+        },
+        {
+          "id": "patch-5",
+          "kind": "patch",
+          "at": {
+            "x": 20.4,
+            "y": 21
+          },
+          "sprite": "patch_02",
+          "scale": 1.0
+        },
+        {
+          "id": "marker-1",
+          "kind": "marker",
+          "at": {
+            "x": 8.4,
+            "y": 7.3
+          },
+          "sprite": "marker_01",
+          "scale": 0.6
+        },
+        {
+          "id": "marker-2",
+          "kind": "marker",
+          "at": {
+            "x": 20.6,
+            "y": 7.3
+          },
+          "sprite": "marker_02",
+          "scale": 0.6
+        },
+        {
+          "id": "marker-3",
+          "kind": "marker",
+          "at": {
+            "x": 18.4,
+            "y": 17.4
+          },
+          "sprite": "marker_03",
+          "scale": 0.6
+        },
+        {
+          "id": "marker-4",
+          "kind": "marker",
+          "at": {
+            "x": 25.2,
+            "y": 17.5
+          },
+          "sprite": "marker_01",
+          "scale": 0.6
+        }
+      ]
+    },
+    "objects": [
+      {
+        "id": "bakery",
+        "kind": "building",
+        "at": {
+          "x": 17.47,
+          "y": 7.97
+        },
+        "sprite": "bakery_01",
+        "locationId": "sunrise-bakery"
+      },
+      {
+        "id": "lemonade-bar",
+        "kind": "building",
+        "at": {
+          "x": 13.44,
+          "y": 7.85
+        },
+        "sprite": "lemonade_bar_01",
+        "locationId": "lemonade-bar",
+        "scale": 1.4
+      },
+      {
+        "id": "library",
+        "kind": "building",
+        "at": {
+          "x": 23.4,
+          "y": 15.74
+        },
+        "sprite": "library_01",
+        "locationId": "sparkle-library"
+      },
+      {
+        "id": "market",
+        "kind": "building",
+        "at": {
+          "x": 9.98,
+          "y": 15.87
+        },
+        "sprite": "market_01",
+        "locationId": "market-square"
+      },
+      {
+        "id": "clinic",
+        "kind": "building",
+        "at": {
+          "x": 24.07,
+          "y": 20.58
+        },
+        "sprite": "clinic_01",
+        "locationId": "pony-clinic"
+      },
+      {
+        "id": "inn",
+        "kind": "building",
+        "at": {
+          "x": 17.14,
+          "y": 15.84
+        },
+        "sprite": "inn_01",
+        "locationId": "moonlit-inn",
+        "sleepRadius": 1.1
+      },
+      {
+        "id": "pavilion",
+        "kind": "landmark",
+        "at": {
+          "x": 32.26,
+          "y": 15.83
+        },
+        "sprite": "pavilion_01",
+        "locationId": "songbird-pavilion"
+      },
+      {
+        "id": "observatory",
+        "kind": "building",
+        "at": {
+          "x": 29.83,
+          "y": 7.67
+        },
+        "sprite": "observatory_01",
+        "locationId": "starlight-observatory"
+      },
+      {
+        "id": "farm",
+        "kind": "location",
+        "at": {
+          "x": 6,
+          "y": 6
+        },
+        "locationId": "windmill-farm"
+      },
+      {
+        "id": "rainbow-bridge",
+        "kind": "landmark",
+        "at": {
+          "x": 33,
+          "y": 7
+        },
+        "locationId": "rainbow-bridge"
+      },
+      {
+        "id": "firefly-meadow",
+        "kind": "location",
+        "at": {
+          "x": 30,
+          "y": 19
+        },
+        "locationId": "firefly-meadow"
+      },
+      {
+        "id": "crystal-creek",
+        "kind": "location",
+        "at": {
+          "x": 22,
+          "y": 20
+        },
+        "locationId": "crystal-creek"
+      },
+      {
+        "id": "whispering-forest",
+        "kind": "nature",
+        "at": {
+          "x": 3.01,
+          "y": 10.59
+        },
+        "sprite": "forest_01",
+        "locationId": "whispering-forest",
+        "scale": 3.0
+      },
+      {
+        "id": "silver-lake",
+        "kind": "nature",
+        "at": {
+          "x": 29.54,
+          "y": 24.0
+        },
+        "sprite": "lake_01",
+        "locationId": "silver-lake",
+        "scale": 3.2
+      }
     ]
   }
 }
