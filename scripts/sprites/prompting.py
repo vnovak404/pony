@@ -2,7 +2,7 @@ STYLE_BIBLE = (
     "Sprite frame for a 2D game. "
     "Transparent background (alpha). "
     "PNG with alpha channel. "
-    "Side view pony facing right. "
+    "Side view pony facing right, nose pointing to the right. "
     "Full body visible, no cropping, extra padding around edges. "
     "Leave a clear transparent margin around the pony. "
     "Clean silhouette, simple storybook shading. "

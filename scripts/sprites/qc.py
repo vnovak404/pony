@@ -55,7 +55,52 @@ def try_fix_transparency(path, tolerance=12):
             return False
 
         image.save(image_path)
-        return True
+    return True
+
+
+def needs_horizontal_flip(path, threshold=0.02):
+    image_path = Path(path)
+    try:
+        image = _load_image(image_path)
+    except RuntimeError:
+        return False
+
+    with image:
+        if image.mode != "RGBA":
+            image = image.convert("RGBA")
+        width, height = image.size
+        alpha = image.getchannel("A")
+        data = alpha.getdata()
+        total = 0
+        sum_x = 0
+        for idx, value in enumerate(data):
+            if value == 0:
+                continue
+            x = idx % width
+            total += value
+            sum_x += value * x
+
+        if total == 0:
+            return False
+
+        center_x = sum_x / total
+        margin = width * threshold
+        return center_x < (width * 0.5 - margin)
+
+
+def enforce_facing_right(path):
+    try:
+        from PIL import Image
+    except ImportError as exc:
+        raise RuntimeError("Pillow is required. Install with: pip install pillow") from exc
+
+    image_path = Path(path)
+    if not needs_horizontal_flip(image_path):
+        return False
+    with Image.open(image_path) as image:
+        image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        image.save(image_path)
+    return True
 
 
 def qc_image(path):

@@ -153,6 +153,13 @@ def generate_frame(task):
                         temp_path.replace(out_path)
                         return "generated"
             if ok:
+                flipped = False
+                try:
+                    flipped = qc.enforce_facing_right(temp_path)
+                except RuntimeError as exc:
+                    log(prefix, f"Facing check skipped: {exc}")
+                if flipped:
+                    log(prefix, "Auto-flipped to face right.")
                 log(prefix, "QC ok.")
                 temp_path.replace(out_path)
                 return "generated"
