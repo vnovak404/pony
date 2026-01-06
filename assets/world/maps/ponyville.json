@@ -1,0 +1,27 @@
+{
+  "meta": { "tileSize": 128, "width": 40, "height": 24 },
+  "layers": {
+    "ground": { "type": "fill", "tile": "grass" },
+    "roads": {
+      "type": "segments",
+      "segments": [
+        { "id": "main-road", "from": { "x": 3, "y": 12 }, "to": { "x": 36, "y": 12 } },
+        { "id": "market-road", "from": { "x": 12, "y": 6 }, "to": { "x": 12, "y": 18 } },
+        { "id": "bridge-road", "from": { "x": 26, "y": 10 }, "to": { "x": 34, "y": 6 } }
+      ]
+    },
+      "objects": [
+        { "id": "bakery", "kind": "building", "at": { "x": 9, "y": 11 }, "sprite": "bakery_01", "locationId": "sunrise-bakery" },
+        { "id": "library", "kind": "building", "at": { "x": 14, "y": 9 }, "sprite": "library_01", "locationId": "sparkle-library" },
+        { "id": "market", "kind": "building", "at": { "x": 12, "y": 14 }, "sprite": "market_01", "locationId": "market-square" },
+        { "id": "clinic", "kind": "building", "at": { "x": 17, "y": 13 }, "sprite": "clinic_01", "locationId": "pony-clinic" },
+      { "id": "inn", "kind": "building", "at": { "x": 15, "y": 12 }, "sprite": "inn_01", "locationId": "moonlit-inn" },
+        { "id": "pavilion", "kind": "landmark", "at": { "x": 20, "y": 15 }, "sprite": "pavilion_01", "locationId": "songbird-pavilion" },
+        { "id": "farm", "kind": "location", "at": { "x": 6, "y": 6 }, "locationId": "windmill-farm" },
+        { "id": "rainbow-bridge", "kind": "landmark", "at": { "x": 33, "y": 7 }, "locationId": "rainbow-bridge" },
+      { "id": "firefly-meadow", "kind": "location", "at": { "x": 30, "y": 19 }, "locationId": "firefly-meadow" },
+      { "id": "crystal-creek", "kind": "location", "at": { "x": 22, "y": 20 }, "locationId": "crystal-creek" },
+      { "id": "observatory", "kind": "building", "at": { "x": 28, "y": 5 }, "sprite": "observatory_01", "locationId": "starlight-observatory" }
+    ]
+  }
+}

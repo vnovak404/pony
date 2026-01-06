@@ -13,7 +13,11 @@
       "mane_color": "violet purple",
       "accent_color": "buttercream",
       "talent": "firefly guiding",
-      "personality": "curious and gentle"
+      "personality": "curious and gentle",
+      "sprites": {
+        "sheet": "assets/ponies/golden-violet/sheets/spritesheet.png",
+        "meta": "assets/ponies/golden-violet/sheets/spritesheet.json"
+      }
     },
     {
       "name": "Sky Sprinter",
@@ -23,7 +27,11 @@
       "mane_color": "sunshine yellow",
       "accent_color": "bright purple",
       "talent": "cloud sculpting",
-      "personality": "playful and brave"
+      "personality": "playful and brave",
+      "sprites": {
+        "sheet": "assets/ponies/sky-sprinter/sheets/spritesheet.png",
+        "meta": "assets/ponies/sky-sprinter/sheets/spritesheet.json"
+      }
     },
     {
       "name": "Sunny Pippin",
@@ -33,7 +41,11 @@
       "mane_color": "deep royal purple",
       "accent_color": "warm gold",
       "talent": "treasure spotting",
-      "personality": "cheerful and helpful"
+      "personality": "cheerful and helpful",
+      "sprites": {
+        "sheet": "assets/ponies/sunny-pippin/sheets/spritesheet.png",
+        "meta": "assets/ponies/sunny-pippin/sheets/spritesheet.json"
+      }
     },
     {
       "name": "Moonbeam",
@@ -43,7 +55,11 @@
       "mane_color": "pale yellow",
       "accent_color": "twilight purple",
       "talent": "star catching",
-      "personality": "calm and dreamy"
+      "personality": "calm and dreamy",
+      "sprites": {
+        "sheet": "assets/ponies/moonbeam/sheets/spritesheet.png",
+        "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
+      }
     },
     {
       "name": "Raging Torrent",
@@ -53,7 +69,54 @@
       "mane_color": "envy green",
       "accent_color": "emerald",
       "talent": "tantrum master",
-      "personality": "stubborn and quarrelsome"
+      "personality": "stubborn and quarrelsome",
+      "sprites": {
+        "sheet": "assets/ponies/raging-torrent/sheets/spritesheet.png",
+        "meta": "assets/ponies/raging-torrent/sheets/spritesheet.json"
+      }
+    },
+    {
+      "name": "Blue Wonder",
+      "slug": "blue-wonder",
+      "species": "unicorn",
+      "body_color": "ocean blue",
+      "mane_color": "reddish blue",
+      "accent_color": "lapislazuli",
+      "talent": "casting magic",
+      "personality": "mysterious",
+      "sprites": {
+        "sheet": "assets/ponies/blue-wonder/sheets/spritesheet.png",
+        "meta": "assets/ponies/blue-wonder/sheets/spritesheet.json"
+      }
+    },
+    {
+      "name": "Stellacorn",
+      "slug": "stellacorn",
+      "species": "unicorn",
+      "body_color": "Golden Yellow",
+      "mane_color": "Strawberry Blonde",
+      "accent_color": "Orange",
+      "talent": "animal rescuing",
+      "personality": "kind and gentle",
+      "sprites": {
+        "sheet": "assets/ponies/stellacorn/sheets/spritesheet.png",
+        "meta": "assets/ponies/stellacorn/sheets/spritesheet.json"
+      }
+    },
+    {
+      "name": "Gleam Treasure",
+      "slug": "gleam-treasure",
+      "species": "pony",
+      "body_color": "sunny yellow",
+      "mane_color": "sunset orange",
+      "accent_color": "gold",
+      "talent": "racing",
+      "personality": "brave",
+      "sprites": {
+        "sheet": "assets/ponies/gleam-treasure/sheets/spritesheet.png",
+        "meta": "assets/ponies/gleam-treasure/sheets/spritesheet.json"
+      },
+      "sprite_flip": true
     }
   ]
 }

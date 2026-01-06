@@ -42,21 +42,30 @@ def sanitize_value(value, fallback="", max_len=120):
     return value[:max_len]
 
 
+def normalize_name(name):
+    return " ".join(name.strip().lower().split())
+
+
 def build_pony(payload):
     name = sanitize_value(payload.get("name"), "New Pony")
     species = sanitize_value(payload.get("species"), "pony").lower()
     if species not in {"pony", "unicorn"}:
         species = "pony"
 
+    slug = slugify(name)
     pony = {
         "name": name,
-        "slug": slugify(name),
+        "slug": slug,
         "species": species,
         "body_color": sanitize_value(payload.get("body_color"), "sunny yellow"),
         "mane_color": sanitize_value(payload.get("mane_color"), "royal purple"),
         "accent_color": sanitize_value(payload.get("accent_color"), "buttercream"),
         "talent": sanitize_value(payload.get("talent"), "making friends"),
         "personality": sanitize_value(payload.get("personality"), "kind and curious"),
+        "sprites": {
+            "sheet": f"assets/ponies/{slug}/sheets/spritesheet.png",
+            "meta": f"assets/ponies/{slug}/sheets/spritesheet.json",
+        },
     }
     return pony
 
@@ -189,6 +198,12 @@ def ensure_output_dir(path):
     full_path.mkdir(parents=True, exist_ok=True)
 
 
+def ensure_pony_asset_dirs(slug):
+    base = ROOT / DEFAULT_OUTPUT_DIR / slug
+    (base / "frames").mkdir(parents=True, exist_ok=True)
+    (base / "sheets").mkdir(parents=True, exist_ok=True)
+
+
 def load_json_body(handler):
     length = int(handler.headers.get("Content-Length", "0"))
     if length <= 0:
@@ -297,6 +312,14 @@ class PonyHandler(SimpleHTTPRequestHandler):
             )
             return
 
+        normalized_name = normalize_name(pony["name"])
+        if any(normalize_name(existing.get("name", "")) == normalized_name for existing in ponies):
+            self.send_json(
+                HTTPStatus.CONFLICT,
+                {"error": "A pony with that name already exists."},
+            )
+            return
+
         if any(existing.get("slug") == pony["slug"] for existing in ponies):
             self.send_json(
                 HTTPStatus.CONFLICT,
@@ -310,6 +333,7 @@ class PonyHandler(SimpleHTTPRequestHandler):
         try:
             save_data(data_path, data)
             ensure_output_dir(self.output_dir)
+            ensure_pony_asset_dirs(pony["slug"])
             run_generator(
                 argparse.Namespace(
                     data=self.data_path,

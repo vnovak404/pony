@@ -1,3 +1,59 @@
 {
-  "locations": []
+  "locations": [
+    {
+      "id": "sunrise-bakery",
+      "name": "Sunrise Bakery",
+      "tags": ["food", "town", "cozy"]
+    },
+    {
+      "id": "sparkle-library",
+      "name": "Sparkle Library",
+      "tags": ["books", "quiet", "town"]
+    },
+    {
+      "id": "windmill-farm",
+      "name": "Windmill Farm",
+      "tags": ["nature", "harvest", "outskirts"]
+    },
+    {
+      "id": "rainbow-bridge",
+      "name": "Rainbow Bridge",
+      "tags": ["landmark", "sky", "colorful"]
+    },
+    {
+      "id": "firefly-meadow",
+      "name": "Firefly Meadow",
+      "tags": ["nature", "night", "glow"]
+    },
+    {
+      "id": "crystal-creek",
+      "name": "Crystal Creek",
+      "tags": ["water", "calm", "nature"]
+    },
+    {
+      "id": "starlight-observatory",
+      "name": "Starlight Observatory",
+      "tags": ["science", "sky", "night"]
+    },
+    {
+      "id": "market-square",
+      "name": "Market Square",
+      "tags": ["town", "shopping", "busy"]
+    },
+    {
+      "id": "pony-clinic",
+      "name": "Pony Clinic",
+      "tags": ["care", "town", "helpful"]
+    },
+    {
+      "id": "moonlit-inn",
+      "name": "Moonlit Inn",
+      "tags": ["rest", "town", "cozy"]
+    },
+    {
+      "id": "songbird-pavilion",
+      "name": "Songbird Pavilion",
+      "tags": ["music", "park", "community"]
+    }
+  ]
 }

@@ -80,6 +80,17 @@
         </div>
       </section>
 
+      <section id="map" class="section map">
+        <div class="section-title">
+          <h2>Ponyville Map</h2>
+          <p>Watch the ponies wander along the main roads of Ponyville.</p>
+        </div>
+        <div class="map-card">
+          <canvas id="pony-map"></canvas>
+          <p id="map-status" class="map-status">Loading map...</p>
+        </div>
+      </section>
+
       <section id="creators" class="section create">
         <div class="section-title">
           <h2>Create Your Own Pony</h2>
@@ -165,6 +176,8 @@
       const ponyAccentInput = document.getElementById("pony-accent");
       const ponyTalentInput = document.getElementById("pony-talent");
       const ponyPersonalityInput = document.getElementById("pony-personality");
+      const ponyMap = document.getElementById("pony-map");
+      const mapStatus = document.getElementById("map-status");
 
       const fallbackVibe = {
         body_colors: ["sunny yellow", "soft lavender", "buttercream"],
@@ -317,9 +330,26 @@
         return (personality || "").trim() || "kind and curious";
       };
 
+      const loadImage = (src) =>
+        new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+          image.src = src;
+        });
+
+      const loadJson = async (path) => {
+        const response = await fetch(path);
+        if (!response.ok) {
+          throw new Error(`Failed to load ${path}`);
+        }
+        return response.json();
+      };
+
       const renderPonyCard = (pony, imagePath, addToTop = false) => {
         if (!ponyGrid) return;
         const ponyId = pony.slug || "";
+        const sheetPath = pony.sprites && pony.sprites.sheet ? pony.sprites.sheet : "";
         const card = document.createElement("article");
         card.className = "pony-card pony-photo";
         card.innerHTML = `
@@ -340,10 +370,17 @@
             <button class="btn ghost small" type="button" data-pony-action="spritesheet" data-pony-id="${ponyId}">
               Pack Sheet
             </button>
+            <button class="btn ghost small" type="button" data-pony-sheet="${sheetPath}">
+              Show Spritesheet
+            </button>
           </div>
           <p class="pony-status" data-pony-status></p>`
               : ""
           }
+          <div class="pony-sheet-preview" hidden>
+            <p class="pony-sheet-status"></p>
+            <img alt="${pony.name} spritesheet" loading="lazy" />
+          </div>
         `;
         if (addToTop) {
           ponyGrid.prepend(card);
@@ -372,6 +409,7 @@
 
       const vibeReady = loadVibes();
       loadPonies();
+      loadMap();
 
       const buildRandomName = () => {
         const terms = vibeState.allTerms.length
@@ -474,6 +512,44 @@
 
       if (ponyGrid) {
         ponyGrid.addEventListener("click", async (event) => {
+          const sheetButton = event.target.closest("[data-pony-sheet]");
+          if (sheetButton) {
+            const sheetPath = sheetButton.dataset.ponySheet;
+            const card = sheetButton.closest(".pony-card");
+            if (!card) return;
+            const preview = card.querySelector(".pony-sheet-preview");
+            const status = card.querySelector(".pony-sheet-status");
+            const image = card.querySelector(".pony-sheet-preview img");
+            if (!preview || !status || !image) return;
+
+            if (!sheetPath) {
+              preview.hidden = false;
+              status.textContent = "Spritesheet path not set.";
+              image.hidden = true;
+              return;
+            }
+
+            if (!preview.hidden && image.src) {
+              preview.hidden = true;
+              return;
+            }
+
+            preview.hidden = false;
+            status.textContent = "Loading spritesheet...";
+            image.hidden = true;
+
+            try {
+              await loadImage(`${sheetPath}?t=${Date.now()}`);
+              image.src = `${sheetPath}?t=${Date.now()}`;
+              image.hidden = false;
+              status.textContent = "Spritesheet loaded.";
+            } catch (error) {
+              status.textContent = "Spritesheet not found. Generate and pack first.";
+              image.hidden = true;
+            }
+            return;
+          }
+
           const button = event.target.closest("[data-pony-action]");
           if (!button) return;
           const ponyId = button.dataset.ponyId;
@@ -502,6 +578,301 @@
             toggleCardButtons(card, false);
           }
         });
+      }
+
+      async function loadMap() {
+        if (!ponyMap || !mapStatus) return;
+        mapStatus.textContent = "Loading map...";
+        try {
+          const mapData = await loadJson("/assets/world/maps/ponyville.json");
+          const ponyData = await loadJson("/data/ponies.json");
+          await initMap(mapData, ponyData.ponies || []);
+        } catch (error) {
+          mapStatus.textContent = "Map unavailable. Generate sprites to see ponies move.";
+        }
+      }
+
+      async function initMap(mapData, ponies) {
+        if (!ponyMap) return;
+        const ctx = ponyMap.getContext("2d");
+        if (!ctx) return;
+
+        const mapWidth = mapData.meta.width * mapData.meta.tileSize;
+        const mapHeight = mapData.meta.height * mapData.meta.tileSize;
+
+        const resize = () => {
+          const parent = ponyMap.parentElement;
+          if (!parent) return;
+          const width = parent.clientWidth - 2;
+          const scale = width / mapWidth;
+          const height = mapHeight * scale;
+          const dpr = window.devicePixelRatio || 1;
+          ponyMap.width = width * dpr;
+          ponyMap.height = height * dpr;
+          ponyMap.style.width = `${width}px`;
+          ponyMap.style.height = `${height}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          return scale;
+        };
+
+        let scale = resize() || 1;
+        new ResizeObserver(() => {
+          const nextScale = resize();
+          if (nextScale) {
+            scale = nextScale;
+          }
+        }).observe(ponyMap.parentElement);
+
+        const roads = (mapData.layers.roads && mapData.layers.roads.segments) || [];
+        const objects = mapData.layers.objects || [];
+        const innObject =
+          objects.find((item) => item.id === "inn" || item.locationId === "moonlit-inn") ||
+          null;
+        const roadPoints = roads.map((segment) => ({
+          id: segment.id,
+          from: {
+            x: segment.from.x * mapData.meta.tileSize,
+            y: segment.from.y * mapData.meta.tileSize,
+          },
+          to: {
+            x: segment.to.x * mapData.meta.tileSize,
+            y: segment.to.y * mapData.meta.tileSize,
+          },
+        }));
+
+        const sprites = await Promise.all(
+          ponies.map(async (pony) => {
+            if (!pony.sprites || !pony.sprites.meta || !pony.sprites.sheet) {
+              return null;
+            }
+            try {
+              const meta = await loadJson(pony.sprites.meta);
+              const sheet = await loadImage(pony.sprites.sheet);
+              const moveType = meta.animations.walk
+                ? "walk"
+                : meta.animations.trot
+                  ? "trot"
+                  : "idle";
+              const moveFrames = meta.animations[moveType];
+              const sleepFrames = meta.animations.sleep || meta.animations.idle || moveFrames;
+              if (!moveFrames || !moveFrames.length) return null;
+              return { pony, meta, sheet, moveFrames, sleepFrames, moveType };
+            } catch (error) {
+              return null;
+            }
+          })
+        );
+
+        const activeSprites = sprites.filter(Boolean);
+        if (!activeSprites.length) {
+          mapStatus.textContent = "No spritesheets found. Pack sprites to animate.";
+        } else {
+          const missingCount = ponies.length - activeSprites.length;
+          if (missingCount > 0) {
+            mapStatus.textContent = `${missingCount} ponies missing spritesheets.`;
+          } else {
+            mapStatus.textContent = "Ponyville is live.";
+          }
+        }
+
+        const actors = activeSprites.map((sprite, index) => {
+          const segment = roadPoints[index % roadPoints.length] || {
+            from: { x: 0, y: 0 },
+            to: { x: mapWidth, y: 0 },
+          };
+          const baseSpeed = sprite.moveType === "trot" ? 0.3 : 0.1;
+          return {
+            sprite,
+            segment,
+            t: Math.random(),
+            speed: baseSpeed + Math.random() * baseSpeed,
+            frameIndex: Math.floor(Math.random() * sprite.moveFrames.length),
+            lastFrame: 0,
+            sleepUntil: 0,
+            sleepOffset: { x: (Math.random() - 0.5) * 40, y: (Math.random() - 0.5) * 40 },
+            innCooldownUntil: 0,
+          };
+        });
+
+        let innSprite = null;
+        if (innObject) {
+          try {
+            innSprite = await loadImage("/assets/world/structures/inn.png");
+          } catch (error) {
+            innSprite = null;
+          }
+        }
+
+        const pattern = (() => {
+          const tile = document.createElement("canvas");
+          tile.width = 140;
+          tile.height = 140;
+          const tctx = tile.getContext("2d");
+          if (!tctx) return null;
+          const gradient = tctx.createLinearGradient(0, 0, 140, 140);
+          gradient.addColorStop(0, "#f6ffe6");
+          gradient.addColorStop(1, "#e4f5d2");
+          tctx.fillStyle = gradient;
+          tctx.fillRect(0, 0, tile.width, tile.height);
+          for (let i = 0; i < 80; i += 1) {
+            tctx.fillStyle = i % 2 === 0 ? "rgba(170, 210, 140, 0.4)" : "rgba(200, 230, 170, 0.5)";
+            tctx.beginPath();
+            tctx.arc(
+              Math.random() * tile.width,
+              Math.random() * tile.height,
+              1.2 + Math.random() * 1.8,
+              0,
+              Math.PI * 2
+            );
+            tctx.fill();
+          }
+          return ctx.createPattern(tile, "repeat");
+        })();
+
+        const drawRoads = () => {
+          const roadWidth = Math.max(6, mapData.meta.tileSize * scale * 0.28);
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.strokeStyle = "rgba(188, 150, 90, 0.9)";
+          ctx.lineWidth = roadWidth;
+          roadPoints.forEach((segment) => {
+            ctx.beginPath();
+            ctx.moveTo(segment.from.x * scale, segment.from.y * scale);
+            ctx.lineTo(segment.to.x * scale, segment.to.y * scale);
+            ctx.stroke();
+          });
+
+          ctx.strokeStyle = "rgba(242, 216, 165, 0.9)";
+          ctx.lineWidth = roadWidth * 0.55;
+          roadPoints.forEach((segment) => {
+            ctx.beginPath();
+            ctx.moveTo(segment.from.x * scale, segment.from.y * scale);
+            ctx.lineTo(segment.to.x * scale, segment.to.y * scale);
+            ctx.stroke();
+          });
+        };
+
+        const drawInn = () => {
+          if (!innObject || !innSprite) return;
+          const x = innObject.at.x * mapData.meta.tileSize * scale;
+          const y = innObject.at.y * mapData.meta.tileSize * scale;
+          const size = mapData.meta.tileSize * scale * 1.8;
+          ctx.drawImage(
+            innSprite,
+            x - size * 0.5,
+            y - size,
+            size,
+            size
+          );
+        };
+
+        const drawActors = (delta, now) => {
+          actors.forEach((actor) => {
+            const { sprite, segment } = actor;
+            const meta = sprite.meta;
+            const frames = meta.frames;
+            const anchor = Object.values(frames)[0]?.anchor || { x: 256, y: 480 };
+            const sleeping = actor.sleepUntil > now;
+            const frameNames = sleeping ? sprite.sleepFrames : sprite.moveFrames;
+            const fps = sleeping
+              ? meta.fps.sleep || meta.fps.idle || 2
+              : meta.fps[sprite.moveType] || 6;
+            actor.lastFrame += delta;
+            const frameDuration = 1000 / fps;
+            if (actor.lastFrame >= frameDuration) {
+              actor.frameIndex = (actor.frameIndex + 1) % frameNames.length;
+              actor.lastFrame = 0;
+            }
+
+            const frame = frames[frameNames[actor.frameIndex]]?.frame;
+            if (!frame) return;
+
+            let x = segment.from.x + (segment.to.x - segment.from.x) * actor.t;
+            let y = segment.from.y + (segment.to.y - segment.from.y) * actor.t;
+
+            if (sleeping && innObject) {
+              x = innObject.at.x * mapData.meta.tileSize + actor.sleepOffset.x;
+              y = innObject.at.y * mapData.meta.tileSize + actor.sleepOffset.y;
+            } else {
+              const distance = Math.hypot(
+                segment.to.x - segment.from.x,
+                segment.to.y - segment.from.y
+              );
+              actor.t += (actor.speed * delta) / Math.max(distance, 1);
+              if (actor.t >= 1) {
+                actor.t = 0;
+                actor.segment =
+                  roadPoints[Math.floor(Math.random() * roadPoints.length)] || segment;
+              }
+
+              if (innObject) {
+                const innX = innObject.at.x * mapData.meta.tileSize;
+                const innY = innObject.at.y * mapData.meta.tileSize;
+                const distToInn = Math.hypot(x - innX, y - innY);
+                const sleepRadius = mapData.meta.tileSize * 0.6;
+                if (distToInn < sleepRadius && now > actor.innCooldownUntil) {
+                  const napTime = 2000 + Math.random() * 3000;
+                  actor.sleepUntil = now + napTime;
+                  actor.innCooldownUntil = actor.sleepUntil + 8000 + Math.random() * 4000;
+                  actor.frameIndex = 0;
+                  actor.lastFrame = 0;
+                }
+              }
+            }
+
+            const frameScale = (mapData.meta.tileSize * scale) / frame.w;
+            const destX = x * scale - anchor.x * frameScale;
+            const destY = y * scale - anchor.y * frameScale;
+            const drawW = frame.w * frameScale;
+            const drawH = frame.h * frameScale;
+            const flip = Boolean(sprite.pony.sprite_flip);
+
+            if (flip) {
+              ctx.save();
+              ctx.translate(destX + drawW, 0);
+              ctx.scale(-1, 1);
+              ctx.drawImage(
+                sprite.sheet,
+                frame.x,
+                frame.y,
+                frame.w,
+                frame.h,
+                0,
+                destY,
+                drawW,
+                drawH
+              );
+              ctx.restore();
+            } else {
+              ctx.drawImage(
+                sprite.sheet,
+                frame.x,
+                frame.y,
+                frame.w,
+                frame.h,
+                destX,
+                destY,
+                drawW,
+                drawH
+              );
+            }
+          });
+        };
+
+        let lastTime = performance.now();
+        const draw = (now) => {
+          const delta = now - lastTime;
+          lastTime = now;
+          ctx.clearRect(0, 0, ponyMap.width, ponyMap.height);
+          ctx.fillStyle = pattern || "#eaf7da";
+          ctx.fillRect(0, 0, ponyMap.width, ponyMap.height);
+          drawRoads();
+          drawInn();
+          drawActors(delta, now);
+          requestAnimationFrame(draw);
+        };
+
+        requestAnimationFrame(draw);
       }
     </script>
   </body>
