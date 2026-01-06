@@ -87,6 +87,7 @@
         </div>
         <div class="map-card">
           <canvas id="pony-map"></canvas>
+          <div id="map-tooltip" class="map-tooltip" aria-hidden="true"></div>
           <p id="map-status" class="map-status">Loading map...</p>
         </div>
       </section>
@@ -178,6 +179,7 @@
       const ponyPersonalityInput = document.getElementById("pony-personality");
       const ponyMap = document.getElementById("pony-map");
       const mapStatus = document.getElementById("map-status");
+      const mapTooltip = document.getElementById("map-tooltip");
 
       const fallbackVibe = {
         body_colors: ["sunny yellow", "soft lavender", "buttercream"],
@@ -586,19 +588,45 @@
         try {
           const mapData = await loadJson("/assets/world/maps/ponyville.json");
           const ponyData = await loadJson("/data/ponies.json");
-          await initMap(mapData, ponyData.ponies || []);
+          let locationData = { locations: [] };
+          try {
+            locationData = await loadJson("/data/world_locations.json");
+          } catch (error) {
+            locationData = { locations: [] };
+          }
+          await initMap(mapData, ponyData.ponies || [], locationData.locations || []);
         } catch (error) {
           mapStatus.textContent = "Map unavailable. Generate sprites to see ponies move.";
         }
       }
 
-      async function initMap(mapData, ponies) {
+      async function initMap(mapData, ponies, locations) {
         if (!ponyMap) return;
         const ctx = ponyMap.getContext("2d");
         if (!ctx) return;
 
         const mapWidth = mapData.meta.width * mapData.meta.tileSize;
         const mapHeight = mapData.meta.height * mapData.meta.tileSize;
+        const MAX_ACTORS = 30;
+        const ASSET_SCALE = 2;
+
+        const locationIndex = new Map();
+        locations.forEach((location) => {
+          if (location && location.id) {
+            locationIndex.set(location.id, location);
+          }
+        });
+
+        const toTitleCase = (value) =>
+          String(value || "")
+            .replace(/[_-]+/g, " ")
+            .replace(/\b\w/g, (match) => match.toUpperCase());
+
+        const getStructureLabel = (item) => {
+          if (!item) return "Ponyville";
+          const location = item.locationId && locationIndex.get(item.locationId);
+          return location?.name || toTitleCase(item.id);
+        };
 
         const resize = () => {
           const parent = ponyMap.parentElement;
@@ -628,7 +656,7 @@
         const innObject =
           objects.find((item) => item.id === "inn" || item.locationId === "moonlit-inn") ||
           null;
-        const roadPoints = roads.map((segment) => ({
+        const roadSegments = roads.map((segment) => ({
           id: segment.id,
           from: {
             x: segment.from.x * mapData.meta.tileSize,
@@ -639,6 +667,95 @@
             y: segment.to.y * mapData.meta.tileSize,
           },
         }));
+
+        const endpointKey = (point) => `${point.x},${point.y}`;
+        const endpointIndex = new Map();
+        const addEndpoint = (point, segment, end) => {
+          const key = endpointKey(point);
+          if (!endpointIndex.has(key)) {
+            endpointIndex.set(key, []);
+          }
+          endpointIndex.get(key).push({ segment, end });
+        };
+
+        roadSegments.forEach((segment) => {
+          addEndpoint(segment.from, segment, "from");
+          addEndpoint(segment.to, segment, "to");
+        });
+
+        const isOffMap = (point) =>
+          point.x < 0 || point.x > mapWidth || point.y < 0 || point.y > mapHeight;
+
+        const PROMENADE_PREFIX = "loop-";
+        const pickNextSegment = (choices) => {
+          if (!choices.length) return null;
+          const promenade = choices.filter((item) =>
+            String(item.segment.id || "").startsWith(PROMENADE_PREFIX)
+          );
+          if (promenade.length && Math.random() < 0.7) {
+            return promenade[Math.floor(Math.random() * promenade.length)];
+          }
+          return choices[Math.floor(Math.random() * choices.length)];
+        };
+
+        const innSleepSpots = (() => {
+          const base = mapData.meta.tileSize * 0.28;
+          return [
+            { x: -base, y: -base },
+            { x: base, y: -base },
+            { x: -base * 1.8, y: 0 },
+            { x: base * 1.8, y: 0 },
+            { x: -base, y: base * 1.2 },
+            { x: base, y: base * 1.2 },
+            { x: 0, y: base * 1.6 },
+            { x: 0, y: -base * 1.6 },
+            { x: -base * 1.4, y: base * 1.8 },
+            { x: base * 1.4, y: base * 1.8 },
+          ];
+        })();
+        const sleepSpotUsage = new Array(innSleepSpots.length).fill(false);
+        const claimSleepSpot = () => {
+          for (let i = 0; i < sleepSpotUsage.length; i += 1) {
+            if (!sleepSpotUsage[i]) {
+              sleepSpotUsage[i] = true;
+              return i;
+            }
+          }
+          return null;
+        };
+        const releaseSleepSpot = (index) => {
+          if (index === null || index === undefined) return;
+          sleepSpotUsage[index] = false;
+        };
+
+        const structureSprites = {};
+        const structureItems = objects.filter((item) => item.sprite);
+        await Promise.all(
+          structureItems.map(async (item) => {
+            try {
+              structureSprites[item.id] = await loadImage(
+                `/assets/world/structures/${item.sprite}.png`
+              );
+            } catch (error) {
+              structureSprites[item.id] = null;
+            }
+          })
+        );
+
+        const decorItems = (mapData.layers.decor && mapData.layers.decor.items) || [];
+        const decorSprites = {};
+        await Promise.all(
+          decorItems.map(async (item) => {
+            if (!item.sprite) return;
+            try {
+              decorSprites[item.id] = await loadImage(
+                `/assets/world/decor/${item.sprite}.png`
+              );
+            } catch (error) {
+              decorSprites[item.id] = null;
+            }
+          })
+        );
 
         const sprites = await Promise.all(
           ponies.map(async (pony) => {
@@ -668,40 +785,42 @@
           mapStatus.textContent = "No spritesheets found. Pack sprites to animate.";
         } else {
           const missingCount = ponies.length - activeSprites.length;
-          if (missingCount > 0) {
+          if (activeSprites.length > MAX_ACTORS) {
+            mapStatus.textContent = `Showing ${MAX_ACTORS} of ${activeSprites.length} ponies.`;
+          } else if (missingCount > 0) {
             mapStatus.textContent = `${missingCount} ponies missing spritesheets.`;
           } else {
             mapStatus.textContent = "Ponyville is live.";
           }
         }
 
-        const actors = activeSprites.map((sprite, index) => {
-          const segment = roadPoints[index % roadPoints.length] || {
-            from: { x: 0, y: 0 },
-            to: { x: mapWidth, y: 0 },
-          };
+        const shuffledSprites = activeSprites.slice();
+        for (let i = shuffledSprites.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledSprites[i], shuffledSprites[j]] = [shuffledSprites[j], shuffledSprites[i]];
+        }
+        const limitedSprites = shuffledSprites.slice(0, MAX_ACTORS);
+
+        const actors = limitedSprites.map((sprite, index) => {
+          const segment =
+            roadSegments.length > 0
+              ? roadSegments[index % roadSegments.length]
+              : { from: { x: 0, y: 0 }, to: { x: mapWidth, y: 0 } };
           const baseSpeed = sprite.moveType === "trot" ? 0.3 : 0.1;
           return {
             sprite,
             segment,
             t: Math.random(),
             speed: baseSpeed + Math.random() * baseSpeed,
+            direction: Math.random() > 0.5 ? 1 : -1,
             frameIndex: Math.floor(Math.random() * sprite.moveFrames.length),
             lastFrame: 0,
             sleepUntil: 0,
-            sleepOffset: { x: (Math.random() - 0.5) * 40, y: (Math.random() - 0.5) * 40 },
+            sleepOffset: { x: 0, y: 0 },
+            sleepSpotIndex: null,
             innCooldownUntil: 0,
           };
         });
-
-        let innSprite = null;
-        if (innObject) {
-          try {
-            innSprite = await loadImage("/assets/world/structures/inn.png");
-          } catch (error) {
-            innSprite = null;
-          }
-        }
 
         const pattern = (() => {
           const tile = document.createElement("canvas");
@@ -735,7 +854,7 @@
           ctx.lineJoin = "round";
           ctx.strokeStyle = "rgba(188, 150, 90, 0.9)";
           ctx.lineWidth = roadWidth;
-          roadPoints.forEach((segment) => {
+          roadSegments.forEach((segment) => {
             ctx.beginPath();
             ctx.moveTo(segment.from.x * scale, segment.from.y * scale);
             ctx.lineTo(segment.to.x * scale, segment.to.y * scale);
@@ -744,7 +863,7 @@
 
           ctx.strokeStyle = "rgba(242, 216, 165, 0.9)";
           ctx.lineWidth = roadWidth * 0.55;
-          roadPoints.forEach((segment) => {
+          roadSegments.forEach((segment) => {
             ctx.beginPath();
             ctx.moveTo(segment.from.x * scale, segment.from.y * scale);
             ctx.lineTo(segment.to.x * scale, segment.to.y * scale);
@@ -752,18 +871,67 @@
           });
         };
 
-        const drawInn = () => {
-          if (!innObject || !innSprite) return;
-          const x = innObject.at.x * mapData.meta.tileSize * scale;
-          const y = innObject.at.y * mapData.meta.tileSize * scale;
-          const size = mapData.meta.tileSize * scale * 1.8;
-          ctx.drawImage(
-            innSprite,
-            x - size * 0.5,
-            y - size,
-            size,
-            size
-          );
+        const structureScale = {
+          building: 1.8,
+          landmark: 1.7,
+          location: 1.5,
+          nature: 2.4,
+        };
+
+        let structureBounds = [];
+        const dragState = {
+          active: false,
+          item: null,
+          offsetX: 0,
+          offsetY: 0,
+          pointerId: null,
+        };
+
+        const drawDecor = () => {
+          if (!decorItems.length) return;
+          decorItems.forEach((item) => {
+            if (!item || !item.at) return;
+            const sprite = decorSprites[item.id];
+            if (!sprite) return;
+            const size =
+              (item.scale || item.size || 0.8) * mapData.meta.tileSize * scale * ASSET_SCALE;
+            const x = item.at.x * mapData.meta.tileSize * scale;
+            const y = item.at.y * mapData.meta.tileSize * scale;
+            ctx.drawImage(sprite, x - size * 0.5, y - size, size, size);
+          });
+        };
+
+        const drawStructures = () => {
+          const nextBounds = [];
+          objects.forEach((item) => {
+            const sprite = structureSprites[item.id];
+            if (!sprite) return;
+            const scaleFactor = item.scale || structureScale[item.kind] || 1.6;
+            const x = item.at.x * mapData.meta.tileSize * scale;
+            const y = item.at.y * mapData.meta.tileSize * scale;
+            const size = mapData.meta.tileSize * scale * scaleFactor * ASSET_SCALE;
+            const destX = x - size * 0.5;
+            const destY = y - size;
+            ctx.drawImage(
+              sprite,
+              destX,
+              destY,
+              size,
+              size
+            );
+            nextBounds.push({
+              id: item.id,
+              label: getStructureLabel(item),
+              x: destX,
+              y: destY,
+              width: size,
+              height: size,
+              anchorX: x,
+              anchorY: y,
+              item,
+            });
+          });
+          structureBounds = nextBounds;
         };
 
         const drawActors = (delta, now) => {
@@ -773,6 +941,10 @@
             const frames = meta.frames;
             const anchor = Object.values(frames)[0]?.anchor || { x: 256, y: 480 };
             const sleeping = actor.sleepUntil > now;
+            if (!sleeping && actor.sleepSpotIndex !== null) {
+              releaseSleepSpot(actor.sleepSpotIndex);
+              actor.sleepSpotIndex = null;
+            }
             const frameNames = sleeping ? sprite.sleepFrames : sprite.moveFrames;
             const fps = sleeping
               ? meta.fps.sleep || meta.fps.idle || 2
@@ -787,45 +959,71 @@
             const frame = frames[frameNames[actor.frameIndex]]?.frame;
             if (!frame) return;
 
-            let x = segment.from.x + (segment.to.x - segment.from.x) * actor.t;
-            let y = segment.from.y + (segment.to.y - segment.from.y) * actor.t;
+            const from = actor.direction === 1 ? segment.from : segment.to;
+            const to = actor.direction === 1 ? segment.to : segment.from;
+            let x = from.x + (to.x - from.x) * actor.t;
+            let y = from.y + (to.y - from.y) * actor.t;
 
             if (sleeping && innObject) {
               x = innObject.at.x * mapData.meta.tileSize + actor.sleepOffset.x;
               y = innObject.at.y * mapData.meta.tileSize + actor.sleepOffset.y;
             } else {
               const distance = Math.hypot(
-                segment.to.x - segment.from.x,
-                segment.to.y - segment.from.y
+                to.x - from.x,
+                to.y - from.y
               );
               actor.t += (actor.speed * delta) / Math.max(distance, 1);
               if (actor.t >= 1) {
                 actor.t = 0;
-                actor.segment =
-                  roadPoints[Math.floor(Math.random() * roadPoints.length)] || segment;
+                if (isOffMap(to)) {
+                  actor.segment =
+                    roadSegments[Math.floor(Math.random() * roadSegments.length)] || segment;
+                  actor.direction = Math.random() > 0.5 ? 1 : -1;
+                } else {
+                  const key = endpointKey(to);
+                  const options = endpointIndex.get(key) || [];
+                  const nextOptions = options.filter((item) => item.segment !== segment);
+                  const choicePool = nextOptions.length ? nextOptions : options;
+                  const next = pickNextSegment(choicePool);
+                  if (next) {
+                    actor.segment = next.segment;
+                    actor.direction = next.end === "from" ? 1 : -1;
+                  } else {
+                    actor.direction *= -1;
+                  }
+                }
               }
 
               if (innObject) {
                 const innX = innObject.at.x * mapData.meta.tileSize;
                 const innY = innObject.at.y * mapData.meta.tileSize;
                 const distToInn = Math.hypot(x - innX, y - innY);
-                const sleepRadius = mapData.meta.tileSize * 0.6;
+                const sleepRadiusTiles = innObject.sleepRadius || 0.6;
+                const sleepRadius = mapData.meta.tileSize * sleepRadiusTiles;
                 if (distToInn < sleepRadius && now > actor.innCooldownUntil) {
-                  const napTime = 2000 + Math.random() * 3000;
-                  actor.sleepUntil = now + napTime;
-                  actor.innCooldownUntil = actor.sleepUntil + 8000 + Math.random() * 4000;
-                  actor.frameIndex = 0;
-                  actor.lastFrame = 0;
+                  const spotIndex = claimSleepSpot();
+                  if (spotIndex !== null) {
+                    const napTime = 2000 + Math.random() * 3000;
+                    actor.sleepSpotIndex = spotIndex;
+                    actor.sleepOffset = innSleepSpots[spotIndex];
+                    actor.sleepUntil = now + napTime;
+                    actor.innCooldownUntil = actor.sleepUntil + 8000 + Math.random() * 4000;
+                    actor.frameIndex = 0;
+                    actor.lastFrame = 0;
+                  } else {
+                    actor.innCooldownUntil = now + 3000 + Math.random() * 2000;
+                  }
                 }
               }
             }
 
-            const frameScale = (mapData.meta.tileSize * scale) / frame.w;
+            const frameScale = (mapData.meta.tileSize * scale * ASSET_SCALE) / frame.w;
             const destX = x * scale - anchor.x * frameScale;
             const destY = y * scale - anchor.y * frameScale;
             const drawW = frame.w * frameScale;
             const drawH = frame.h * frameScale;
-            const flip = Boolean(sprite.pony.sprite_flip);
+            const directionFlip = to.x < from.x;
+            const flip = directionFlip !== Boolean(sprite.pony.sprite_flip);
 
             if (flip) {
               ctx.save();
@@ -867,12 +1065,148 @@
           ctx.fillStyle = pattern || "#eaf7da";
           ctx.fillRect(0, 0, ponyMap.width, ponyMap.height);
           drawRoads();
-          drawInn();
+          drawDecor();
+          drawStructures();
           drawActors(delta, now);
           requestAnimationFrame(draw);
         };
 
         requestAnimationFrame(draw);
+
+        if (mapTooltip) {
+          const hideTooltip = () => {
+            mapTooltip.classList.remove("is-visible");
+            mapTooltip.setAttribute("aria-hidden", "true");
+            mapTooltip.style.transform = "translate(-9999px, -9999px)";
+          };
+
+          const getCanvasPoint = (event) => {
+            const canvasRect = ponyMap.getBoundingClientRect();
+            return {
+              x: event.clientX - canvasRect.left,
+              y: event.clientY - canvasRect.top,
+            };
+          };
+
+          const getHit = (point) =>
+            structureBounds.find(
+              (item) =>
+                point.x >= item.x &&
+                point.x <= item.x + item.width &&
+                point.y >= item.y &&
+                point.y <= item.y + item.height
+            );
+
+          const setCursor = (value) => {
+            ponyMap.style.cursor = value;
+          };
+
+          const showTooltip = (label, clientX, clientY) => {
+            const cardRect = ponyMap.parentElement?.getBoundingClientRect();
+            if (!cardRect) return;
+            const localX = clientX - cardRect.left;
+            const localY = clientY - cardRect.top;
+            mapTooltip.textContent = label;
+            mapTooltip.classList.add("is-visible");
+            mapTooltip.setAttribute("aria-hidden", "false");
+            const tooltipWidth = mapTooltip.offsetWidth;
+            const tooltipHeight = mapTooltip.offsetHeight;
+            let left = localX + 14;
+            let top = localY + 12;
+            const maxLeft = cardRect.width - tooltipWidth - 8;
+            const maxTop = cardRect.height - tooltipHeight - 8;
+            if (left > maxLeft) left = maxLeft;
+            if (top > maxTop) top = maxTop;
+            if (left < 8) left = 8;
+            if (top < 8) top = 8;
+            mapTooltip.style.transform = `translate(${left}px, ${top}px)`;
+          };
+
+          const handleMove = (event) => {
+            if (dragState.active) return;
+            const point = getCanvasPoint(event);
+            const hit = getHit(point);
+            if (hit) {
+              setCursor("grab");
+              showTooltip(hit.label, event.clientX, event.clientY);
+            } else {
+              setCursor("default");
+              hideTooltip();
+            }
+          };
+
+          const handleDragStart = (event) => {
+            const point = getCanvasPoint(event);
+            const hit = getHit(point);
+            if (!hit || !hit.item) return;
+            event.preventDefault();
+            dragState.active = true;
+            dragState.item = hit.item;
+            dragState.offsetX = point.x - hit.anchorX;
+            dragState.offsetY = point.y - hit.anchorY;
+            dragState.pointerId = event.pointerId;
+            ponyMap.setPointerCapture(event.pointerId);
+            setCursor("grabbing");
+            hideTooltip();
+          };
+
+          const handleDragMove = (event) => {
+            if (!dragState.active || dragState.pointerId !== event.pointerId) {
+              handleMove(event);
+              return;
+            }
+            const point = getCanvasPoint(event);
+            const anchorX = point.x - dragState.offsetX;
+            const anchorY = point.y - dragState.offsetY;
+            const tileSize = mapData.meta.tileSize;
+            const nextX = Math.max(0, Math.min(mapWidth, anchorX / scale));
+            const nextY = Math.max(0, Math.min(mapHeight, anchorY / scale));
+            dragState.item.at = {
+              x: Number((nextX / tileSize).toFixed(2)),
+              y: Number((nextY / tileSize).toFixed(2)),
+            };
+          };
+
+          const saveStructureLocation = async (item) => {
+            try {
+              const response = await fetch(`/api/map/objects/${encodeURIComponent(item.id)}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ at: item.at }),
+              });
+              if (!response.ok) {
+                throw new Error("Save failed.");
+              }
+              mapStatus.textContent = `Saved ${getStructureLabel(item)}.`;
+            } catch (error) {
+              mapStatus.textContent = "Unable to save map changes.";
+            }
+          };
+
+          const handleDragEnd = async (event) => {
+            if (!dragState.active || dragState.pointerId !== event.pointerId) return;
+            ponyMap.releasePointerCapture(event.pointerId);
+            setCursor("default");
+            const item = dragState.item;
+            dragState.active = false;
+            dragState.item = null;
+            dragState.pointerId = null;
+            if (item) {
+              await saveStructureLocation(item);
+            }
+          };
+
+          ponyMap.addEventListener("pointerdown", handleDragStart);
+          ponyMap.addEventListener("pointermove", handleDragMove);
+          ponyMap.addEventListener("pointerup", handleDragEnd);
+          ponyMap.addEventListener("pointercancel", handleDragEnd);
+          ponyMap.addEventListener("pointerleave", (event) => {
+            if (!dragState.active) {
+              setCursor("default");
+              hideTooltip();
+            }
+          });
+        }
       }
     </script>
   </body>

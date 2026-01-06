@@ -332,6 +332,7 @@ h1 {
   box-shadow: var(--shadow);
   display: grid;
   gap: 12px;
+  position: relative;
 }
 
 .map-card canvas {
@@ -339,6 +340,7 @@ h1 {
   border-radius: 18px;
   border: 2px solid rgba(44, 33, 54, 0.1);
   background: #f4ffec;
+  touch-action: none;
 }
 
 .map-status {
@@ -346,6 +348,29 @@ h1 {
   text-align: center;
   font-weight: 600;
   color: var(--ink-soft);
+}
+
+.map-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(30, 24, 38, 0.92);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-9999px, -9999px);
+  transition: opacity 0.15s ease;
+  box-shadow: 0 8px 18px rgba(22, 15, 32, 0.25);
+  z-index: 3;
+}
+
+.map-tooltip.is-visible {
+  opacity: 1;
 }
 
 .adventure:nth-child(1) {

@@ -14,6 +14,7 @@ DEFAULT_OUTPUT_DIR = "assets/ponies"
 DEFAULT_ENV_FILE = ".env"
 DEFAULT_SPRITE_JOBS = 6
 DEFAULT_SPRITE_RETRIES = 5
+DEFAULT_MAP_PATH = "assets/world/maps/ponyville.json"
 
 
 def slugify(name):
@@ -216,10 +217,19 @@ def load_json_body(handler):
 
 
 class PonyHandler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, data_path=None, output_dir=None, env_file=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        data_path=None,
+        output_dir=None,
+        env_file=None,
+        map_path=None,
+        **kwargs,
+    ):
         self.data_path = data_path or DEFAULT_DATA
         self.output_dir = output_dir or DEFAULT_OUTPUT_DIR
         self.env_file = env_file or DEFAULT_ENV_FILE
+        self.map_path = map_path or DEFAULT_MAP_PATH
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def send_json(self, status, payload):
@@ -236,6 +246,9 @@ class PonyHandler(SimpleHTTPRequestHandler):
 
         if self.path.startswith("/api/ponies/"):
             return self._handle_sprite_actions()
+
+        if self.path.startswith("/api/map/objects/"):
+            return self._handle_update_map_object()
 
         self.send_error(HTTPStatus.NOT_FOUND, "Not Found")
         return
@@ -289,6 +302,79 @@ class PonyHandler(SimpleHTTPRequestHandler):
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 {"error": str(exc)},
             )
+        return
+
+    def _handle_update_map_object(self):
+        parts = self.path.strip("/").split("/")
+        if len(parts) != 4 or parts[:3] != ["api", "map", "objects"]:
+            self.send_error(HTTPStatus.NOT_FOUND, "Not Found")
+            return
+
+        object_id = parts[3]
+        payload = load_json_body(self)
+        if payload is None:
+            self.send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": "Invalid JSON body."},
+            )
+            return
+
+        at = payload.get("at") if isinstance(payload, dict) else None
+        x = payload.get("x")
+        y = payload.get("y")
+        if isinstance(at, dict):
+            x = at.get("x", x)
+            y = at.get("y", y)
+
+        try:
+            x = float(x)
+            y = float(y)
+        except (TypeError, ValueError):
+            self.send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": "x and y must be numbers."},
+            )
+            return
+
+        map_path = ROOT / self.map_path
+        try:
+            map_data = load_data(map_path)
+        except FileNotFoundError:
+            self.send_json(
+                HTTPStatus.NOT_FOUND,
+                {"error": "Map data not found."},
+            )
+            return
+
+        meta = map_data.get("meta", {})
+        width = float(meta.get("width", 0) or 0)
+        height = float(meta.get("height", 0) or 0)
+        if width > 0:
+            x = max(0.0, min(width, x))
+        if height > 0:
+            y = max(0.0, min(height, y))
+
+        layers = map_data.get("layers", {})
+        objects = layers.get("objects", [])
+        target = None
+        for item in objects:
+            if item.get("id") == object_id:
+                target = item
+                break
+
+        if not target:
+            self.send_json(
+                HTTPStatus.NOT_FOUND,
+                {"error": "Map object not found."},
+            )
+            return
+
+        target["at"] = {"x": round(x, 2), "y": round(y, 2)}
+        save_data(map_path, map_data)
+        self.send_json(
+            HTTPStatus.OK,
+            {"status": "ok", "object": target},
+        )
         return
 
     def _handle_create_pony(self):
@@ -369,6 +455,7 @@ def parse_args():
     parser.add_argument("--data", default=DEFAULT_DATA)
     parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--env-file", default=DEFAULT_ENV_FILE)
+    parser.add_argument("--map", default=DEFAULT_MAP_PATH)
     return parser.parse_args()
 
 
@@ -380,6 +467,7 @@ def main():
         data_path=args.data,
         output_dir=args.output_dir,
         env_file=args.env_file,
+        map_path=args.map,
         **handler_kwargs,
     )
 
