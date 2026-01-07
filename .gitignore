@@ -1,6 +1,8 @@
 .env
 .DS_Store
 .venv/
+__pycache__/
+**/__pycache__/
 data/runtime_state.json
 assets/*
 !assets/js/
