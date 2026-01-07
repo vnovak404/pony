@@ -5,6 +5,8 @@ their portraits and sprites, and watch them wander around a Ponyville map. The
 site blends a kid-friendly builder UI with a live canvas scene where ponies
 walk, rest, and visit spots around town.
 
+![Pony Parade hero](assets/ponies/stellacorn.png)
+
 ## What the page includes
 - Pony creator form with color, talent, and vibe inputs.
 - Hero portraits for each pony (stored under `assets/ponies/*.png`).
