@@ -3,7 +3,9 @@
 Pony Parade is a playful webpage and mini-sim where you create ponies, generate
 their portraits and sprites, and watch them wander around a Ponyville map. The
 site blends a kid-friendly builder UI with a live canvas scene where ponies
-walk, rest, and visit spots around town.
+walk, rest, and visit spots around town. 
+
+Pony parade was build by a 7 year old girl through conversations with Codex 5.2 High.
 
 ![Pony Parade hero](assets/ponies/stellacorn.png)
 
