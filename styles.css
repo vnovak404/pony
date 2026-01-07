@@ -335,6 +335,41 @@ h1 {
   position: relative;
 }
 
+.pony-command-menu {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  top: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(44, 33, 54, 0.12);
+  box-shadow: 0 16px 30px rgba(28, 18, 40, 0.18);
+  display: grid;
+  gap: 10px;
+}
+
+.pony-command-menu[hidden] {
+  display: none;
+}
+
+.pony-command-title {
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+
+.pony-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pony-command-menu .btn.small {
+  padding: 6px 14px;
+}
+
 .map-controls {
   display: flex;
   justify-content: flex-end;

@@ -84,6 +84,11 @@
       "id": "songbird-pavilion",
       "name": "Songbird Pavilion",
       "tags": ["music", "park", "community"]
+    },
+    {
+      "id": "pony-race-track",
+      "name": "Ponyville Race Track",
+      "tags": ["recreation", "sport", "outskirts"]
     }
   ]
 }

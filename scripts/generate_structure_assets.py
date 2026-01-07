@@ -67,6 +67,11 @@ STRUCTURES = {
         "decorative trim, unicorn swirl finial. "
         + BASE_BUILDING_PROMPT
     ),
+    "race_track_01": (
+        "Pony race track, oval dirt track with low rails, tiny pennant flags with no letters, "
+        "hoofprint lane markers, little winners podium with no text, pony motifs. "
+        + BASE_BUILDING_PROMPT
+    ),
     "observatory_01": (
         "Pony observatory, domed roof, telescope silhouette, star emblem with no letters, "
         "arched doorway, crescent horse motif. "

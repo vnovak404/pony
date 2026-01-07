@@ -66,6 +66,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const DRINK_DURATION_MAX = 3200;
   const DRINK_COOLDOWN_MIN = 5000;
   const DRINK_COOLDOWN_MAX = 8000;
+  const MANUAL_SPEED_MULTIPLIER = 1.8;
 
   const locationIndex = new Map();
   locations.forEach((location) => {
@@ -125,6 +126,8 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const innObject =
     objects.find((item) => item.id === "inn" || item.locationId === "moonlit-inn") ||
     null;
+  const isInnObject = (item) =>
+    Boolean(item && (item.id === "inn" || item.locationId === "moonlit-inn"));
   const isFoodSpot = (item) => {
     if (!item) return false;
     if (item.kind === "food") return true;
@@ -456,6 +459,21 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     return bestPoint || target;
   };
 
+  let innAccessPoint = null;
+  const updateInnAccessPoint = () => {
+    if (!innObject || !innObject.at) {
+      innAccessPoint = null;
+      return;
+    }
+    const target = {
+      x: innObject.at.x * mapData.meta.tileSize,
+      y: innObject.at.y * mapData.meta.tileSize,
+    };
+    innAccessPoint = computeAccessPoint(target);
+  };
+  updateInnAccessPoint();
+  const getInnTargetPoint = () => innAccessPoint;
+
   const buildHouseAccessPoints = () => {
     houseObjects.forEach((house) => {
       const target = {
@@ -518,6 +536,9 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     if (isDrinkSpot(item)) {
       drinkAccessPoints.set(item.id, computeAccessPoint(target));
     }
+    if (isInnObject(item)) {
+      innAccessPoint = computeAccessPoint(target);
+    }
     updateLakeState(item);
   };
 
@@ -576,6 +597,70 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     if (!scored.length) return null;
     const pickFrom = scored.slice(0, Math.min(2, scored.length));
     return pickFrom[Math.floor(Math.random() * pickFrom.length)].spot;
+  };
+
+  const getActorPosition = (actor) => {
+    if (!actor || !actor.segment) return { x: 0, y: 0 };
+    const from = actor.direction === 1 ? actor.segment.from : actor.segment.to;
+    const to = actor.direction === 1 ? actor.segment.to : actor.segment.from;
+    return {
+      x: from.x + (to.x - from.x) * actor.t,
+      y: from.y + (to.y - from.y) * actor.t,
+    };
+  };
+
+  const assignManualTask = (actor, command) => {
+    if (!actor) return;
+    if (command === "close") {
+      return;
+    }
+    if (command === "clear") {
+      actor.task = null;
+      return;
+    }
+    const position = getActorPosition(actor);
+    if (command === "eat") {
+      const target = pickFoodSpot(actor, position);
+      if (target) {
+        actor.task = { type: "eat", foodId: target.id, manual: true };
+        actor.eatCooldownUntil = 0;
+      } else if (mapStatus) {
+        mapStatus.textContent = "No food spots available.";
+      }
+      return;
+    }
+    if (command === "drink") {
+      const target = pickDrinkSpot(actor, position);
+      if (target) {
+        actor.task = { type: "drink", drinkId: target.id, manual: true };
+        actor.drinkCooldownUntil = 0;
+      } else if (mapStatus) {
+        mapStatus.textContent = "No drink spots available.";
+      }
+      return;
+    }
+    if (command === "rest") {
+      const homeId = actor.homeId;
+      const state = homeId ? houseStates.get(homeId) : null;
+      if (
+        homeId &&
+        state &&
+        state.status !== "repairing" &&
+        state.status !== "under_construction"
+      ) {
+        actor.task = { type: "rest", houseId: homeId, manual: true };
+        actor.homeCooldownUntil = 0;
+        return;
+      }
+      if (innObject && getInnTargetPoint()) {
+        actor.task = { type: "rest", inn: true, manual: true };
+        actor.innCooldownUntil = 0;
+        return;
+      }
+      if (mapStatus) {
+        mapStatus.textContent = "No rest spot available.";
+      }
+    }
   };
 
   const findRepairTarget = () => {
@@ -729,6 +814,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         ? roadSegments[index % roadSegments.length]
         : { from: { x: 0, y: 0 }, to: { x: mapWidth, y: 0 } });
     const baseSpeed = sprite.moveType === "trot" ? 0.3 : 0.1;
+    const startSpeed = baseSpeed + Math.random() * baseSpeed;
     const baseStats = sprite.pony.stats || {};
     const savedStats = savedState && savedState.stats ? savedState.stats : {};
     const driveEat =
@@ -780,7 +866,8 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       sprite,
       segment,
       t: savedT !== null ? savedT : Math.random(),
-      speed: baseSpeed + Math.random() * baseSpeed,
+      baseSpeed: startSpeed,
+      speed: startSpeed,
       direction: savedDirection !== null ? savedDirection : Math.random() > 0.5 ? 1 : -1,
       frameIndex: Math.floor(Math.random() * sprite.moveFrames.length),
       lastFrame: 0,
@@ -810,6 +897,40 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     };
   });
   let lastPointer = null;
+  const commandMenu = document.getElementById("pony-command-menu");
+  const commandTitle = commandMenu
+    ? commandMenu.querySelector(".pony-command-title")
+    : null;
+  let commandTarget = null;
+
+  const hideCommandMenu = () => {
+    if (!commandMenu) return;
+    commandMenu.hidden = true;
+    commandTarget = null;
+  };
+
+  const showCommandMenu = (actor, clientX, clientY) => {
+    if (!commandMenu || !ponyMap) return;
+    const cardRect = ponyMap.parentElement?.getBoundingClientRect();
+    if (!cardRect) return;
+    commandTarget = actor;
+    if (commandTitle) {
+      commandTitle.textContent = actor?.sprite?.pony?.name || "Pony";
+    }
+    commandMenu.hidden = false;
+    const menuWidth = commandMenu.offsetWidth || 160;
+    const menuHeight = commandMenu.offsetHeight || 100;
+    let left = clientX - cardRect.left;
+    let top = clientY - cardRect.top;
+    const maxLeft = cardRect.width - menuWidth - 8;
+    const maxTop = cardRect.height - menuHeight - 8;
+    if (left > maxLeft) left = maxLeft;
+    if (top > maxTop) top = maxTop;
+    if (left < 8) left = 8;
+    if (top < 8) top = 8;
+    commandMenu.style.left = `${left}px`;
+    commandMenu.style.top = `${top}px`;
+  };
 
   const pattern = (() => {
     const tile = document.createElement("canvas");
@@ -1065,50 +1186,53 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         const drinkThreshold = Number.isFinite(actor.drinkThreshold)
           ? actor.drinkThreshold
           : DRINK_THRESHOLD_DEFAULT;
-        const canEat = foodSpots.length > 0 && now > actor.eatCooldownUntil;
-        const canDrink = drinkSpots.length > 0 && now > actor.drinkCooldownUntil;
-        const candidates = [];
-        if (canEat && actor.stats.hunger >= eatThreshold) {
-          const target = pickFoodSpot(actor, { x, y });
-          if (target) {
-            candidates.push({
-              need: "hunger",
-              level: actor.stats.hunger,
-              task: { type: "eat", foodId: target.id },
-            });
-          }
-        }
-        if (canDrink && actor.stats.thirst >= drinkThreshold) {
-          const target = pickDrinkSpot(actor, { x, y });
-          if (target) {
-            candidates.push({
-              need: "thirst",
-              level: actor.stats.thirst,
-              task: { type: "drink", drinkId: target.id },
-            });
-          }
-        }
-        if (
-          actor.stats.tiredness > 60 &&
-          actor.homeId &&
-          housesById.has(actor.homeId)
-        ) {
-          candidates.push({
-            need: "tired",
-            level: actor.stats.tiredness,
-            task: { type: "rest", houseId: actor.homeId },
-          });
-        }
-        const chosenNeed = pickNeedCandidate(candidates);
-        if (chosenNeed) {
-          if (!actor.task || actor.task.type !== chosenNeed.task.type) {
-            actor.task = chosenNeed.task;
-          }
-        } else if (isBuilder) {
-          if (!actor.task || actor.task.type !== "repair") {
-            const target = findRepairTarget();
+        const hasManualTask = actor.task && actor.task.manual;
+        if (!hasManualTask) {
+          const canEat = foodSpots.length > 0 && now > actor.eatCooldownUntil;
+          const canDrink = drinkSpots.length > 0 && now > actor.drinkCooldownUntil;
+          const candidates = [];
+          if (canEat && actor.stats.hunger >= eatThreshold) {
+            const target = pickFoodSpot(actor, { x, y });
             if (target) {
-              actor.task = { type: "repair", houseId: target.id };
+              candidates.push({
+                need: "hunger",
+                level: actor.stats.hunger,
+                task: { type: "eat", foodId: target.id },
+              });
+            }
+          }
+          if (canDrink && actor.stats.thirst >= drinkThreshold) {
+            const target = pickDrinkSpot(actor, { x, y });
+            if (target) {
+              candidates.push({
+                need: "thirst",
+                level: actor.stats.thirst,
+                task: { type: "drink", drinkId: target.id },
+              });
+            }
+          }
+          if (
+            actor.stats.tiredness > 60 &&
+            actor.homeId &&
+            housesById.has(actor.homeId)
+          ) {
+            candidates.push({
+              need: "tired",
+              level: actor.stats.tiredness,
+              task: { type: "rest", houseId: actor.homeId },
+            });
+          }
+          const chosenNeed = pickNeedCandidate(candidates);
+          if (chosenNeed) {
+            if (!actor.task || actor.task.type !== chosenNeed.task.type) {
+              actor.task = chosenNeed.task;
+            }
+          } else if (isBuilder) {
+            if (!actor.task || actor.task.type !== "repair") {
+              const target = findRepairTarget();
+              if (target) {
+                actor.task = { type: "repair", houseId: target.id };
+              }
             }
           }
         }
@@ -1122,6 +1246,9 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             actor.task = null;
           }
         }
+        if (actor.task && actor.task.type === "rest" && actor.task.inn && !innObject) {
+          actor.task = null;
+        }
         if (actor.task && actor.task.type === "eat") {
           const spot = foodSpotById.get(actor.task.foodId);
           if (!spot) {
@@ -1134,6 +1261,9 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             actor.task = null;
           }
         }
+        actor.speed = hasManualTask
+          ? actor.baseSpeed * MANUAL_SPEED_MULTIPLIER
+          : actor.baseSpeed;
         const distance = Math.hypot(to.x - from.x, to.y - from.y);
         actor.t += (actor.speed * delta) / Math.max(distance, 1);
         if (actor.t >= 1) {
@@ -1149,7 +1279,13 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             const choicePool = nextOptions.length ? nextOptions : options;
             let targetPoint = null;
             let preferTarget = false;
-            if (actor.task && actor.task.houseId) {
+            if (actor.task && actor.task.type === "rest") {
+              if (actor.task.houseId) {
+                targetPoint = getHouseTargetPoint(actor.task.houseId);
+              } else if (actor.task.inn) {
+                targetPoint = getInnTargetPoint();
+              }
+            } else if (actor.task && actor.task.houseId) {
               targetPoint = getHouseTargetPoint(actor.task.houseId);
             } else if (actor.task && actor.task.type === "eat") {
               targetPoint = getFoodTargetPoint(actor.task.foodId);
@@ -1237,18 +1373,23 @@ async function initMap(mapData, ponies, locations, runtimeState) {
           }
         }
 
-        if (innObject && !startedEating && !startedDrinking) {
+        const skipAutoRest = actor.task && actor.task.manual && actor.task.type !== "rest";
+        if (innObject && !startedEating && !startedDrinking && !skipAutoRest) {
           const innX = innObject.at.x * mapData.meta.tileSize;
           const innY = innObject.at.y * mapData.meta.tileSize;
           const distToInn = Math.hypot(x - innX, y - innY);
           const sleepRadiusTiles = innObject.sleepRadius || 0.6;
           const sleepRadius = mapData.meta.tileSize * sleepRadiusTiles;
+          const forceRestAtInn =
+            actor.task && actor.task.type === "rest" && actor.task.inn;
           if (distToInn < sleepRadius && now > actor.innCooldownUntil) {
             const tirednessLevel = Number.isFinite(actor.stats.tiredness)
               ? actor.stats.tiredness
               : 35;
-            const restChance = Math.min(0.9, Math.max(0.15, tirednessLevel / 100));
-            if (Math.random() > restChance) {
+            const restChance = forceRestAtInn
+              ? 1
+              : Math.min(0.9, Math.max(0.15, tirednessLevel / 100));
+            if (!forceRestAtInn && Math.random() > restChance) {
               actor.innCooldownUntil = now + 2000 + Math.random() * 2000;
             } else {
               const homeState = actor.homeId ? houseStates.get(actor.homeId) : null;
@@ -1258,7 +1399,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
                 homeState &&
                 homeState.status !== "repairing" &&
                 homeState.status !== "under_construction";
-              if (canRestAtHome && Math.random() < 0.9) {
+              if (!forceRestAtInn && canRestAtHome && Math.random() < 0.9) {
                 actor.innCooldownUntil = now + 2000 + Math.random() * 2000;
               } else {
                 const spotIndex = claimInnSpot();
@@ -1274,6 +1415,9 @@ async function initMap(mapData, ponies, locations, runtimeState) {
                   actor.frameIndex = 0;
                   actor.lastFrame = 0;
                   actor.stats.tiredness = 0;
+                  if (forceRestAtInn) {
+                    actor.task = null;
+                  }
                 } else {
                   actor.innCooldownUntil = now + 3000 + Math.random() * 2000;
                 }
@@ -1282,7 +1426,15 @@ async function initMap(mapData, ponies, locations, runtimeState) {
           }
         }
 
-        if (actor.homeId && !startedEating && !startedDrinking) {
+        const skipHomeRest =
+          actor.task && actor.task.manual && actor.task.type === "rest" && actor.task.inn;
+        if (
+          actor.homeId &&
+          !startedEating &&
+          !startedDrinking &&
+          !skipAutoRest &&
+          !skipHomeRest
+        ) {
           const house = housesById.get(actor.homeId);
           const state = house ? houseStates.get(actor.homeId) : null;
           if (house && state) {
@@ -1602,6 +1754,25 @@ async function initMap(mapData, ponies, locations, runtimeState) {
 
   window.setInterval(saveRuntimeState, STATE_SAVE_INTERVAL);
 
+  if (commandMenu) {
+    commandMenu.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-command]");
+      if (!button) return;
+      event.preventDefault();
+      const command = button.dataset.command;
+      if (commandTarget) {
+        assignManualTask(commandTarget, command);
+      }
+      hideCommandMenu();
+    });
+  }
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!commandMenu || commandMenu.hidden) return;
+    if (commandMenu.contains(event.target)) return;
+    hideCommandMenu();
+  });
+
   if (mapTooltip) {
     const hideTooltip = () => {
       mapTooltip.classList.remove("is-visible");
@@ -1624,6 +1795,16 @@ async function initMap(mapData, ponies, locations, runtimeState) {
           point.x <= item.x + item.width &&
           point.y >= item.y &&
           point.y <= item.y + item.height
+      );
+
+    const getPonyHit = (point) =>
+      actors.find(
+        (actor) =>
+          actor.bounds &&
+          point.x >= actor.bounds.x &&
+          point.x <= actor.bounds.x + actor.bounds.width &&
+          point.y >= actor.bounds.y &&
+          point.y <= actor.bounds.y + actor.bounds.height
       );
 
     const setCursor = (value) => {
@@ -1728,10 +1909,27 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       }
     };
 
+    const handlePonyClick = (event) => {
+      if (dragState.active) return;
+      const point = getCanvasPoint(event);
+      const hit = getPonyHit(point);
+      if (hit) {
+        if (commandTarget === hit && commandMenu && !commandMenu.hidden) {
+          hideCommandMenu();
+          return;
+        }
+        showCommandMenu(hit, event.clientX, event.clientY);
+        hideTooltip();
+      } else {
+        hideCommandMenu();
+      }
+    };
+
     ponyMap.addEventListener("pointerdown", handleDragStart);
     ponyMap.addEventListener("pointermove", handleDragMove);
     ponyMap.addEventListener("pointerup", handleDragEnd);
     ponyMap.addEventListener("pointercancel", handleDragEnd);
+    ponyMap.addEventListener("click", handlePonyClick);
     ponyMap.addEventListener("pointerleave", () => {
       if (!dragState.active) {
         setCursor("default");
