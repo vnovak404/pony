@@ -502,11 +502,25 @@
         "id": "bakery",
         "kind": "building",
         "at": {
-          "x": 17.47,
-          "y": 7.97
+          "x": 17.15,
+          "y": 7.88
         },
         "sprite": "bakery_01",
         "locationId": "sunrise-bakery"
+      },
+      {
+        "id": "restaurant",
+        "kind": "food",
+        "at": {
+          "x": 27.74,
+          "y": 16.03
+        },
+        "sprite": "restaurant_01",
+        "locationId": "pony-restaurant",
+        "drives": [
+          "eat"
+        ],
+        "scale": 1.6
       },
       {
         "id": "lemonade-bar",
@@ -517,6 +531,9 @@
         },
         "sprite": "lemonade_bar_01",
         "locationId": "lemonade-bar",
+        "drives": [
+          "drink"
+        ],
         "scale": 1.4
       },
       {
@@ -540,11 +557,25 @@
         "locationId": "market-square"
       },
       {
+        "id": "milk-honey-well",
+        "kind": "landmark",
+        "at": {
+          "x": 20.42,
+          "y": 15.69
+        },
+        "sprite": "well_01",
+        "locationId": "milk-honey-well",
+        "drives": [
+          "drink"
+        ],
+        "scale": 1.3
+      },
+      {
         "id": "clinic",
         "kind": "building",
         "at": {
-          "x": 24.07,
-          "y": 20.58
+          "x": 23.98,
+          "y": 19.58
         },
         "sprite": "clinic_01",
         "locationId": "pony-clinic"
@@ -617,11 +648,25 @@
         "locationId": "crystal-creek"
       },
       {
+        "id": "picnic-spot",
+        "kind": "food",
+        "at": {
+          "x": 4.12,
+          "y": 15.09
+        },
+        "sprite": "picnic_01",
+        "locationId": "picnic-grove",
+        "drives": [
+          "eat"
+        ],
+        "scale": 1.7
+      },
+      {
         "id": "whispering-forest",
         "kind": "nature",
         "at": {
-          "x": 3.01,
-          "y": 10.59
+          "x": 2.93,
+          "y": 10.25
         },
         "sprite": "forest_01",
         "locationId": "whispering-forest",
@@ -631,12 +676,140 @@
         "id": "silver-lake",
         "kind": "nature",
         "at": {
-          "x": 29.54,
-          "y": 24.0
+          "x": 30.85,
+          "y": 12.78
         },
         "sprite": "lake_01",
         "locationId": "silver-lake",
         "scale": 3.2
+      },
+      {
+        "id": "starlight-manor",
+        "kind": "house",
+        "at": {
+          "x": 25.81,
+          "y": 7.81
+        },
+        "spritePath": "/assets/world/houses/starlight-manor.png",
+        "label": "Starlight Manor",
+        "residents": [
+          "Golden Violet",
+          "Moonbeam"
+        ],
+        "scale": 1.9
+      },
+      {
+        "id": "sunrise-loft",
+        "kind": "house",
+        "at": {
+          "x": 8.14,
+          "y": 7.82
+        },
+        "spritePath": "/assets/world/houses/sunrise-loft.png",
+        "label": "Sunrise Loft",
+        "residents": [
+          "Sky Sprinter",
+          "Sunny Pippin"
+        ],
+        "scale": 1.8
+      },
+      {
+        "id": "mystic-tower",
+        "kind": "house",
+        "at": {
+          "x": 13.46,
+          "y": 15.73
+        },
+        "spritePath": "/assets/world/houses/mystic-tower.png",
+        "label": "Mystic Tower",
+        "residents": [
+          "Catohorn"
+        ],
+        "scale": 1.6
+      },
+      {
+        "id": "rescue-cottage",
+        "kind": "house",
+        "at": {
+          "x": 4.48,
+          "y": 12.0
+        },
+        "spritePath": "/assets/world/houses/rescue-cottage.png",
+        "label": "Rescue Cottage",
+        "residents": [
+          "Stellacorn"
+        ],
+        "scale": 1.5
+      },
+      {
+        "id": "racers-roost",
+        "kind": "house",
+        "at": {
+          "x": 36.4,
+          "y": 12.5
+        },
+        "spritePath": "/assets/world/houses/racers-roost.png",
+        "label": "Racer's Roost",
+        "residents": [
+          "Gleam Treasure"
+        ],
+        "scale": 1.5
+      },
+      {
+        "id": "torrent-lodge",
+        "kind": "house",
+        "at": {
+          "x": 7.74,
+          "y": 11.18
+        },
+        "spritePath": "/assets/world/houses/torrent-lodge.png",
+        "label": "Torrent Lodge",
+        "residents": [
+          "Tiny Horn"
+        ],
+        "scale": 1.5
+      },
+      {
+        "id": "acrobat-atelier",
+        "kind": "house",
+        "at": {
+          "x": 28.04,
+          "y": 19.2
+        },
+        "spritePath": "/assets/world/houses/acrobat-atelier.png",
+        "label": "Acrobat Atelier",
+        "residents": [
+          "Pixie"
+        ],
+        "scale": 1.5
+      },
+      {
+        "id": "kindness-cottage",
+        "kind": "house",
+        "at": {
+          "x": 20.32,
+          "y": 19.11
+        },
+        "spritePath": "/assets/world/houses/kindness-cottage.png",
+        "label": "Kindness Cottage",
+        "residents": [
+          "Maria"
+        ],
+        "scale": 1.5
+      },
+      {
+        "id": "house-taticorn",
+        "kind": "house",
+        "at": {
+          "x": 22.57,
+          "y": 7.83
+        },
+        "spritePath": "/assets/world/houses/house-taticorn.png",
+        "label": "Taticorn's House",
+        "residents": [
+          "Taticorn"
+        ],
+        "scale": 1.5
       }
     ]
   }

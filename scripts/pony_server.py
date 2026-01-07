@@ -2,8 +2,10 @@
 import argparse
 import json
 import os
+import random
 import subprocess
 import sys
+import threading
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -15,6 +17,24 @@ DEFAULT_ENV_FILE = ".env"
 DEFAULT_SPRITE_JOBS = 6
 DEFAULT_SPRITE_RETRIES = 5
 DEFAULT_MAP_PATH = "assets/world/maps/ponyville.json"
+DEFAULT_STATE_PATH = "data/runtime_state.json"
+HOUSE_SHARE_CHANCE = 0.35
+HOUSE_GROUP_CHANCE = 0.2
+FOOD_PREFERENCES = ["restaurant", "picnic", "bakery"]
+DRINK_PREFERENCES = ["lemonade", "well"]
+HOUSE_LOTS = [
+    {"x": 8.5, "y": 4.2},
+    {"x": 13.5, "y": 4.2},
+    {"x": 22.5, "y": 4.2},
+    {"x": 27.5, "y": 4.2},
+    {"x": 32.5, "y": 4.2},
+    {"x": 5.5, "y": 18.8},
+    {"x": 13.5, "y": 20.2},
+    {"x": 18.5, "y": 20.2},
+    {"x": 24.5, "y": 20.2},
+    {"x": 30.5, "y": 20.2},
+    {"x": 35.5, "y": 18.8},
+]
 
 
 def slugify(name):
@@ -54,6 +74,45 @@ def build_pony(payload):
         species = "pony"
 
     slug = slugify(name)
+    job_payload = payload.get("job") if isinstance(payload, dict) else {}
+    if not isinstance(job_payload, dict):
+        job_payload = {}
+    job_title = sanitize_value(job_payload.get("title"), "helper")
+    job_service = sanitize_value(
+        job_payload.get("service"),
+        "helps with friendly pony tasks",
+    )
+    job_paid_in = sanitize_value(job_payload.get("paid_in"), "kindness tokens")
+    house_payload = payload.get("house") if isinstance(payload, dict) else {}
+    if not isinstance(house_payload, dict):
+        house_payload = {}
+    house_id = sanitize_value(house_payload.get("id"), f"house-{slug}", max_len=80)
+    house_name = sanitize_value(house_payload.get("name"), f"{name}'s House")
+    drives_payload = payload.get("drives") if isinstance(payload, dict) else {}
+    if not isinstance(drives_payload, dict):
+        drives_payload = {}
+    eat_payload = drives_payload.get("eat") if isinstance(drives_payload, dict) else {}
+    if not isinstance(eat_payload, dict):
+        eat_payload = {}
+    drink_payload = drives_payload.get("drink") if isinstance(drives_payload, dict) else {}
+    if not isinstance(drink_payload, dict):
+        drink_payload = {}
+    eat_threshold = eat_payload.get("threshold", 60)
+    try:
+        eat_threshold = int(eat_threshold)
+    except (TypeError, ValueError):
+        eat_threshold = 60
+    eat_preference = sanitize_value(eat_payload.get("preference"), "")
+    if not eat_preference:
+        eat_preference = random.choice(FOOD_PREFERENCES)
+    drink_threshold = drink_payload.get("threshold", 55)
+    try:
+        drink_threshold = int(drink_threshold)
+    except (TypeError, ValueError):
+        drink_threshold = 55
+    drink_preference = sanitize_value(drink_payload.get("preference"), "")
+    if not drink_preference:
+        drink_preference = random.choice(DRINK_PREFERENCES)
     pony = {
         "name": name,
         "slug": slug,
@@ -63,6 +122,34 @@ def build_pony(payload):
         "accent_color": sanitize_value(payload.get("accent_color"), "buttercream"),
         "talent": sanitize_value(payload.get("talent"), "making friends"),
         "personality": sanitize_value(payload.get("personality"), "kind and curious"),
+        "job": {
+            "title": job_title,
+            "service": job_service,
+            "paid_in": job_paid_in,
+        },
+        "stats": {
+            "health": int(payload.get("health", 92)) if isinstance(payload, dict) else 92,
+            "hunger": int(payload.get("hunger", 28)) if isinstance(payload, dict) else 28,
+            "thirst": int(payload.get("thirst", 20)) if isinstance(payload, dict) else 20,
+            "boredom": int(payload.get("boredom", 24)) if isinstance(payload, dict) else 24,
+            "tiredness": int(payload.get("tiredness", 35))
+            if isinstance(payload, dict)
+            else 35,
+        },
+        "house": {
+            "id": house_id,
+            "name": house_name,
+        },
+        "drives": {
+            "eat": {
+                "threshold": eat_threshold,
+                "preference": eat_preference,
+            },
+            "drink": {
+                "threshold": drink_threshold,
+                "preference": drink_preference,
+            },
+        },
         "sprites": {
             "sheet": f"assets/ponies/{slug}/sheets/spritesheet.png",
             "meta": f"assets/ponies/{slug}/sheets/spritesheet.json",
@@ -194,6 +281,23 @@ def run_spritesheet_packer(slug, payload):
     }
 
 
+def run_house_generator(slug):
+    command = [
+        sys.executable,
+        "scripts/generate_pony_houses.py",
+        "--pony",
+        slug,
+    ]
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr or result.stdout or "House asset generation failed.")
+
+
 def ensure_output_dir(path):
     full_path = ROOT / path
     full_path.mkdir(parents=True, exist_ok=True)
@@ -203,6 +307,106 @@ def ensure_pony_asset_dirs(slug):
     base = ROOT / DEFAULT_OUTPUT_DIR / slug
     (base / "frames").mkdir(parents=True, exist_ok=True)
     (base / "sheets").mkdir(parents=True, exist_ok=True)
+
+
+def assign_house(ponies, pony):
+    existing = {}
+    for entry in ponies:
+        house = entry.get("house") or {}
+        house_id = house.get("id")
+        if house_id:
+            existing.setdefault(house_id, []).append(entry)
+
+    share = bool(existing) and random.random() < HOUSE_SHARE_CHANCE
+    if share:
+        if random.random() < HOUSE_GROUP_CHANCE:
+            candidates = [hid for hid, residents in existing.items() if len(residents) >= 2]
+        else:
+            candidates = []
+        if not candidates:
+            candidates = list(existing.keys())
+        house_id = random.choice(candidates)
+        residents = existing.get(house_id, [])
+        house_name = None
+        for resident in residents:
+            house_name = (resident.get("house") or {}).get("name")
+            if house_name:
+                break
+        house_name = house_name or pony["house"].get("name") or f"{pony['name']}'s House"
+        pony["house"] = {
+            "id": house_id,
+            "name": house_name,
+            "shared": True,
+        }
+        for resident in residents:
+            resident_house = resident.setdefault("house", {})
+            resident_house["id"] = house_id
+            resident_house.setdefault("name", house_name)
+            resident_house["shared"] = True
+        return house_id, False
+
+    pony["house"] = {
+        "id": pony["house"].get("id") or f"house-{pony['slug']}",
+        "name": pony["house"].get("name") or f"{pony['name']}'s House",
+        "shared": False,
+    }
+    return pony["house"]["id"], True
+
+
+def ensure_house_on_map(map_path, house, residents):
+    map_data = load_data(map_path)
+    layers = map_data.setdefault("layers", {})
+    objects = layers.setdefault("objects", [])
+    for item in objects:
+        if item.get("id") == house["id"]:
+            item["label"] = item.get("label") or house.get("name")
+            item["residents"] = residents
+            if house.get("shared"):
+                item["scale"] = max(float(item.get("scale", 1.5)), 1.7)
+            save_data(map_path, map_data)
+            return
+
+    used = {
+        ((item.get("at") or {}).get("x"), (item.get("at") or {}).get("y"))
+        for item in objects
+    }
+    spot = None
+    for candidate in HOUSE_LOTS:
+        if (candidate["x"], candidate["y"]) not in used:
+            spot = candidate
+            break
+    if not spot:
+        spot = {"x": 2.5 + random.random() * 35, "y": 2.5 + random.random() * 19}
+
+    objects.append(
+        {
+            "id": house["id"],
+            "kind": "house",
+            "at": {"x": round(spot["x"], 2), "y": round(spot["y"], 2)},
+            "spritePath": f"/assets/world/houses/{house['id']}.png",
+            "label": house["name"],
+            "residents": residents,
+            "scale": 1.7 if house.get("shared") else 1.5,
+        }
+    )
+    save_data(map_path, map_data)
+
+
+def launch_async(target, *args):
+    thread = threading.Thread(target=target, args=args, daemon=True)
+    thread.start()
+
+
+def run_post_create_tasks(slug):
+    try:
+        run_sprite_generator(slug, {"use_portrait": True})
+        run_spritesheet_packer(slug, {})
+    except Exception as exc:
+        print(f"Sprite pipeline failed for {slug}: {exc}", file=sys.stderr)
+    try:
+        run_house_generator(slug)
+    except Exception as exc:
+        print(f"House generation failed for {slug}: {exc}", file=sys.stderr)
 
 
 def load_json_body(handler):
@@ -224,12 +428,14 @@ class PonyHandler(SimpleHTTPRequestHandler):
         output_dir=None,
         env_file=None,
         map_path=None,
+        state_path=None,
         **kwargs,
     ):
         self.data_path = data_path or DEFAULT_DATA
         self.output_dir = output_dir or DEFAULT_OUTPUT_DIR
         self.env_file = env_file or DEFAULT_ENV_FILE
         self.map_path = map_path or DEFAULT_MAP_PATH
+        self.state_path = state_path or DEFAULT_STATE_PATH
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def send_json(self, status, payload):
@@ -240,15 +446,25 @@ class PonyHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_GET(self):
+        path = self.path.split("?", 1)[0]
+        if path == "/api/state":
+            return self._handle_get_state()
+        return super().do_GET()
+
     def do_POST(self):
-        if self.path == "/api/ponies":
+        path = self.path.split("?", 1)[0]
+        if path == "/api/ponies":
             return self._handle_create_pony()
 
-        if self.path.startswith("/api/ponies/"):
+        if path.startswith("/api/ponies/"):
             return self._handle_sprite_actions()
 
-        if self.path.startswith("/api/map/objects/"):
+        if path.startswith("/api/map/objects/"):
             return self._handle_update_map_object()
+
+        if path == "/api/state":
+            return self._handle_save_state()
 
         self.send_error(HTTPStatus.NOT_FOUND, "Not Found")
         return
@@ -302,6 +518,50 @@ class PonyHandler(SimpleHTTPRequestHandler):
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 {"error": str(exc)},
             )
+        return
+
+    def _handle_get_state(self):
+        state_path = ROOT / self.state_path
+        if not state_path.exists():
+            self.send_json(
+                HTTPStatus.OK,
+                {"version": 1, "ponies": {}, "updatedAt": None},
+            )
+            return
+        try:
+            payload = load_data(state_path)
+        except Exception:
+            self.send_json(
+                HTTPStatus.OK,
+                {"version": 1, "ponies": {}, "updatedAt": None},
+            )
+            return
+        if not isinstance(payload, dict):
+            payload = {"version": 1, "ponies": {}, "updatedAt": None}
+        payload.setdefault("version", 1)
+        payload.setdefault("ponies", {})
+        self.send_json(HTTPStatus.OK, payload)
+        return
+
+    def _handle_save_state(self):
+        payload = load_json_body(self)
+        if payload is None:
+            self.send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": "Invalid JSON body."},
+            )
+            return
+        state_path = ROOT / self.state_path
+        try:
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            save_data(state_path, payload)
+        except Exception as exc:
+            self.send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": str(exc)},
+            )
+            return
+        self.send_json(HTTPStatus.OK, {"status": "ok"})
         return
 
     def _handle_update_map_object(self):
@@ -413,11 +673,27 @@ class PonyHandler(SimpleHTTPRequestHandler):
             )
             return
 
+        house_id, _ = assign_house(ponies, pony)
+
         ponies.append(pony)
         data["ponies"] = ponies
 
         try:
             save_data(data_path, data)
+            try:
+                residents = [
+                    entry.get("name")
+                    for entry in ponies
+                    if (entry.get("house") or {}).get("id") == house_id
+                ]
+                if residents:
+                    ensure_house_on_map(
+                        ROOT / self.map_path,
+                        pony.get("house", {}),
+                        residents,
+                    )
+            except Exception as exc:
+                print(f"Map update failed for {pony['slug']}: {exc}", file=sys.stderr)
             ensure_output_dir(self.output_dir)
             ensure_pony_asset_dirs(pony["slug"])
             run_generator(
@@ -438,6 +714,8 @@ class PonyHandler(SimpleHTTPRequestHandler):
             )
             return
 
+        launch_async(run_post_create_tasks, pony["slug"])
+
         image_path = f"{self.output_dir}/{pony['slug']}.png"
         self.send_json(
             HTTPStatus.CREATED,
@@ -456,6 +734,7 @@ def parse_args():
     parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--env-file", default=DEFAULT_ENV_FILE)
     parser.add_argument("--map", default=DEFAULT_MAP_PATH)
+    parser.add_argument("--state", default=DEFAULT_STATE_PATH)
     return parser.parse_args()
 
 
@@ -468,6 +747,7 @@ def main():
         output_dir=args.output_dir,
         env_file=args.env_file,
         map_path=args.map,
+        state_path=args.state,
         **handler_kwargs,
     )
 

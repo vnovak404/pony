@@ -58,7 +58,7 @@ def try_fix_transparency(path, tolerance=12):
     return True
 
 
-def needs_horizontal_flip(path, threshold=0.02):
+def needs_horizontal_flip(path, threshold=0.02, balance_threshold=0.08):
     image_path = Path(path)
     try:
         image = _load_image(image_path)
@@ -73,19 +73,29 @@ def needs_horizontal_flip(path, threshold=0.02):
         data = alpha.getdata()
         total = 0
         sum_x = 0
+        left_sum = 0
+        right_sum = 0
         for idx, value in enumerate(data):
             if value == 0:
                 continue
             x = idx % width
             total += value
             sum_x += value * x
+            if x < width * 0.5:
+                left_sum += value
+            else:
+                right_sum += value
 
         if total == 0:
             return False
 
         center_x = sum_x / total
         margin = width * threshold
-        return center_x < (width * 0.5 - margin)
+        if center_x < (width * 0.5 - margin):
+            return True
+        if right_sum == 0:
+            return False
+        return left_sum > right_sum * (1 + balance_threshold)
 
 
 def enforce_facing_right(path):

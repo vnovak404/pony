@@ -85,7 +85,7 @@ def build_prompt(pony, style, extra_prompt):
         f"Talent: {talent}.",
         f"Palette: {palette}.",
         f"Background: {background}.",
-        "Full body, standing, smiling, looking toward the viewer.",
+        "Full body, standing, smiling, side view facing right.",
         "No text, no watermark.",
     ]
 
@@ -125,7 +125,7 @@ def request_images(api_url, api_key, prompt, model, size, quality, count):
         message = f"Request failed: {exc.code} {exc.reason}\n{detail}"
         if exc.code == 404:
             message += (
-                "\nCheck the API URL. The images endpoint is typically "
+                "\nCheck the API URL. For OpenAI use "
                 "https://api.openai.com/v1/images/generations."
             )
         raise RuntimeError(message) from exc
@@ -135,16 +135,28 @@ def save_images(image_data, output_dir, slug, overwrite):
     paths = []
     for idx, entry in enumerate(image_data, start=1):
         b64_json = entry.get("b64_json")
+        url = entry.get("url")
         if not b64_json:
-            continue
+            if not url:
+                continue
         suffix = f"-{idx}" if len(image_data) > 1 else ""
         filename = f"{slug}{suffix}.png"
         path = os.path.join(output_dir, filename)
         if os.path.exists(path) and not overwrite:
             print(f"Skipping existing file: {path}")
             continue
-        with open(path, "wb") as handle:
-            handle.write(base64.b64decode(b64_json))
+        if b64_json:
+            with open(path, "wb") as handle:
+                handle.write(base64.b64decode(b64_json))
+        else:
+            try:
+                with urllib.request.urlopen(url, timeout=120) as response:
+                    content = response.read()
+                with open(path, "wb") as handle:
+                    handle.write(content)
+            except urllib.error.URLError as exc:
+                print(f"Failed to download image for {slug}: {exc}")
+                continue
         paths.append(path)
     return paths
 
@@ -226,9 +238,9 @@ def parse_args():
 def main():
     args = parse_args()
 
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        api_key = load_env_value(args.env_file, "OPENAI_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY") or load_env_value(
+        args.env_file, "OPENAI_API_KEY"
+    )
     if not api_key and not args.dry_run:
         print("Missing OPENAI_API_KEY in the environment.")
         return 1
@@ -240,6 +252,8 @@ def main():
 
     only = {slug.strip() for slug in args.only.split(",") if slug.strip()}
     os.makedirs(args.output_dir, exist_ok=True)
+    api_url = args.api_url
+    model = args.model
 
     for pony in ponies:
         slug = pony.get("slug") or slugify(pony.get("name", "pony"))
@@ -253,10 +267,10 @@ def main():
 
         print(f"Generating image for {slug}...")
         image_data = request_images(
-            args.api_url,
+            api_url,
             api_key,
             prompt,
-            args.model,
+            model,
             args.size,
             args.quality,
             args.count,

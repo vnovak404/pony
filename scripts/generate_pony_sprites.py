@@ -8,7 +8,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.sprites.prompting import build_sprite_prompt  # noqa: E402
+from scripts.sprites.prompting import (  # noqa: E402
+    build_sprite_prompt,
+    get_action_frame_name,
+)
 from scripts.sprites import images_api, qc  # noqa: E402
 
 DEFAULT_DATA = "data/ponies.json"
@@ -77,6 +80,11 @@ def parse_args():
         default=DEFAULT_ACTIONS,
         help=f"Path to actions JSON (default: {DEFAULT_ACTIONS}).",
     )
+    parser.add_argument(
+        "--auto-flip",
+        action="store_true",
+        help="Auto-flip frames to face right (disabled by default).",
+    )
     return parser.parse_args()
 
 
@@ -84,8 +92,8 @@ def log(prefix, message):
     print(f"[{prefix}] {message}", flush=True)
 
 
-def build_frame_name(action_id, index):
-    return f"{action_id}_{index + 1:02d}"
+def build_frame_name(action_id, index, frame_count):
+    return get_action_frame_name(action_id, index, frame_count)
 
 
 def select_actions(action_list, selected):
@@ -105,6 +113,7 @@ def generate_frame(task):
     dry_run = task["dry_run"]
     force = task["force"]
     max_retries = task["max_retries"]
+    auto_flip = task["auto_flip"]
     prefix = task["prefix"]
     source_image = task.get("source_image")
 
@@ -153,13 +162,14 @@ def generate_frame(task):
                         temp_path.replace(out_path)
                         return "generated"
             if ok:
-                flipped = False
-                try:
-                    flipped = qc.enforce_facing_right(temp_path)
-                except RuntimeError as exc:
-                    log(prefix, f"Facing check skipped: {exc}")
-                if flipped:
-                    log(prefix, "Auto-flipped to face right.")
+                if auto_flip:
+                    flipped = False
+                    try:
+                        flipped = qc.enforce_facing_right(temp_path)
+                    except RuntimeError as exc:
+                        log(prefix, f"Facing check skipped: {exc}")
+                    if flipped:
+                        log(prefix, "Auto-flipped to face right.")
                 log(prefix, "QC ok.")
                 temp_path.replace(out_path)
                 return "generated"
@@ -225,7 +235,7 @@ def main():
         for action in actions:
             frame_count = int(action.get("frames", 1))
             for frame_index in range(frame_count):
-                frame_name = build_frame_name(action["id"], frame_index)
+                frame_name = build_frame_name(action["id"], frame_index, frame_count)
                 out_path = frame_dir / f"{frame_name}.png"
                 tasks.append(
                     {
@@ -238,6 +248,7 @@ def main():
                         "dry_run": args.dry_run,
                         "force": args.force,
                         "max_retries": args.max_retries,
+                        "auto_flip": args.auto_flip,
                         "prefix": f"{pony_id}/{action['id']}/{frame_index + 1}",
                         "source_image": source_image,
                     }

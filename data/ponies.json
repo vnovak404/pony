@@ -17,7 +17,30 @@
       "sprites": {
         "sheet": "assets/ponies/golden-violet/sheets/spritesheet.png",
         "meta": "assets/ponies/golden-violet/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "lantern guide",
+        "service": "leads firefly lantern tours",
+        "paid_in": "glow tokens"
+      },
+      "house": {
+        "id": "starlight-manor",
+        "name": "Starlight Manor",
+        "shared": true
+      },
+      "drives": {
+        "eat": {
+          "threshold": 62,
+          "preference": "picnic"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false
     },
     {
       "name": "Sky Sprinter",
@@ -31,7 +54,30 @@
       "sprites": {
         "sheet": "assets/ponies/sky-sprinter/sheets/spritesheet.png",
         "meta": "assets/ponies/sky-sprinter/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "cloud sculptor",
+        "service": "shapes parade clouds",
+        "paid_in": "sky tickets"
+      },
+      "house": {
+        "id": "sunrise-loft",
+        "name": "Sunrise Loft",
+        "shared": true
+      },
+      "drives": {
+        "eat": {
+          "threshold": 55,
+          "preference": "picnic"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false
     },
     {
       "name": "Sunny Pippin",
@@ -45,7 +91,30 @@
       "sprites": {
         "sheet": "assets/ponies/sunny-pippin/sheets/spritesheet.png",
         "meta": "assets/ponies/sunny-pippin/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "home builder",
+        "service": "builds and renovates pony houses",
+        "paid_in": "cupcake coins"
+      },
+      "house": {
+        "id": "sunrise-loft",
+        "name": "Sunrise Loft",
+        "shared": true
+      },
+      "drives": {
+        "eat": {
+          "threshold": 60,
+          "preference": "restaurant"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false
     },
     {
       "name": "Moonbeam",
@@ -59,24 +128,69 @@
       "sprites": {
         "sheet": "assets/ponies/moonbeam/sheets/spritesheet.png",
         "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "stargazer",
+        "service": "tracks wishes and star stories",
+        "paid_in": "moon charms"
+      },
+      "house": {
+        "id": "starlight-manor",
+        "name": "Starlight Manor",
+        "shared": true
+      },
+      "drives": {
+        "eat": {
+          "threshold": 58,
+          "preference": "picnic"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false
     },
     {
-      "name": "Raging Torrent",
+      "name": "Tiny Horn",
       "slug": "raging-torrent",
       "species": "unicorn",
       "body_color": "midnight green",
       "mane_color": "envy green",
       "accent_color": "emerald",
-      "talent": "tantrum master",
+      "talent": "entertaining and clowning",
       "personality": "stubborn and quarrelsome",
       "sprites": {
         "sheet": "assets/ponies/raging-torrent/sheets/spritesheet.png",
         "meta": "assets/ponies/raging-torrent/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "storm trainer",
+        "service": "teaches strong-water safety",
+        "paid_in": "storm badges"
+      },
+      "house": {
+        "id": "torrent-lodge",
+        "name": "Torrent Lodge"
+      },
+      "drives": {
+        "eat": {
+          "threshold": 65,
+          "preference": "restaurant"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": true
     },
     {
-      "name": "Blue Wonder",
+      "name": "Catohorn",
       "slug": "blue-wonder",
       "species": "unicorn",
       "body_color": "ocean blue",
@@ -87,7 +201,29 @@
       "sprites": {
         "sheet": "assets/ponies/blue-wonder/sheets/spritesheet.png",
         "meta": "assets/ponies/blue-wonder/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "arcane helper",
+        "service": "fixes magical mishaps",
+        "paid_in": "crystal notes"
+      },
+      "house": {
+        "id": "mystic-tower",
+        "name": "Mystic Tower"
+      },
+      "drives": {
+        "eat": {
+          "threshold": 62,
+          "preference": "restaurant"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": true
     },
     {
       "name": "Stellacorn",
@@ -101,7 +237,29 @@
       "sprites": {
         "sheet": "assets/ponies/stellacorn/sheets/spritesheet.png",
         "meta": "assets/ponies/stellacorn/sheets/spritesheet.json"
-      }
+      },
+      "job": {
+        "title": "animal rescuer",
+        "service": "rescues and shelters critters",
+        "paid_in": "care tokens"
+      },
+      "house": {
+        "id": "rescue-cottage",
+        "name": "Rescue Cottage"
+      },
+      "drives": {
+        "eat": {
+          "threshold": 58,
+          "preference": "picnic"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": true
     },
     {
       "name": "Gleam Treasure",
@@ -116,7 +274,143 @@
         "sheet": "assets/ponies/gleam-treasure/sheets/spritesheet.png",
         "meta": "assets/ponies/gleam-treasure/sheets/spritesheet.json"
       },
-      "sprite_flip": true
+      "sprite_flip": true,
+      "job": {
+        "title": "race coach",
+        "service": "trains speed and balance",
+        "paid_in": "ribbon points"
+      },
+      "house": {
+        "id": "racers-roost",
+        "name": "Racer's Roost"
+      },
+      "drives": {
+        "eat": {
+          "threshold": 64,
+          "preference": "restaurant"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false
+    },
+    {
+      "name": "Pixie",
+      "slug": "pixie",
+      "species": "unicorn",
+      "body_color": "pearl white",
+      "mane_color": "sparkle silver",
+      "accent_color": "starlight",
+      "talent": "gymnastics",
+      "personality": "nice and friendly",
+      "sprites": {
+        "sheet": "assets/ponies/pixie/sheets/spritesheet.png",
+        "meta": "assets/ponies/pixie/sheets/spritesheet.json"
+      },
+      "job": {
+        "title": "acrobat tutor",
+        "service": "teaches flips and balance",
+        "paid_in": "sparkle stars"
+      },
+      "house": {
+        "id": "acrobat-atelier",
+        "name": "Acrobat Atelier"
+      },
+      "drives": {
+        "eat": {
+          "threshold": 56,
+          "preference": "picnic"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false
+    },
+    {
+      "name": "Maria",
+      "slug": "maria",
+      "species": "unicorn",
+      "body_color": "rose pink",
+      "mane_color": "royal purple",
+      "accent_color": "gold",
+      "talent": "sparkle sprinkling",
+      "personality": "kind and thoughtful",
+      "sprites": {
+        "sheet": "assets/ponies/maria/sheets/spritesheet.png",
+        "meta": "assets/ponies/maria/sheets/spritesheet.json"
+      },
+      "job": {
+        "title": "kindness chef",
+        "service": "bakes comfort treats",
+        "paid_in": "thank-you notes"
+      },
+      "house": {
+        "id": "kindness-cottage",
+        "name": "Kindness Cottage"
+      },
+      "drives": {
+        "eat": {
+          "threshold": 54,
+          "preference": "bakery"
+        }
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "label_always_on": false,
+      "sprite_flip": false
+    },
+    {
+      "name": "Taticorn",
+      "slug": "taticorn",
+      "species": "unicorn",
+      "body_color": "Midnight Black",
+      "mane_color": "Raven Black",
+      "accent_color": "gold",
+      "talent": "building homes",
+      "personality": "strong and stern",
+      "job": {
+        "title": "helper",
+        "service": "helps with friendly pony tasks",
+        "paid_in": "kindness tokens"
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "thirst": 20,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "house": {
+        "id": "house-taticorn",
+        "name": "Taticorn's House",
+        "shared": false
+      },
+      "drives": {
+        "eat": {
+          "threshold": 60,
+          "preference": "picnic"
+        },
+        "drink": {
+          "threshold": 55,
+          "preference": "lemonade"
+        }
+      },
+      "sprites": {
+        "sheet": "assets/ponies/taticorn/sheets/spritesheet.png",
+        "meta": "assets/ponies/taticorn/sheets/spritesheet.json"
+      }
     }
   ]
 }

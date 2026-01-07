@@ -36,6 +36,17 @@ STRUCTURES = {
         "round doorway, carrot and apple motifs, no text signage. "
         + BASE_BUILDING_PROMPT
     ),
+    "restaurant_01": (
+        "Pony restaurant, cozy cafe facade, arched windows, lanterns, "
+        "outdoor patio table with empty plates, chalkboard sign with no letters, "
+        "horseshoe trim and pony motifs. "
+        + BASE_BUILDING_PROMPT
+    ),
+    "picnic_01": (
+        "Pony picnic spot, gingham blanket, wicker basket, fruit and treats, "
+        "low table and cushions, pony motif bunting with no letters. "
+        + BASE_SCENERY_PROMPT
+    ),
     "library_01": (
         "Pony library, tall arched windows, book icon plaque with no letters, "
         "classic roof, friendly lanterns, unicorn star motif. "
@@ -64,6 +75,11 @@ STRUCTURES = {
     "lemonade_bar_01": (
         "Pony lemonade bar, small kiosk with striped canopy, glass jars, lemon slices, "
         "round counter height for ponies, horseshoe accents, no text signage. "
+        + BASE_BUILDING_PROMPT
+    ),
+    "well_01": (
+        "Milk and honey pony well, rounded stone fountain, twin spouts pouring milk and honey, "
+        "gentle pony carvings, bucket and ladle, cozy village charm, no text signage. "
         + BASE_BUILDING_PROMPT
     ),
     "forest_01": (

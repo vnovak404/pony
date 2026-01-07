@@ -6,6 +6,16 @@
       "tags": ["food", "town", "cozy"]
     },
     {
+      "id": "pony-restaurant",
+      "name": "Golden Spoon Restaurant",
+      "tags": ["food", "town", "cozy"]
+    },
+    {
+      "id": "picnic-grove",
+      "name": "Sunny Picnic Grove",
+      "tags": ["food", "outskirts", "picnic"]
+    },
+    {
       "id": "sparkle-library",
       "name": "Sparkle Library",
       "tags": ["books", "quiet", "town"]
@@ -48,7 +58,12 @@
     {
       "id": "lemonade-bar",
       "name": "Lemonade Bar",
-      "tags": ["snacks", "town", "cheerful"]
+      "tags": ["snacks", "drink", "town", "cheerful"]
+    },
+    {
+      "id": "milk-honey-well",
+      "name": "Milk & Honey Well",
+      "tags": ["drink", "town", "cozy"]
     },
     {
       "id": "moonlit-inn",

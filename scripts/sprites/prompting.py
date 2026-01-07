@@ -1,32 +1,153 @@
 STYLE_BIBLE = (
     "Sprite frame for a 2D game. "
-    "Transparent background (alpha). "
-    "PNG with alpha channel. "
+    "Transparent background (RGBA) with alpha channel. "
     "Side view pony facing right, nose pointing to the right. "
     "Full body visible, no cropping, extra padding around edges. "
     "Leave a clear transparent margin around the pony. "
     "Clean silhouette, simple storybook shading. "
-    "No text, no border, no scenery, no background. "
+    "No text, no border, no scenery, no background, no props. "
+    "No motion blur, no ground shadow. "
+    "Consistent proportions across frames. "
     "Regular quadruped pony, not humanoid."
 )
 
+WALK_TROT_STYLE = (
+    f"{STYLE_BIBLE} Regular pony (quadruped), no horn, no wings. "
+    "Not a unicorn or pegasus."
+)
 
-WALK_HOOF_POSITIONS = [
-    "front-right forward, front-left back, rear-right back, rear-left forward",
-    "front-right down, front-left lifting, rear-right lifting, rear-left down",
-    "front-right back, front-left forward, rear-right forward, rear-left back",
-    "front-right lifting, front-left down, rear-right down, rear-left lifting",
+WALK_PHASES = [
+    {
+        "name": "WALK_CONTACT_A",
+        "file": "walk_contact_a",
+        "pose": (
+            "Front RIGHT hoof forward touching ground; rear LEFT hoof forward touching ground; "
+            "front LEFT and rear RIGHT behind body; body neutral height; head steady"
+        ),
+        "exclude": ["down", "pass", "up"],
+    },
+    {
+        "name": "WALK_DOWN_A",
+        "file": "walk_down_a",
+        "pose": (
+            "Weight on front RIGHT and rear LEFT; body slightly lowered; "
+            "supporting legs slightly bent"
+        ),
+        "exclude": ["contact", "pass", "up"],
+    },
+    {
+        "name": "WALK_PASS_A",
+        "file": "walk_pass_a",
+        "pose": (
+            "Front LEFT hoof passing under body; rear RIGHT hoof passing under body; "
+            "other two hooves behind; body centered"
+        ),
+        "exclude": ["contact", "down", "up"],
+    },
+    {
+        "name": "WALK_UP_A",
+        "file": "walk_up_a",
+        "pose": (
+            "Front LEFT and rear RIGHT pushing off; body slightly raised; "
+            "transition toward the B contact"
+        ),
+        "exclude": ["contact", "down", "pass"],
+    },
+    {
+        "name": "WALK_CONTACT_B",
+        "file": "walk_contact_b",
+        "pose": (
+            "Front LEFT hoof forward touching ground; rear RIGHT hoof forward touching ground; "
+            "front RIGHT and rear LEFT behind body; mirror of contact A"
+        ),
+        "exclude": ["down", "pass", "up"],
+    },
+    {
+        "name": "WALK_DOWN_B",
+        "file": "walk_down_b",
+        "pose": (
+            "Weight on front LEFT and rear RIGHT; body slightly lowered; "
+            "supporting legs slightly bent"
+        ),
+        "exclude": ["contact", "pass", "up"],
+    },
+    {
+        "name": "WALK_PASS_B",
+        "file": "walk_pass_b",
+        "pose": (
+            "Front RIGHT hoof passing under body; rear LEFT hoof passing under body; "
+            "other two hooves behind; body centered"
+        ),
+        "exclude": ["contact", "down", "up"],
+    },
+    {
+        "name": "WALK_UP_B",
+        "file": "walk_up_b",
+        "pose": (
+            "Front RIGHT and rear LEFT pushing off; body slightly raised"
+        ),
+        "exclude": ["contact", "down", "pass"],
+    },
 ]
 
-TROT_HOOF_POSITIONS = [
-    "front-right forward with rear-left forward, front-left back with rear-right back",
-    "front-right down, rear-left down, front-left lifting, rear-right lifting",
-    "front-right back with rear-left back, front-left forward with rear-right forward",
-    "front-right lifting, rear-left lifting, front-left down, rear-right down",
+TROT_PHASES = [
+    {
+        "name": "TROT_CONTACT_A",
+        "file": "trot_contact_a",
+        "pose": (
+            "Front RIGHT and rear LEFT contacting ground together; "
+            "other diagonal pair lifted and moving forward; slight forward energy"
+        ),
+        "exclude": ["down", "push-off"],
+    },
+    {
+        "name": "TROT_DOWN_A",
+        "file": "trot_down_a",
+        "pose": (
+            "Weight on front RIGHT and rear LEFT; body compressed; legs bent"
+        ),
+        "exclude": ["contact", "push-off"],
+    },
+    {
+        "name": "TROT_PUSH_A",
+        "file": "trot_push_a",
+        "pose": (
+            "Front RIGHT and rear LEFT pushing off; body rising; "
+            "other diagonal pair swinging forward"
+        ),
+        "exclude": ["contact", "down"],
+    },
+    {
+        "name": "TROT_CONTACT_B",
+        "file": "trot_contact_b",
+        "pose": (
+            "Front LEFT and rear RIGHT contacting ground together; "
+            "other diagonal pair lifted and moving forward"
+        ),
+        "exclude": ["down", "push-off"],
+    },
+    {
+        "name": "TROT_DOWN_B",
+        "file": "trot_down_b",
+        "pose": (
+            "Weight on front LEFT and rear RIGHT; body compressed; legs bent"
+        ),
+        "exclude": ["contact", "push-off"],
+    },
+    {
+        "name": "TROT_PUSH_B",
+        "file": "trot_push_b",
+        "pose": (
+            "Front LEFT and rear RIGHT pushing off; body rising"
+        ),
+        "exclude": ["contact", "down"],
+    },
 ]
 
+PHASES_BY_ACTION = {"walk": WALK_PHASES, "trot": TROT_PHASES}
 
-def _format_identity(pony):
+
+def _format_identity(pony, force_regular=False):
     name = pony.get("name", "Unknown")
     species = pony.get("species", "pony").lower()
     body_color = pony.get("body_color") or "pastel coat"
@@ -34,8 +155,13 @@ def _format_identity(pony):
     eye_color = pony.get("eye_color")
     vibe = pony.get("vibe") or pony.get("personality")
 
+    if force_regular:
+        species_label = "regular pony"
+    else:
+        species_label = f"{species} pony"
+
     lines = [
-        f"Character: {name}, a {species} pony.",
+        f"Character: {name}, a {species_label}.",
         f"Coat color: {body_color}.",
         f"Mane and tail color: {mane_color}.",
     ]
@@ -45,7 +171,9 @@ def _format_identity(pony):
     if vibe:
         lines.append(f"Vibe: {vibe}.")
 
-    if species == "unicorn":
+    if force_regular:
+        lines.append("No horn or wings.")
+    elif species == "unicorn":
         lines.append("Include a small unicorn horn.")
     else:
         lines.append("No horn.")
@@ -61,18 +189,6 @@ def _format_action_cue(pony, action_id, frame_index, frame_count):
 
     if action_id == "idle":
         return f"{base}{frame_hint} Standing pose, gentle smile, relaxed tail."
-
-    if action_id == "walk":
-        position = WALK_HOOF_POSITIONS[frame_index % len(WALK_HOOF_POSITIONS)]
-        return (
-            f"{base}{frame_hint} Walking cycle with {position}."
-        )
-
-    if action_id == "trot":
-        position = TROT_HOOF_POSITIONS[frame_index % len(TROT_HOOF_POSITIONS)]
-        return (
-            f"{base}{frame_hint} Energetic trot with {position}, slight bounce."
-        )
 
     if action_id == "sleep":
         return f"{base}{frame_hint} Sleeping, curled up or lying down, eyes closed."
@@ -103,6 +219,13 @@ def _format_action_cue(pony, action_id, frame_index, frame_count):
     return f"{base}{frame_hint} Neutral standing pose."
 
 
+def _format_phase_exclusions(phase_name, excludes):
+    if not excludes:
+        return f"This is only {phase_name}."
+    excluded = ", ".join([f"not {item}" for item in excludes])
+    return f"This is only {phase_name} ({excluded})."
+
+
 def _format_canvas(pony):
     size = pony.get("frame_size", 512)
     try:
@@ -112,7 +235,36 @@ def _format_canvas(pony):
     return f"Canvas size: {size_value}x{size_value} pixels."
 
 
+def get_action_frame_name(action_id, frame_index, frame_count=None):
+    phases = PHASES_BY_ACTION.get(action_id)
+    if phases and frame_index < len(phases):
+        return phases[frame_index]["file"]
+    return f"{action_id}_{frame_index + 1:02d}"
+
+
+def get_action_frame_order(action_id):
+    phases = PHASES_BY_ACTION.get(action_id)
+    if not phases:
+        return None
+    return [phase["file"] for phase in phases]
+
+
 def build_sprite_prompt(pony, action_id, frame_index, frame_count):
+    if action_id in PHASES_BY_ACTION:
+        phases = PHASES_BY_ACTION[action_id]
+        phase = phases[frame_index % len(phases)]
+        identity = _format_identity(pony, force_regular=True)
+        canvas = _format_canvas(pony)
+        exclusions = _format_phase_exclusions(phase["name"], phase["exclude"])
+        return (
+            f"{WALK_TROT_STYLE} {identity} "
+            f"This image represents {phase['name']} of a {action_id} cycle. "
+            f"This is one frame of a {action_id} cycle. "
+            f"Pose details: {phase['pose']}. "
+            f"{exclusions} "
+            f"{canvas}"
+        )
+
     identity = _format_identity(pony)
     action_cue = _format_action_cue(pony, action_id, frame_index, frame_count)
     canvas = _format_canvas(pony)

@@ -1,4 +1,11 @@
 .env
 .DS_Store
 .venv/
-assets/
+data/runtime_state.json
+assets/*
+!assets/js/
+!assets/js/**
+!assets/world/
+assets/world/*
+!assets/world/maps/
+!assets/world/maps/ponyville.json
