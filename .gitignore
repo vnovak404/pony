@@ -9,3 +9,6 @@ assets/*
 assets/world/*
 !assets/world/maps/
 !assets/world/maps/ponyville.json
+!assets/ponies/
+assets/ponies/*
+!assets/ponies/*.png
