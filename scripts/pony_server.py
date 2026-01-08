@@ -298,6 +298,25 @@ def run_house_generator(slug):
         raise RuntimeError(result.stderr or result.stdout or "House asset generation failed.")
 
 
+def run_house_state_generator(slug):
+    command = [
+        sys.executable,
+        "scripts/generate_house_state_assets.py",
+        "--pony",
+        slug,
+    ]
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            result.stderr or result.stdout or "House state generation failed."
+        )
+
+
 def ensure_output_dir(path):
     full_path = ROOT / path
     full_path.mkdir(parents=True, exist_ok=True)
@@ -397,7 +416,7 @@ def launch_async(target, *args):
     thread.start()
 
 
-def run_post_create_tasks(slug):
+def run_post_create_tasks(slug, generate_house_variants=False):
     try:
         run_sprite_generator(slug, {"use_portrait": True})
         run_spritesheet_packer(slug, {})
@@ -405,6 +424,8 @@ def run_post_create_tasks(slug):
         print(f"Sprite pipeline failed for {slug}: {exc}", file=sys.stderr)
     try:
         run_house_generator(slug)
+        if generate_house_variants:
+            run_house_state_generator(slug)
     except Exception as exc:
         print(f"House generation failed for {slug}: {exc}", file=sys.stderr)
 
@@ -673,7 +694,7 @@ class PonyHandler(SimpleHTTPRequestHandler):
             )
             return
 
-        house_id, _ = assign_house(ponies, pony)
+        house_id, is_new_house = assign_house(ponies, pony)
 
         ponies.append(pony)
         data["ponies"] = ponies
@@ -714,7 +735,8 @@ class PonyHandler(SimpleHTTPRequestHandler):
             )
             return
 
-        launch_async(run_post_create_tasks, pony["slug"])
+        generate_variants = bool(is_new_house) and pony.get("species") == "unicorn"
+        launch_async(run_post_create_tasks, pony["slug"], generate_variants)
 
         image_path = f"{self.output_dir}/{pony['slug']}.png"
         self.send_json(

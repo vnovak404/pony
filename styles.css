@@ -347,6 +347,7 @@ h1 {
   box-shadow: 0 16px 30px rgba(28, 18, 40, 0.18);
   display: grid;
   gap: 10px;
+  min-width: 240px;
 }
 
 .pony-command-menu[hidden] {
@@ -359,11 +360,51 @@ h1 {
   text-align: center;
 }
 
+.pony-command-target {
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
 .pony-command-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
+}
+
+.pony-command-stats {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pony-command-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(122, 77, 255, 0.1);
+}
+
+.pony-command-stat img {
+  width: 22px;
+  height: 22px;
+}
+
+.pony-command-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.pony-command-btn img {
+  width: 24px;
+  height: 24px;
 }
 
 .pony-command-menu .btn.small {

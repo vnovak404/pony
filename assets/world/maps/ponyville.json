@@ -561,7 +561,7 @@
         "kind": "landmark",
         "at": {
           "x": 20.42,
-          "y": 15.69
+          "y": 15.72
         },
         "sprite": "well_01",
         "locationId": "milk-honey-well",
@@ -605,8 +605,8 @@
         "id": "race-track",
         "kind": "landmark",
         "at": {
-          "x": 17.33,
-          "y": 12.28
+          "x": 17.2,
+          "y": 11.45
         },
         "sprite": "race_track_01",
         "locationId": "pony-race-track",
@@ -692,7 +692,11 @@
         },
         "sprite": "lake_01",
         "locationId": "silver-lake",
-        "scale": 3.2
+        "scale": 3.2,
+        "funOffset": {
+          "x": 0,
+          "y": -1.1
+        }
       },
       {
         "id": "starlight-manor",
@@ -729,7 +733,7 @@
         "kind": "house",
         "at": {
           "x": 13.43,
-          "y": 15.73
+          "y": 15.7
         },
         "spritePath": "/assets/world/houses/mystic-tower.png",
         "label": "Mystic Tower",

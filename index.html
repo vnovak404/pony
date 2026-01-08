@@ -94,15 +94,69 @@
           </div>
           <div id="pony-command-menu" class="pony-command-menu" hidden>
             <div class="pony-command-title">Pony</div>
+            <div class="pony-command-target" data-command-target>
+              Heading: Wandering
+            </div>
+            <div class="pony-command-stats" data-command-stats>
+              <div class="pony-command-stat" data-stat="health">
+                <img src="/assets/ui/icons/health.png" alt="" />
+                <span class="pony-command-value">--</span>
+              </div>
+              <div class="pony-command-stat" data-stat="thirst">
+                <img src="/assets/ui/icons/thirst.png" alt="" />
+                <span class="pony-command-value">--</span>
+              </div>
+              <div class="pony-command-stat" data-stat="hunger">
+                <img src="/assets/ui/icons/hunger.png" alt="" />
+                <span class="pony-command-value">--</span>
+              </div>
+              <div class="pony-command-stat" data-stat="tiredness">
+                <img src="/assets/ui/icons/tired.png" alt="" />
+                <span class="pony-command-value">--</span>
+              </div>
+              <div class="pony-command-stat" data-stat="boredom">
+                <img src="/assets/ui/icons/boredom.png" alt="" />
+                <span class="pony-command-value">--</span>
+              </div>
+            </div>
             <div class="pony-command-actions">
-              <button class="btn ghost small" type="button" data-command="eat">Eat</button>
-              <button class="btn ghost small" type="button" data-command="drink">
-                Drink
+              <button
+                class="btn ghost small pony-command-btn"
+                type="button"
+                data-command="eat"
+                aria-label="Eat"
+                title="Eat"
+              >
+                <img src="/assets/ui/icons/hunger.png" alt="" />
               </button>
-              <button class="btn ghost small" type="button" data-command="rest">Rest</button>
-              <button class="btn ghost small" type="button" data-command="clear">
-                Clear
+              <button
+                class="btn ghost small pony-command-btn"
+                type="button"
+                data-command="drink"
+                aria-label="Drink"
+                title="Drink"
+              >
+                <img src="/assets/ui/icons/thirst.png" alt="" />
               </button>
+              <button
+                class="btn ghost small pony-command-btn"
+                type="button"
+                data-command="fun"
+                aria-label="Frolic"
+                title="Frolic"
+              >
+                <img src="/assets/ui/icons/boredom.png" alt="" />
+              </button>
+              <button
+                class="btn ghost small pony-command-btn"
+                type="button"
+                data-command="rest"
+                aria-label="Rest"
+                title="Rest"
+              >
+                <img src="/assets/ui/icons/tired.png" alt="" />
+              </button>
+              <button class="btn ghost small" type="button" data-command="clear">Clear</button>
               <button class="btn ghost small" type="button" data-command="close">
                 Close
               </button>

@@ -66,7 +66,16 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const DRINK_DURATION_MAX = 3200;
   const DRINK_COOLDOWN_MIN = 5000;
   const DRINK_COOLDOWN_MAX = 8000;
+  const FUN_RADIUS_TILES = 0.7;
+  const FUN_DURATION_MIN = 2400;
+  const FUN_DURATION_MAX = 4200;
+  const FUN_COOLDOWN_MIN = 7000;
+  const FUN_COOLDOWN_MAX = 10000;
+  const BOREDOM_RATE = 0.0003;
+  const BOREDOM_THRESHOLD_DEFAULT = 60;
+  const CRITICAL_NEED_LEVEL = 100;
   const MANUAL_SPEED_MULTIPLIER = 1.8;
+  const TARGET_T_EPSILON = 0.02;
 
   const locationIndex = new Map();
   locations.forEach((location) => {
@@ -148,10 +157,29 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     }
     return false;
   };
+  const FUN_TAGS = new Set([
+    "recreation",
+    "sport",
+    "music",
+    "park",
+    "community",
+    "fun",
+  ]);
+  const isFunSpot = (item) => {
+    if (!item) return false;
+    if (Array.isArray(item.drives) && item.drives.includes("fun")) return true;
+    const location = item.locationId && locationIndex.get(item.locationId);
+    if (location && Array.isArray(location.tags)) {
+      return location.tags.some((tag) => FUN_TAGS.has(String(tag).toLowerCase()));
+    }
+    return false;
+  };
   const foodSpots = objects.filter((item) => isFoodSpot(item));
   const foodSpotById = new Map(foodSpots.map((spot) => [spot.id, spot]));
   const drinkSpots = objects.filter((item) => isDrinkSpot(item));
   const drinkSpotById = new Map(drinkSpots.map((spot) => [spot.id, spot]));
+  const funSpots = objects.filter((item) => isFunSpot(item));
+  const funSpotById = new Map(funSpots.map((spot) => [spot.id, spot]));
   const roadSegments = roads.map((segment) => ({
     id: segment.id,
     from: {
@@ -257,8 +285,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     if (targetPoint) {
       const scored = choices
         .map((choice) => {
-          const endPoint =
-            choice.end === "from" ? choice.segment.from : choice.segment.to;
+          const endPoint = nearestPointOnSegment(targetPoint, choice.segment);
           return {
             choice,
             distance: Math.hypot(
@@ -425,7 +452,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     usage[index] = false;
   };
 
-  const nearestPointOnSegment = (point, segment) => {
+  function nearestPointOnSegment(point, segment) {
     const dx = segment.to.x - segment.from.x;
     const dy = segment.to.y - segment.from.y;
     const lengthSquared = dx * dx + dy * dy;
@@ -440,6 +467,17 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       x: segment.from.x + dx * clamped,
       y: segment.from.y + dy * clamped,
     };
+  }
+
+  const getSegmentT = (point, segment) => {
+    const dx = segment.to.x - segment.from.x;
+    const dy = segment.to.y - segment.from.y;
+    const lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared === 0) return 0;
+    const t =
+      ((point.x - segment.from.x) * dx + (point.y - segment.from.y) * dy) /
+      lengthSquared;
+    return Math.max(0, Math.min(1, t));
   };
 
   const computeAccessPoint = (target) => {
@@ -457,6 +495,29 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       }
     });
     return bestPoint || target;
+  };
+
+  const getRoutingTargetPoint = (target) => {
+    if (!roadSegments.length || !target) return target;
+    let best = null;
+    roadSegments.forEach((segment) => {
+      const point = nearestPointOnSegment(target, segment);
+      const distance = Math.hypot(point.x - target.x, point.y - target.y);
+      if (!best || distance < best.distance) {
+        best = { segment, point, distance };
+      }
+    });
+    if (!best) return target;
+    const endpoints = [best.segment.from, best.segment.to];
+    const onMap = endpoints.filter((point) => !isOffMap(point));
+    const candidates = onMap.length ? onMap : endpoints;
+    return candidates
+      .slice()
+      .sort(
+        (a, b) =>
+          Math.hypot(target.x - a.x, target.y - a.y) -
+          Math.hypot(target.x - b.x, target.y - b.y)
+      )[0];
   };
 
   let innAccessPoint = null;
@@ -521,6 +582,38 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     return drinkAccessPoints.get(drinkId) || null;
   };
 
+  const funAccessPoints = new Map();
+  const buildFunAccessPoints = () => {
+    funSpots.forEach((spot) => {
+      const target = {
+        x: spot.at.x * mapData.meta.tileSize,
+        y: spot.at.y * mapData.meta.tileSize,
+      };
+      funAccessPoints.set(spot.id, computeAccessPoint(target));
+    });
+  };
+  buildFunAccessPoints();
+
+  const getFunTargetPoint = (funId) => {
+    return funAccessPoints.get(funId) || null;
+  };
+
+  const getTaskTargetPoint = (actor) => {
+    if (!actor || !actor.task) return null;
+    const task = actor.task;
+    if (task.type === "rest") {
+      if (task.houseId) return getHouseTargetPoint(task.houseId);
+      if (task.inn) return getInnTargetPoint();
+      return null;
+    }
+    if (task.type === "eat") return getFoodTargetPoint(task.foodId);
+    if (task.type === "drink") return getDrinkTargetPoint(task.drinkId);
+    if (task.type === "fun") return getFunTargetPoint(task.funId);
+    if (task.type === "repair") return getHouseTargetPoint(task.houseId);
+    if (task.houseId) return getHouseTargetPoint(task.houseId);
+    return null;
+  };
+
   const updateAccessPointForItem = (item) => {
     if (!item || !item.at) return;
     const target = {
@@ -535,6 +628,9 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     }
     if (isDrinkSpot(item)) {
       drinkAccessPoints.set(item.id, computeAccessPoint(target));
+    }
+    if (isFunSpot(item)) {
+      funAccessPoints.set(item.id, computeAccessPoint(target));
     }
     if (isInnObject(item)) {
       innAccessPoint = computeAccessPoint(target);
@@ -557,6 +653,23 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         y: spot.at.y * mapData.meta.tileSize,
       }
     );
+  };
+  const getFunSpotAccessPoint = (spot) => {
+    return (
+      getFunTargetPoint(spot.id) || {
+        x: spot.at.x * mapData.meta.tileSize,
+        y: spot.at.y * mapData.meta.tileSize,
+      }
+    );
+  };
+
+  const getSpotOffset = (spot, key) => {
+    const offset = spot && spot[key];
+    if (!offset) return { x: 0, y: 0 };
+    return {
+      x: (offset.x || 0) * mapData.meta.tileSize,
+      y: (offset.y || 0) * mapData.meta.tileSize,
+    };
   };
   const pickFoodSpot = (actor, position) => {
     if (!foodSpots.length) return null;
@@ -599,6 +712,65 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     return pickFrom[Math.floor(Math.random() * pickFrom.length)].spot;
   };
 
+  const pickFunSpot = (actor, position) => {
+    if (!funSpots.length) return null;
+    const scored = funSpots
+      .map((spot) => {
+        const accessPoint = getFunSpotAccessPoint(spot);
+        const score = Math.hypot(
+          accessPoint.x - position.x,
+          accessPoint.y - position.y
+        );
+        return { spot, score };
+      })
+      .sort((a, b) => a.score - b.score);
+    if (!scored.length) return null;
+    const pickFrom = scored.slice(0, Math.min(2, scored.length));
+    return pickFrom[Math.floor(Math.random() * pickFrom.length)].spot;
+  };
+
+  const getCriticalNeedTask = (actor, position) => {
+    if (actor.stats.thirst >= CRITICAL_NEED_LEVEL && drinkSpots.length) {
+      const target = pickDrinkSpot(actor, position);
+      if (target) {
+        actor.drinkCooldownUntil = 0;
+        return { type: "drink", drinkId: target.id, urgent: true };
+      }
+    }
+    if (actor.stats.hunger >= CRITICAL_NEED_LEVEL && foodSpots.length) {
+      const target = pickFoodSpot(actor, position);
+      if (target) {
+        actor.eatCooldownUntil = 0;
+        return { type: "eat", foodId: target.id, urgent: true };
+      }
+    }
+    if (actor.stats.tiredness >= CRITICAL_NEED_LEVEL) {
+      const homeId = actor.homeId;
+      const state = homeId ? houseStates.get(homeId) : null;
+      if (
+        homeId &&
+        state &&
+        state.status !== "repairing" &&
+        state.status !== "under_construction"
+      ) {
+        actor.homeCooldownUntil = 0;
+        return { type: "rest", houseId: homeId, urgent: true };
+      }
+      if (innObject && getInnTargetPoint()) {
+        actor.innCooldownUntil = 0;
+        return { type: "rest", inn: true, urgent: true };
+      }
+    }
+    if (actor.stats.boredom >= CRITICAL_NEED_LEVEL && funSpots.length) {
+      const target = pickFunSpot(actor, position);
+      if (target) {
+        actor.funCooldownUntil = 0;
+        return { type: "fun", funId: target.id, urgent: true };
+      }
+    }
+    return null;
+  };
+
   const getActorPosition = (actor) => {
     if (!actor || !actor.segment) return { x: 0, y: 0 };
     const from = actor.direction === 1 ? actor.segment.from : actor.segment.to;
@@ -636,6 +808,16 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         actor.drinkCooldownUntil = 0;
       } else if (mapStatus) {
         mapStatus.textContent = "No drink spots available.";
+      }
+      return;
+    }
+    if (command === "fun") {
+      const target = pickFunSpot(actor, position);
+      if (target) {
+        actor.task = { type: "fun", funId: target.id, manual: true };
+        actor.funCooldownUntil = 0;
+      } else if (mapStatus) {
+        mapStatus.textContent = "No frolic spots available.";
       }
       return;
     }
@@ -683,7 +865,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       if (state.status === "repairing") {
         state.condition = Math.min(1, state.condition + delta * HOUSE_REPAIR_RATE);
         if (state.condition >= 0.98 || now >= state.repairingUntil) {
-          state.condition = Math.max(state.condition, 0.98);
+          state.condition = 1;
           state.status = "ok";
           state.repairingUntil = 0;
           state.repairingBy = null;
@@ -703,13 +885,28 @@ async function initMap(mapData, ponies, locations, runtimeState) {
 
   const structureSprites = {};
   const structureItems = objects.filter((item) => item.sprite || item.spritePath);
+  const getVariantPath = (path, suffix) => {
+    if (!path) return "";
+    const dotIndex = path.lastIndexOf(".");
+    if (dotIndex === -1) return `${path}_${suffix}`;
+    return `${path.slice(0, dotIndex)}_${suffix}${path.slice(dotIndex)}`;
+  };
   await Promise.all(
     structureItems.map(async (item) => {
       const spritePath = item.spritePath
         ? item.spritePath
         : `/assets/world/structures/${item.sprite}.png`;
       try {
-        structureSprites[item.id] = await loadImage(spritePath);
+        const base = await loadImage(spritePath);
+        if (item.kind === "house") {
+          const [repair, ruined] = await Promise.all([
+            loadImage(getVariantPath(spritePath, "repair")).catch(() => null),
+            loadImage(getVariantPath(spritePath, "ruined")).catch(() => null),
+          ]);
+          structureSprites[item.id] = { base, repair, ruined };
+        } else {
+          structureSprites[item.id] = base;
+        }
       } catch (error) {
         structureSprites[item.id] = null;
       }
@@ -835,6 +1032,11 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       savedState && Number.isFinite(savedState.t)
         ? clamp(savedState.t, 0, 1)
         : null;
+    const driveFun =
+      sprite.pony.drives && sprite.pony.drives.fun ? sprite.pony.drives.fun : {};
+    const funThreshold = Number.isFinite(driveFun.threshold)
+      ? driveFun.threshold
+      : BOREDOM_THRESHOLD_DEFAULT;
     const actorStats = {
       health: Number.isFinite(savedStats.health)
         ? savedStats.health
@@ -894,6 +1096,11 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       drinkCooldownUntil: 0,
       drinkThreshold,
       drinkPreference: driveDrink.preference || null,
+      funUntil: 0,
+      funTargetId: null,
+      funOffset: { x: 0, y: 0 },
+      funCooldownUntil: 0,
+      funThreshold,
     };
   });
   let lastPointer = null;
@@ -901,12 +1108,96 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const commandTitle = commandMenu
     ? commandMenu.querySelector(".pony-command-title")
     : null;
+  const commandStats = commandMenu
+    ? commandMenu.querySelector("[data-command-stats]")
+    : null;
+  const commandTargetLabel = commandMenu
+    ? commandMenu.querySelector("[data-command-target]")
+    : null;
   let commandTarget = null;
+  let lastCommandStatsUpdate = 0;
 
   const hideCommandMenu = () => {
     if (!commandMenu) return;
     commandMenu.hidden = true;
     commandTarget = null;
+  };
+
+  const resolveTaskLabel = (actor, now) => {
+    if (!actor) return "Heading: Wandering";
+    const task = actor.task;
+    if (task && task.type === "eat") {
+      const spot = foodSpotById.get(task.foodId);
+      return spot ? `Heading: ${getStructureLabel(spot)}` : "Heading: Food spot";
+    }
+    if (task && task.type === "drink") {
+      const spot = drinkSpotById.get(task.drinkId);
+      return spot ? `Heading: ${getStructureLabel(spot)}` : "Heading: Drink spot";
+    }
+    if (task && task.type === "fun") {
+      const spot = funSpotById.get(task.funId);
+      return spot ? `Heading: ${getStructureLabel(spot)}` : "Heading: Fun spot";
+    }
+    if (task && task.type === "rest") {
+      if (task.houseId) {
+        const house = housesById.get(task.houseId);
+        return house ? `Heading: ${getStructureLabel(house)}` : "Heading: Home";
+      }
+      if (task.inn && innObject) {
+        return `Heading: ${getStructureLabel(innObject)}`;
+      }
+      return "Heading: Rest stop";
+    }
+    if (task && task.type === "repair") {
+      const house = housesById.get(task.houseId);
+      return house ? `Heading: ${getStructureLabel(house)}` : "Heading: Repair";
+    }
+    if (actor.eatUntil > now && actor.eatTargetId) {
+      const spot = foodSpotById.get(actor.eatTargetId);
+      return spot ? `Eating at ${getStructureLabel(spot)}` : "Eating";
+    }
+    if (actor.drinkUntil > now && actor.drinkTargetId) {
+      const spot = drinkSpotById.get(actor.drinkTargetId);
+      return spot ? `Drinking at ${getStructureLabel(spot)}` : "Drinking";
+    }
+    if (actor.funUntil > now && actor.funTargetId) {
+      const spot = funSpotById.get(actor.funTargetId);
+      return spot ? `Frolicking at ${getStructureLabel(spot)}` : "Frolicking";
+    }
+    if (actor.sleepUntil > now && actor.restTarget) {
+      if (actor.restTarget.kind === "house") {
+        const house = housesById.get(actor.restTarget.id);
+        return house ? `Resting at ${getStructureLabel(house)}` : "Resting";
+      }
+      if (actor.restTarget.kind === "inn" && innObject) {
+        return `Resting at ${getStructureLabel(innObject)}`;
+      }
+      return "Resting";
+    }
+    return "Heading: Wandering";
+  };
+
+  const updateCommandStats = (now) => {
+    if (!commandStats || !commandTarget) return;
+    const stats = commandTarget.stats || {};
+    const values = {
+      health: Number.isFinite(stats.health) ? Math.round(stats.health) : 0,
+      thirst: Number.isFinite(stats.thirst) ? Math.round(stats.thirst) : 0,
+      hunger: Number.isFinite(stats.hunger) ? Math.round(stats.hunger) : 0,
+      tiredness: Number.isFinite(stats.tiredness) ? Math.round(stats.tiredness) : 0,
+      boredom: Number.isFinite(stats.boredom) ? Math.round(stats.boredom) : 0,
+    };
+    commandStats.querySelectorAll(".pony-command-stat").forEach((item) => {
+      const key = item.dataset.stat;
+      if (!key || !(key in values)) return;
+      const valueEl = item.querySelector(".pony-command-value");
+      if (valueEl) {
+        valueEl.textContent = values[key];
+      }
+    });
+    if (commandTargetLabel) {
+      commandTargetLabel.textContent = resolveTaskLabel(commandTarget, now);
+    }
   };
 
   const showCommandMenu = (actor, clientX, clientY) => {
@@ -917,6 +1208,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     if (commandTitle) {
       commandTitle.textContent = actor?.sprite?.pony?.name || "Pony";
     }
+    updateCommandStats(performance.now());
     commandMenu.hidden = false;
     const menuWidth = commandMenu.offsetWidth || 160;
     const menuHeight = commandMenu.offsetHeight || 100;
@@ -1018,7 +1310,19 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const drawStructures = () => {
     const nextBounds = [];
     objects.forEach((item) => {
-      const sprite = structureSprites[item.id];
+      const spriteEntry = structureSprites[item.id];
+      if (!spriteEntry) return;
+      let sprite = spriteEntry;
+      if (item.kind === "house" && spriteEntry.base) {
+        const state = houseStates.get(item.id);
+        if (state && state.status === "repairing" && spriteEntry.repair) {
+          sprite = spriteEntry.repair;
+        } else if (state && state.status === "under_construction" && spriteEntry.ruined) {
+          sprite = spriteEntry.ruined;
+        } else {
+          sprite = spriteEntry.base;
+        }
+      }
       if (!sprite) return;
       const scaleFactor = item.scale || structureScale[item.kind] || 1.6;
       const x = item.at.x * mapData.meta.tileSize * scale;
@@ -1094,6 +1398,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       const sleeping = actor.sleepUntil > now;
       const eating = actor.eatUntil > now;
       const drinking = actor.drinkUntil > now;
+      const playing = actor.funUntil > now;
       if (!sleeping && actor.sleepSpotOwner) {
         if (actor.sleepSpotOwner.kind === "inn") {
           releaseInnSpot(actor.sleepSpotIndex);
@@ -1112,32 +1417,44 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         actor.drinkTargetId = null;
         actor.drinkOffset = { x: 0, y: 0 };
       }
+      if (!playing && actor.funTargetId) {
+        actor.funTargetId = null;
+        actor.funOffset = { x: 0, y: 0 };
+      }
+      const rushTask = actor.task && (actor.task.manual || actor.task.urgent);
+      const rushMoveType =
+        rushTask && meta.animations.trot ? "trot" : sprite.moveType;
+      const moveFrames = meta.animations[rushMoveType] || sprite.moveFrames;
       const frameNames = sleeping
         ? sprite.sleepFrames
-        : eating || drinking
+        : eating || drinking || playing
           ? sprite.idleFrames
-          : sprite.moveFrames;
+          : moveFrames;
       const fps = sleeping
         ? meta.fps.sleep || meta.fps.idle || 2
-        : eating || drinking
+        : eating || drinking || playing
           ? meta.fps.idle || 2
-          : meta.fps[sprite.moveType] || 6;
+          : meta.fps[rushMoveType] || 6;
       actor.lastFrame += delta;
       const frameDuration = 1000 / fps;
       if (actor.lastFrame >= frameDuration) {
         actor.frameIndex = (actor.frameIndex + 1) % frameNames.length;
         actor.lastFrame = 0;
       }
+      if (actor.frameIndex >= frameNames.length) {
+        actor.frameIndex = 0;
+      }
 
       const frame = frames[frameNames[actor.frameIndex]]?.frame;
       if (!frame) return;
 
-      const from = actor.direction === 1 ? segment.from : segment.to;
-      const to = actor.direction === 1 ? segment.to : segment.from;
+      let from = actor.direction === 1 ? segment.from : segment.to;
+      let to = actor.direction === 1 ? segment.to : segment.from;
       let x = from.x + (to.x - from.x) * actor.t;
       let y = from.y + (to.y - from.y) * actor.t;
       let startedEating = false;
       let startedDrinking = false;
+      let startedFun = false;
 
       if (sleeping && actor.restTarget) {
         if (actor.restTarget.kind === "house") {
@@ -1170,6 +1487,16 @@ async function initMap(mapData, ponies, locations, runtimeState) {
           actor.drinkTargetId = null;
           actor.drinkOffset = { x: 0, y: 0 };
         }
+      } else if (playing && actor.funTargetId) {
+        const spot = funSpotById.get(actor.funTargetId);
+        if (spot) {
+          x = spot.at.x * mapData.meta.tileSize + actor.funOffset.x;
+          y = spot.at.y * mapData.meta.tileSize + actor.funOffset.y;
+        } else {
+          actor.funUntil = 0;
+          actor.funTargetId = null;
+          actor.funOffset = { x: 0, y: 0 };
+        }
       } else if (sleeping && innObject) {
         x = innObject.at.x * mapData.meta.tileSize + actor.sleepOffset.x;
         y = innObject.at.y * mapData.meta.tileSize + actor.sleepOffset.y;
@@ -1177,19 +1504,26 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         actor.stats.tiredness = Math.min(100, actor.stats.tiredness + delta * 0.00006);
         actor.stats.hunger = Math.min(100, actor.stats.hunger + delta * HUNGER_RATE);
         actor.stats.thirst = Math.min(100, actor.stats.thirst + delta * THIRST_RATE);
+        actor.stats.boredom = Math.min(100, actor.stats.boredom + delta * BOREDOM_RATE);
 
-        const jobTitle = (sprite.pony.job && sprite.pony.job.title) || "";
-        const isBuilder = jobTitle.toLowerCase().includes("builder");
+        const ponySlug = (sprite.pony.slug || "").toLowerCase();
+        const isBuilder = ponySlug === "taticorn";
         const eatThreshold = Number.isFinite(actor.eatThreshold)
           ? actor.eatThreshold
           : EAT_THRESHOLD_DEFAULT;
         const drinkThreshold = Number.isFinite(actor.drinkThreshold)
           ? actor.drinkThreshold
           : DRINK_THRESHOLD_DEFAULT;
+        const urgentTask = getCriticalNeedTask(actor, { x, y });
+        if (urgentTask) {
+          actor.task = urgentTask;
+        }
         const hasManualTask = actor.task && actor.task.manual;
-        if (!hasManualTask) {
+        const hasUrgentTask = actor.task && actor.task.urgent;
+        if (!hasManualTask && !hasUrgentTask) {
           const canEat = foodSpots.length > 0 && now > actor.eatCooldownUntil;
           const canDrink = drinkSpots.length > 0 && now > actor.drinkCooldownUntil;
+          const canFun = funSpots.length > 0 && now > actor.funCooldownUntil;
           const candidates = [];
           if (canEat && actor.stats.hunger >= eatThreshold) {
             const target = pickFoodSpot(actor, { x, y });
@@ -1221,6 +1555,19 @@ async function initMap(mapData, ponies, locations, runtimeState) {
               level: actor.stats.tiredness,
               task: { type: "rest", houseId: actor.homeId },
             });
+          }
+          const boredomThreshold = Number.isFinite(actor.funThreshold)
+            ? actor.funThreshold
+            : BOREDOM_THRESHOLD_DEFAULT;
+          if (canFun && actor.stats.boredom >= boredomThreshold) {
+            const target = pickFunSpot(actor, { x, y });
+            if (target) {
+              candidates.push({
+                need: "boredom",
+                level: actor.stats.boredom,
+                task: { type: "fun", funId: target.id },
+              });
+            }
           }
           const chosenNeed = pickNeedCandidate(candidates);
           if (chosenNeed) {
@@ -1261,7 +1608,18 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             actor.task = null;
           }
         }
-        actor.speed = hasManualTask
+        if (actor.task && actor.task.type === "fun") {
+          const spot = funSpotById.get(actor.task.funId);
+          if (!spot) {
+            actor.task = null;
+          }
+        }
+        const targetPoint = getTaskTargetPoint(actor);
+        if (actor.task && targetPoint) {
+          // Keep direction stable mid-segment; routing happens at junctions.
+        }
+        const hasRushTask = actor.task && (actor.task.manual || actor.task.urgent);
+        actor.speed = hasRushTask
           ? actor.baseSpeed * MANUAL_SPEED_MULTIPLIER
           : actor.baseSpeed;
         const distance = Math.hypot(to.x - from.x, to.y - from.y);
@@ -1277,21 +1635,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             const options = endpointIndex.get(key) || [];
             const nextOptions = options.filter((item) => item.segment !== segment);
             const choicePool = nextOptions.length ? nextOptions : options;
-            let targetPoint = null;
             let preferTarget = false;
-            if (actor.task && actor.task.type === "rest") {
-              if (actor.task.houseId) {
-                targetPoint = getHouseTargetPoint(actor.task.houseId);
-              } else if (actor.task.inn) {
-                targetPoint = getInnTargetPoint();
-              }
-            } else if (actor.task && actor.task.houseId) {
-              targetPoint = getHouseTargetPoint(actor.task.houseId);
-            } else if (actor.task && actor.task.type === "eat") {
-              targetPoint = getFoodTargetPoint(actor.task.foodId);
-            } else if (actor.task && actor.task.type === "drink") {
-              targetPoint = getDrinkTargetPoint(actor.task.drinkId);
-            }
             if (actor.task && targetPoint) {
               preferTarget = true;
             }
@@ -1373,8 +1717,49 @@ async function initMap(mapData, ponies, locations, runtimeState) {
           }
         }
 
-        const skipAutoRest = actor.task && actor.task.manual && actor.task.type !== "rest";
-        if (innObject && !startedEating && !startedDrinking && !skipAutoRest) {
+        if (actor.task && actor.task.type === "fun") {
+          const spot = funSpotById.get(actor.task.funId);
+          if (spot) {
+            const accessPoint = getFunSpotAccessPoint(spot);
+            const funX = accessPoint.x;
+            const funY = accessPoint.y;
+            const distToFun = Math.hypot(x - funX, y - funY);
+            const funRadiusTiles = spot.funRadius || FUN_RADIUS_TILES;
+            const funRadius = mapData.meta.tileSize * funRadiusTiles;
+            if (distToFun < funRadius && now > actor.funCooldownUntil) {
+              const baseOffset = getSpotOffset(spot, "funOffset");
+              const funDuration =
+                FUN_DURATION_MIN + Math.random() * (FUN_DURATION_MAX - FUN_DURATION_MIN);
+              actor.funUntil = now + funDuration;
+              actor.funCooldownUntil =
+                actor.funUntil +
+                FUN_COOLDOWN_MIN +
+                Math.random() * (FUN_COOLDOWN_MAX - FUN_COOLDOWN_MIN);
+              actor.funTargetId = spot.id;
+              actor.funOffset = {
+                x: baseOffset.x + (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                y: baseOffset.y + (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+              };
+              actor.frameIndex = 0;
+              actor.lastFrame = 0;
+              actor.stats.boredom = 0;
+              actor.task = null;
+              startedFun = true;
+            }
+          }
+        }
+
+        const skipAutoRest =
+          actor.task &&
+          (actor.task.manual || actor.task.urgent) &&
+          actor.task.type !== "rest";
+        if (
+          innObject &&
+          !startedEating &&
+          !startedDrinking &&
+          !startedFun &&
+          !skipAutoRest
+        ) {
           const innX = innObject.at.x * mapData.meta.tileSize;
           const innY = innObject.at.y * mapData.meta.tileSize;
           const distToInn = Math.hypot(x - innX, y - innY);
@@ -1427,11 +1812,15 @@ async function initMap(mapData, ponies, locations, runtimeState) {
         }
 
         const skipHomeRest =
-          actor.task && actor.task.manual && actor.task.type === "rest" && actor.task.inn;
+          actor.task &&
+          (actor.task.manual || actor.task.urgent) &&
+          actor.task.type === "rest" &&
+          actor.task.inn;
         if (
           actor.homeId &&
           !startedEating &&
           !startedDrinking &&
+          !startedFun &&
           !skipAutoRest &&
           !skipHomeRest
         ) {
@@ -1639,9 +2028,14 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             statsLineWidth += groupGap;
           }
         });
+        const showHeading = isHovered;
+        const headingText = showHeading ? resolveTaskLabel(actor, now) : "";
+        const headingWidth = headingText ? ctx.measureText(headingText).width : 0;
         const nameWidth = ctx.measureText(labelName).width;
-        const boxWidth = Math.max(nameWidth, statsLineWidth) + paddingX * 2;
-        const boxHeight = lineHeight * 2 + paddingY * 2 - 4;
+        const boxWidth =
+          Math.max(nameWidth, statsLineWidth, headingWidth) + paddingX * 2;
+        const lineCount = showHeading ? 3 : 2;
+        const boxHeight = lineHeight * lineCount + paddingY * 2 - 4;
         const labelThemes = {
           stellacorn: {
             textPrimary: "#ffe27a",
@@ -1703,6 +2097,12 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             cursorX += groupGap;
           }
         });
+        if (showHeading) {
+          ctx.fillStyle = theme.textSecondary;
+          ctx.textAlign = "center";
+          const headingY = Math.round(nameY + lineHeight * 2);
+          ctx.fillText(headingText, labelX, headingY);
+        }
       }
     });
   };
@@ -1719,6 +2119,12 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     drawStructures();
     updateHouseStates(delta, now);
     drawActors(delta, now);
+    if (commandMenu && !commandMenu.hidden && commandTarget) {
+      if (now - lastCommandStatsUpdate > 500) {
+        updateCommandStats(now);
+        lastCommandStatsUpdate = now;
+      }
+    }
     requestAnimationFrame(draw);
   };
 

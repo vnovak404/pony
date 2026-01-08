@@ -73,12 +73,12 @@
     {
       "id": "whispering-forest",
       "name": "Whispering Forest",
-      "tags": ["nature", "shade", "outskirts"]
+      "tags": ["nature", "shade", "outskirts", "recreation"]
     },
     {
       "id": "silver-lake",
       "name": "Silver Lake",
-      "tags": ["water", "calm", "outskirts"]
+      "tags": ["water", "calm", "outskirts", "recreation"]
     },
     {
       "id": "songbird-pavilion",
