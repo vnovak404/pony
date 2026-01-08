@@ -502,7 +502,7 @@
         "id": "bakery",
         "kind": "building",
         "at": {
-          "x": 17.15,
+          "x": 17.12,
           "y": 7.88
         },
         "sprite": "bakery_01",
@@ -561,7 +561,7 @@
         "kind": "landmark",
         "at": {
           "x": 20.42,
-          "y": 15.72
+          "y": 15.69
         },
         "sprite": "well_01",
         "locationId": "milk-honey-well",

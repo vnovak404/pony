@@ -75,7 +75,6 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const BOREDOM_THRESHOLD_DEFAULT = 60;
   const CRITICAL_NEED_LEVEL = 100;
   const MANUAL_SPEED_MULTIPLIER = 1.8;
-  const TARGET_T_EPSILON = 0.02;
 
   const locationIndex = new Map();
   locations.forEach((location) => {
@@ -180,17 +179,69 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const drinkSpotById = new Map(drinkSpots.map((spot) => [spot.id, spot]));
   const funSpots = objects.filter((item) => isFunSpot(item));
   const funSpotById = new Map(funSpots.map((spot) => [spot.id, spot]));
-  const roadSegments = roads.map((segment) => ({
-    id: segment.id,
-    from: {
+  const roadSegments = roads.map((segment) => {
+    const from = {
       x: segment.from.x * mapData.meta.tileSize,
       y: segment.from.y * mapData.meta.tileSize,
-    },
-    to: {
+    };
+    const to = {
       x: segment.to.x * mapData.meta.tileSize,
       y: segment.to.y * mapData.meta.tileSize,
-    },
-  }));
+    };
+    return {
+      id: segment.id,
+      from,
+      to,
+      length: Math.hypot(to.x - from.x, to.y - from.y),
+    };
+  });
+  const gridWidth = mapData.meta.width;
+  const gridHeight = mapData.meta.height;
+  const roadGrid = Array.from({ length: gridHeight }, () =>
+    new Array(gridWidth).fill(false)
+  );
+  const roadTiles = [];
+  const tileKey = (tileX, tileY) => `${tileX},${tileY}`;
+  const markRoadTile = (tileX, tileY) => {
+    if (
+      tileX < 0 ||
+      tileX >= gridWidth ||
+      tileY < 0 ||
+      tileY >= gridHeight
+    ) {
+      return;
+    }
+    if (roadGrid[tileY][tileX]) return;
+    roadGrid[tileY][tileX] = true;
+    roadTiles.push({ x: tileX, y: tileY });
+  };
+  const rasterizeRoad = (start, end) => {
+    let x0 = Math.round(start.x);
+    let y0 = Math.round(start.y);
+    let x1 = Math.round(end.x);
+    let y1 = Math.round(end.y);
+    const dx = Math.abs(x1 - x0);
+    const dy = Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let err = dx - dy;
+    while (true) {
+      markRoadTile(x0, y0);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 > -dy) {
+        err -= dy;
+        x0 += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        y0 += sy;
+      }
+    }
+  };
+  roads.forEach((segment) => {
+    rasterizeRoad(segment.from, segment.to);
+  });
 
   const endpointKey = (point) => `${point.x},${point.y}`;
   const endpointIndex = new Map();
@@ -206,6 +257,172 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     addEndpoint(segment.from, segment, "from");
     addEndpoint(segment.to, segment, "to");
   });
+
+  const endpointPoints = new Map();
+  roadSegments.forEach((segment) => {
+    endpointPoints.set(endpointKey(segment.from), segment.from);
+    endpointPoints.set(endpointKey(segment.to), segment.to);
+  });
+  const endpoints = Array.from(endpointPoints.entries()).map(([key, point]) => ({
+    key,
+    point,
+  }));
+  const roadGraph = new Map();
+  const addEdge = (fromKey, toKey, segment) => {
+    if (!roadGraph.has(fromKey)) {
+      roadGraph.set(fromKey, []);
+    }
+    roadGraph.get(fromKey).push({
+      key: toKey,
+      weight: segment.length,
+      segment,
+    });
+  };
+  roadSegments.forEach((segment) => {
+    const fromKey = endpointKey(segment.from);
+    const toKey = endpointKey(segment.to);
+    addEdge(fromKey, toKey, segment);
+    addEdge(toKey, fromKey, segment);
+  });
+
+  const tileCenter = (tileX, tileY) => ({
+    x: (tileX + 0.5) * mapData.meta.tileSize,
+    y: (tileY + 0.5) * mapData.meta.tileSize,
+  });
+  const findNearestRoadTile = (point) => {
+    if (!point || !roadTiles.length) return null;
+    let best = null;
+    let bestDistance = Infinity;
+    roadTiles.forEach((tile) => {
+      const center = tileCenter(tile.x, tile.y);
+      const distance = Math.hypot(center.x - point.x, center.y - point.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = tile;
+      }
+    });
+    return best;
+  };
+  const getNeighbors = (tile) => {
+    const neighbors = [];
+    for (let dx = -1; dx <= 1; dx += 1) {
+      for (let dy = -1; dy <= 1; dy += 1) {
+        if (dx === 0 && dy === 0) continue;
+        const x = tile.x + dx;
+        const y = tile.y + dy;
+        if (
+          x < 0 ||
+          x >= gridWidth ||
+          y < 0 ||
+          y >= gridHeight ||
+          !roadGrid[y][x]
+        ) {
+          continue;
+        }
+        neighbors.push({
+          x,
+          y,
+          cost: dx === 0 || dy === 0 ? 1 : Math.SQRT2,
+        });
+      }
+    }
+    return neighbors;
+  };
+  const buildTilePath = (startPoint, targetPoint) => {
+    if (!startPoint || !targetPoint || !roadTiles.length) return null;
+    const startTile = findNearestRoadTile(startPoint);
+    const goalTile = findNearestRoadTile(targetPoint);
+    if (!startTile || !goalTile) return null;
+    const startKey = tileKey(startTile.x, startTile.y);
+    const goalKey = tileKey(goalTile.x, goalTile.y);
+    const open = new Map();
+    const cameFrom = new Map();
+    const gScore = new Map();
+    const fScore = new Map();
+    const heuristic = (tile) =>
+      Math.hypot(tile.x - goalTile.x, tile.y - goalTile.y);
+    gScore.set(startKey, 0);
+    fScore.set(startKey, heuristic(startTile));
+    open.set(startKey, startTile);
+    while (open.size > 0) {
+      let currentKey = null;
+      let currentTile = null;
+      let bestScore = Infinity;
+      open.forEach((tile, key) => {
+        const score = fScore.get(key) ?? Infinity;
+        if (score < bestScore) {
+          bestScore = score;
+          currentKey = key;
+          currentTile = tile;
+        }
+      });
+      if (!currentKey || !currentTile) break;
+      if (currentKey === goalKey) {
+        const pathTiles = [currentTile];
+        let backKey = currentKey;
+        while (cameFrom.has(backKey)) {
+          backKey = cameFrom.get(backKey);
+          const coords = backKey.split(",").map(Number);
+          pathTiles.push({ x: coords[0], y: coords[1] });
+        }
+        pathTiles.reverse();
+        return pathTiles.map((tile) => tileCenter(tile.x, tile.y));
+      }
+      open.delete(currentKey);
+      const neighbors = getNeighbors(currentTile);
+      neighbors.forEach((neighbor) => {
+        const neighborKey = tileKey(neighbor.x, neighbor.y);
+        const tentativeG = (gScore.get(currentKey) ?? Infinity) + neighbor.cost;
+        if (tentativeG < (gScore.get(neighborKey) ?? Infinity)) {
+          cameFrom.set(neighborKey, currentKey);
+          gScore.set(neighborKey, tentativeG);
+          fScore.set(
+            neighborKey,
+            tentativeG + heuristic({ x: neighbor.x, y: neighbor.y })
+          );
+          if (!open.has(neighborKey)) {
+            open.set(neighborKey, { x: neighbor.x, y: neighbor.y });
+          }
+        }
+      });
+    }
+    return null;
+  };
+
+  const advanceAlongPath = (actor, delta) => {
+    if (!actor.path || actor.pathIndex >= actor.path.length) return null;
+    if (!actor.position) {
+      actor.position = { x: actor.path[0].x, y: actor.path[0].y };
+    }
+    let current = { x: actor.position.x, y: actor.position.y };
+    let remaining = actor.speed * delta;
+    let index = actor.pathIndex;
+    let heading = null;
+    while (remaining > 0 && index < actor.path.length) {
+      const target = actor.path[index];
+      const dx = target.x - current.x;
+      const dy = target.y - current.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist === 0) {
+        index += 1;
+        continue;
+      }
+      if (dist <= remaining) {
+        current = { x: target.x, y: target.y };
+        remaining -= dist;
+        index += 1;
+        heading = { from: actor.position, to: target };
+      } else {
+        const ratio = remaining / dist;
+        current = { x: current.x + dx * ratio, y: current.y + dy * ratio };
+        remaining = 0;
+        heading = { from: actor.position, to: target };
+      }
+    }
+    actor.position = current;
+    actor.pathIndex = index;
+    return heading;
+  };
 
   const isOffMap = (point) =>
     point.x < 0 || point.x > mapWidth || point.y < 0 || point.y > mapHeight;
@@ -312,6 +529,31 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       return promenade[Math.floor(Math.random() * promenade.length)];
     }
     return choices[Math.floor(Math.random() * choices.length)];
+  };
+
+  const pickNextSegmentTowardsTarget = (choices, targetPoint) => {
+    if (!choices.length || !targetPoint) return null;
+    const distances = buildDistanceMapForTarget(targetPoint);
+    if (!distances) return null;
+    const scored = choices
+      .map((choice) => {
+        const nextPoint =
+          choice.end === "from" ? choice.segment.to : choice.segment.from;
+        const nextKey = endpointKey(nextPoint);
+        const tail = distances.get(nextKey);
+        if (!Number.isFinite(tail)) return null;
+        return {
+          choice,
+          score: choice.segment.length + tail,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.score - b.score);
+    if (!scored.length) return null;
+    const pickFrom = scored
+      .slice(0, Math.min(2, scored.length))
+      .map((item) => item.choice);
+    return pickFrom[Math.floor(Math.random() * pickFrom.length)];
   };
 
   const needPriorityRank = new Map(
@@ -469,15 +711,102 @@ async function initMap(mapData, ponies, locations, runtimeState) {
     };
   }
 
-  const getSegmentT = (point, segment) => {
+  const projectPointOnSegment = (point, segment) => {
     const dx = segment.to.x - segment.from.x;
     const dy = segment.to.y - segment.from.y;
     const lengthSquared = dx * dx + dy * dy;
-    if (lengthSquared === 0) return 0;
+    if (lengthSquared === 0) {
+      return { t: 0, point: { x: segment.from.x, y: segment.from.y } };
+    }
     const t =
       ((point.x - segment.from.x) * dx + (point.y - segment.from.y) * dy) /
       lengthSquared;
-    return Math.max(0, Math.min(1, t));
+    const clamped = Math.max(0, Math.min(1, t));
+    return {
+      t: clamped,
+      point: {
+        x: segment.from.x + dx * clamped,
+        y: segment.from.y + dy * clamped,
+      },
+    };
+  };
+
+  const findNearestSegmentToPoint = (point) => {
+    if (!point || !roadSegments.length) return null;
+    let best = null;
+    roadSegments.forEach((segment) => {
+      const projection = projectPointOnSegment(point, segment);
+      const distance = Math.hypot(
+        projection.point.x - point.x,
+        projection.point.y - point.y
+      );
+      if (!best || distance < best.distance) {
+        best = {
+          segment,
+          point: projection.point,
+          distance,
+          t: projection.t,
+        };
+      }
+    });
+    return best;
+  };
+
+  const buildDistanceMapForTarget = (targetPoint) => {
+    const distances = new Map();
+    endpoints.forEach((endpoint) => {
+      distances.set(endpoint.key, Infinity);
+    });
+    if (!targetPoint || !endpoints.length) return distances;
+    const nearest = findNearestSegmentToPoint(targetPoint);
+    if (!nearest) return distances;
+    const fromKey = endpointKey(nearest.segment.from);
+    const toKey = endpointKey(nearest.segment.to);
+    const distFrom = Math.hypot(
+      nearest.point.x - nearest.segment.from.x,
+      nearest.point.y - nearest.segment.from.y
+    );
+    const distTo = Math.hypot(
+      nearest.point.x - nearest.segment.to.x,
+      nearest.point.y - nearest.segment.to.y
+    );
+    distances.set(fromKey, Math.min(distances.get(fromKey), distFrom));
+    distances.set(toKey, Math.min(distances.get(toKey), distTo));
+    const visited = new Set();
+    while (visited.size < distances.size) {
+      let currentKey = null;
+      let currentDistance = Infinity;
+      distances.forEach((distance, key) => {
+        if (!visited.has(key) && distance < currentDistance) {
+          currentDistance = distance;
+          currentKey = key;
+        }
+      });
+      if (currentKey === null || !Number.isFinite(currentDistance)) break;
+      visited.add(currentKey);
+      const neighbors = roadGraph.get(currentKey) || [];
+      neighbors.forEach((neighbor) => {
+        if (visited.has(neighbor.key)) return;
+        const nextDistance = currentDistance + neighbor.weight;
+        if (nextDistance < (distances.get(neighbor.key) || Infinity)) {
+          distances.set(neighbor.key, nextDistance);
+        }
+      });
+    }
+    return distances;
+  };
+
+  const snapActorToNearestSegment = (actor, point) => {
+    if (!actor || !point) return;
+    const nearest = findNearestSegmentToPoint(point);
+    if (!nearest) return;
+    actor.segment = nearest.segment;
+    if (actor.direction !== 1 && actor.direction !== -1) {
+      actor.direction = actor.facing === -1 ? -1 : 1;
+    }
+    const baseT = nearest.t ?? 0;
+    actor.t = actor.direction === 1 ? baseT : 1 - baseT;
+    actor.position = { x: nearest.point.x, y: nearest.point.y };
   };
 
   const computeAccessPoint = (target) => {
@@ -1071,6 +1400,12 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       baseSpeed: startSpeed,
       speed: startSpeed,
       direction: savedDirection !== null ? savedDirection : Math.random() > 0.5 ? 1 : -1,
+      facing: savedDirection !== null ? savedDirection : 1,
+      position: null,
+      path: null,
+      pathIndex: 0,
+      pathTargetKey: null,
+      pathBlockedUntil: 0,
       frameIndex: Math.floor(Math.random() * sprite.moveFrames.length),
       lastFrame: 0,
       sleepUntil: 0,
@@ -1392,6 +1727,9 @@ async function initMap(mapData, ponies, locations, runtimeState) {
   const drawActors = (delta, now) => {
     actors.forEach((actor) => {
       const { sprite, segment } = actor;
+      const previousPosition = actor.position
+        ? { x: actor.position.x, y: actor.position.y }
+        : null;
       const meta = sprite.meta;
       const frames = meta.frames;
       const anchor = Object.values(frames)[0]?.anchor || { x: 256, y: 480 };
@@ -1452,6 +1790,16 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       let to = actor.direction === 1 ? segment.to : segment.from;
       let x = from.x + (to.x - from.x) * actor.t;
       let y = from.y + (to.y - from.y) * actor.t;
+      if (!actor.position) {
+        actor.position = { x, y };
+      } else if (!actor.task) {
+        actor.position.x = x;
+        actor.position.y = y;
+      }
+      if (actor.position) {
+        x = actor.position.x;
+        y = actor.position.y;
+      }
       let startedEating = false;
       let startedDrinking = false;
       let startedFun = false;
@@ -1615,38 +1963,109 @@ async function initMap(mapData, ponies, locations, runtimeState) {
           }
         }
         const targetPoint = getTaskTargetPoint(actor);
-        if (actor.task && targetPoint) {
-          // Keep direction stable mid-segment; routing happens at junctions.
-        }
         const hasRushTask = actor.task && (actor.task.manual || actor.task.urgent);
         actor.speed = hasRushTask
           ? actor.baseSpeed * MANUAL_SPEED_MULTIPLIER
           : actor.baseSpeed;
-        const distance = Math.hypot(to.x - from.x, to.y - from.y);
-        actor.t += (actor.speed * delta) / Math.max(distance, 1);
-        if (actor.t >= 1) {
-          actor.t = 0;
-          if (isOffMap(to)) {
-            actor.segment =
-              roadSegments[Math.floor(Math.random() * roadSegments.length)] || segment;
-            actor.direction = Math.random() > 0.5 ? 1 : -1;
-          } else {
-            const key = endpointKey(to);
-            const options = endpointIndex.get(key) || [];
-            const nextOptions = options.filter((item) => item.segment !== segment);
-            const choicePool = nextOptions.length ? nextOptions : options;
-            let preferTarget = false;
-            if (actor.task && targetPoint) {
-              preferTarget = true;
+        const shouldPath = Boolean(actor.task && targetPoint);
+        if (shouldPath && now > actor.pathBlockedUntil) {
+          const targetTile = findNearestRoadTile(targetPoint);
+          const targetKey = targetTile ? tileKey(targetTile.x, targetTile.y) : null;
+          const pathExpired =
+            !actor.path ||
+            actor.pathIndex >= actor.path.length ||
+            actor.pathTargetKey !== targetKey;
+          if (targetKey && pathExpired) {
+            const startPoint = actor.position ? actor.position : { x, y };
+            if (!actor.position) {
+              actor.position = { x: startPoint.x, y: startPoint.y };
             }
-            const next = pickNextSegment(choicePool, targetPoint, preferTarget);
-            if (next) {
-              actor.segment = next.segment;
-              actor.direction = next.end === "from" ? 1 : -1;
+            const path = buildTilePath(startPoint, targetPoint);
+            if (path && path.length) {
+              actor.path = path;
+              actor.pathIndex = 0;
+              actor.pathTargetKey = targetKey;
+              while (
+                actor.pathIndex < actor.path.length &&
+                Math.hypot(
+                  actor.path[actor.pathIndex].x - startPoint.x,
+                  actor.path[actor.pathIndex].y - startPoint.y
+                ) < 4
+              ) {
+                actor.pathIndex += 1;
+              }
             } else {
-              actor.direction *= -1;
+              actor.path = null;
+              actor.pathIndex = 0;
+              actor.pathTargetKey = null;
+              actor.pathBlockedUntil = now + 2000;
             }
           }
+        }
+        if (!shouldPath) {
+          actor.path = null;
+          actor.pathIndex = 0;
+          actor.pathTargetKey = null;
+        }
+
+        let heading = null;
+        const hasPath = actor.task && actor.path && actor.path.length;
+        if (hasPath) {
+          if (actor.pathIndex < actor.path.length) {
+            const before = actor.position
+              ? { x: actor.position.x, y: actor.position.y }
+              : { x, y };
+            heading = advanceAlongPath(actor, delta);
+            x = actor.position.x;
+            y = actor.position.y;
+            if (heading && heading.to) {
+              const dx = heading.to.x - before.x;
+              if (Math.abs(dx) > 1) {
+                actor.facing = dx >= 0 ? 1 : -1;
+              }
+              from = before;
+              to = heading.to;
+            }
+          } else if (actor.position) {
+            x = actor.position.x;
+            y = actor.position.y;
+          }
+        } else {
+          const distance = Math.hypot(to.x - from.x, to.y - from.y);
+          actor.t += (actor.speed * delta) / Math.max(distance, 1);
+          if (actor.t >= 1) {
+            actor.t = 0;
+            if (isOffMap(to)) {
+              actor.segment =
+                roadSegments[Math.floor(Math.random() * roadSegments.length)] || segment;
+              actor.direction = Math.random() > 0.5 ? 1 : -1;
+            } else {
+              const key = endpointKey(to);
+              const options = endpointIndex.get(key) || [];
+              const nextOptions = options.filter((item) => item.segment !== segment);
+              const choicePool = nextOptions.length ? nextOptions : options;
+              let next = null;
+              if (actor.task && targetPoint) {
+                next = pickNextSegmentTowardsTarget(choicePool, targetPoint);
+              }
+              if (!next) {
+                const preferTarget = Boolean(actor.task && targetPoint);
+                next = pickNextSegment(choicePool, targetPoint, preferTarget);
+              }
+              if (next) {
+                actor.segment = next.segment;
+                actor.direction = next.end === "from" ? 1 : -1;
+              } else {
+                actor.direction *= -1;
+              }
+            }
+          }
+          from = actor.direction === 1 ? actor.segment.from : actor.segment.to;
+          to = actor.direction === 1 ? actor.segment.to : actor.segment.from;
+          x = from.x + (to.x - from.x) * actor.t;
+          y = from.y + (to.y - from.y) * actor.t;
+          actor.position = { x, y };
+          actor.facing = actor.direction;
         }
 
         if (actor.task && actor.task.type === "eat") {
@@ -1890,6 +2309,26 @@ async function initMap(mapData, ponies, locations, runtimeState) {
             }
           }
         }
+
+        if (!actor.task && actor.path) {
+          actor.path = null;
+          actor.pathIndex = 0;
+          actor.pathTargetKey = null;
+          actor.pathBlockedUntil = 0;
+          snapActorToNearestSegment(actor, { x, y });
+          from = actor.direction === 1 ? actor.segment.from : actor.segment.to;
+          to = actor.direction === 1 ? actor.segment.to : actor.segment.from;
+          x = actor.position.x;
+          y = actor.position.y;
+        }
+      }
+
+      actor.position = { x, y };
+      if (previousPosition) {
+        const dx = x - previousPosition.x;
+        if (Math.abs(dx) > 0.5) {
+          actor.facing = dx >= 0 ? 1 : -1;
+        }
       }
 
       const frameScale = (mapData.meta.tileSize * scale * ASSET_SCALE) / frame.w;
@@ -1897,7 +2336,7 @@ async function initMap(mapData, ponies, locations, runtimeState) {
       const destY = y * scale - anchor.y * frameScale;
       const drawW = frame.w * frameScale;
       const drawH = frame.h * frameScale;
-      const directionFlip = to.x < from.x;
+      const directionFlip = actor.facing === -1;
       const flip = directionFlip !== Boolean(sprite.pony.sprite_flip);
 
       if (flip) {
