@@ -2,6 +2,10 @@
 
 This repository uses ES modules under `assets/js/`. Keep this file up to date whenever module responsibilities or function signatures change. This list is intentionally exhaustive for future maintenance.
 
+## Tests
+- Run: `npm test`
+- Tests live in `tests/*.test.js`.
+
 ## `assets/js/app.js`
 
 - Purpose: app bootstrap (loads vibes, pony cards, form wiring, and map).

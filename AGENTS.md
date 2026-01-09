@@ -1,25 +1,35 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository is currently empty aside from Git metadata. As code is added, keep a simple, predictable layout:
+This repository contains a browser-based simulation game with
+JavaScript frontend modules, Python-based asset generation tooling,
+and a lightweight local HTTP server.
 
-- `src/` for application or library source code.
-- `tests/` (or `__tests__/`) for automated tests.
-- `scripts/` for developer tooling and automation.
-- `assets/` for static files (images, fixtures, sample data).
+High-level layout:
 
-If you introduce a different structure (e.g., `packages/` for a monorepo), document it in this file.
+- `index.html`, `styles.css` — static entrypoint and styles
+- `assets/js/` — ES module frontend (map sim, UI, actors)
+- `data/` — game data and runtime state (`data/_generated/`)
+- `scripts/` — Python asset generation + local server
+- `docs/` — authoritative developer documentation
+- `tests/` — Node.js tests for map logic and simulation rules
+- `assets/world/`, `assets/ponies/`, `assets/ui/` — generated assets
 
 ## Build, Test, and Development Commands
-No build or dev commands exist yet. Current tests:
+Frontend:
+- Open `index.html` directly in a browser for static viewing.
 
-- `npm test` — run the Node.js test runner over `tests/`.
+Local server (recommended):
+- `python3 scripts/pony_server.py`
+  Runs a local HTTP server for pony creation, asset generation,
+  map edits, and runtime state persistence.
 
-When you add tooling, document it here with examples, e.g.:
+Tests:
+- `npm test`
+  Runs Node.js tests under `tests/` using `node:test`.
 
-- `npm run dev` — run the local development server.
-- `npm test` — execute the test suite.
-- `make build` — compile production artifacts.
+Asset generation:
+- See `docs/python-scripts.md` for detailed CLI usage.
 
 ## Coding Style & Naming Conventions
 No style rules are defined yet. Until tooling is added:
@@ -36,6 +46,7 @@ Tests use Node.js built-in `node:test`. When adding tests:
 - Keep test files next to code (e.g., `src/foo.test.ts`) or under `tests/`.
 - Use descriptive test names (e.g., `should_parse_valid_input`).
 - Document the test runner and how to run targeted tests.
+- Tests focus on simulation logic (pathfinding, repair timing, house state transitions) and avoid DOM or canvas rendering.
 
 ## Commit & Pull Request Guidelines
 There is no commit history yet, so no conventions are established. Until specified:
@@ -48,6 +59,6 @@ There is no commit history yet, so no conventions are established. Until specifi
 Do not commit secrets. Store local configuration in `.env` files and add them to `.gitignore`.
 
 ## Agent Instructions
-- Avoid creating files over 500 lines. If a file approaches 500 lines, split the logic into smaller modules instead of extending the file.
+- Prefer small, single-purpose modules. Frontend logic is intentionally split across many files under `assets/js/`. Keep files under 500-600 lines and split them up if they get bigger than that.
 - Before editing frontend JavaScript, read `docs/js-modules.md` and keep it updated with module/function changes.
 - Before editing Python scripts, read `docs/python-scripts.md` and keep it updated with module/function changes.

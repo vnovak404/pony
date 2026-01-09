@@ -1,6 +1,7 @@
 # Python Scripts and Modules
 
 This repository uses Python for asset generation, server helpers, and sprite tooling.
+This document lives at `docs/python-scripts.md`.
 Update this file whenever a script changes behavior, CLI flags, or function signatures.
 
 ## `scripts/generate_pony_images.py`
@@ -223,7 +224,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--output-dir` portrait output directory.
   - `--env-file` for `OPENAI_API_KEY`.
   - `--map` map JSON path.
-  - `--state` runtime state JSON path.
+  - `--state` runtime state JSON path (default: `data/_generated/runtime_state.json`).
 - HTTP endpoints:
   - `POST /api/ponies` — create pony (also generates portrait, spawns async sprite/house jobs).
   - `POST /api/ponies/<slug>/sprites` — run `generate_pony_sprites.py`.
