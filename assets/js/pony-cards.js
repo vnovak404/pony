@@ -1,12 +1,13 @@
 // Pony Parade: pony card rendering and actions.
 
 import { ponyGrid } from "./dom.js";
-import { formatTalent, formatPersonality, loadImage } from "./utils.js";
+import { formatTalent, formatPersonality, loadImage, loadJson } from "./utils.js";
 
 export const renderPonyCard = (pony, imagePath, addToTop = false) => {
   if (!ponyGrid) return;
   const ponyId = pony.slug || "";
   const sheetPath = pony.sprites && pony.sprites.sheet ? pony.sprites.sheet : "";
+  const metaPath = pony.sprites && pony.sprites.meta ? pony.sprites.meta : "";
   const card = document.createElement("article");
   card.className = "pony-card pony-photo";
   card.innerHTML = `
@@ -29,7 +30,7 @@ export const renderPonyCard = (pony, imagePath, addToTop = false) => {
       <button class="btn ghost small" type="button" data-pony-action="spritesheet" data-pony-id="${ponyId}">
         Pack Sheet
       </button>
-      <button class="btn ghost small" type="button" data-pony-sheet="${sheetPath}">
+      <button class="btn ghost small" type="button" data-pony-sheet="${sheetPath}" data-pony-meta="${metaPath}">
         Show Spritesheet
       </button>
     </div>
@@ -66,6 +67,32 @@ export const loadPonies = async () => {
   }
 };
 
+const resolveSheetPath = (metaPath, meta, fallbackPath) => {
+  const sheets =
+    meta && meta.meta && Array.isArray(meta.meta.sheets) ? meta.meta.sheets : [];
+  const images =
+    meta && meta.meta && Array.isArray(meta.meta.images) && meta.meta.images.length
+      ? meta.meta.images
+      : meta && meta.meta && meta.meta.image
+        ? [meta.meta.image]
+        : [];
+  const preferredSheet =
+    sheets.find((sheet) => sheet.action === "trot") ||
+    sheets.find((sheet) => sheet.action === "walk") ||
+    sheets[0] ||
+    null;
+  const imageName =
+    preferredSheet && preferredSheet.image ? preferredSheet.image : images[0];
+  if (!imageName) {
+    return fallbackPath;
+  }
+  const basePath = metaPath.slice(0, metaPath.lastIndexOf("/") + 1);
+  if (imageName.startsWith("/") || imageName.startsWith("assets/")) {
+    return imageName;
+  }
+  return `${basePath}${imageName}`;
+};
+
 const updateCardStatus = (card, message) => {
   if (!card) return;
   const status = card.querySelector("[data-pony-status]");
@@ -87,7 +114,8 @@ export const bindPonyCardActions = () => {
   ponyGrid.addEventListener("click", async (event) => {
     const sheetButton = event.target.closest("[data-pony-sheet]");
     if (sheetButton) {
-      const sheetPath = sheetButton.dataset.ponySheet;
+      const metaPath = sheetButton.dataset.ponyMeta || "";
+      const fallbackSheet = sheetButton.dataset.ponySheet || "";
       const card = sheetButton.closest(".pony-card");
       if (!card) return;
       const preview = card.querySelector(".pony-sheet-preview");
@@ -95,7 +123,7 @@ export const bindPonyCardActions = () => {
       const image = card.querySelector(".pony-sheet-preview img");
       if (!preview || !status || !image) return;
 
-      if (!sheetPath) {
+      if (!metaPath && !fallbackSheet) {
         preview.hidden = false;
         status.textContent = "Spritesheet path not set.";
         image.hidden = true;
@@ -112,6 +140,20 @@ export const bindPonyCardActions = () => {
       image.hidden = true;
 
       try {
+        let sheetPath = fallbackSheet;
+        if (metaPath) {
+          try {
+            const sheetMeta = await loadJson(`${metaPath}?t=${Date.now()}`);
+            sheetPath = resolveSheetPath(metaPath, sheetMeta, fallbackSheet);
+          } catch (error) {
+            if (!fallbackSheet) {
+              throw error;
+            }
+          }
+        }
+        if (!sheetPath) {
+          throw new Error("Spritesheet path not set.");
+        }
         await loadImage(`${sheetPath}?t=${Date.now()}`);
         image.src = `${sheetPath}?t=${Date.now()}`;
         image.hidden = false;

@@ -1,5 +1,6 @@
 STYLE_BIBLE = (
     "Sprite frame for a 2D game. "
+    "Single still frame, not a smooth animation. "
     "Transparent background (RGBA) with alpha channel. "
     "Side view pony facing right, nose pointing to the right. "
     "Full body visible, no cropping, extra padding around edges. "
@@ -152,6 +153,9 @@ def _format_identity(pony, force_regular=False):
     species = pony.get("species", "pony").lower()
     body_color = pony.get("body_color") or "pastel coat"
     mane_color = pony.get("mane_color") or "soft mane and tail"
+    accent_color = pony.get("accent_color")
+    markings = pony.get("markings")
+    accessories = pony.get("accessories")
     eye_color = pony.get("eye_color")
     vibe = pony.get("vibe") or pony.get("personality")
 
@@ -168,6 +172,12 @@ def _format_identity(pony, force_regular=False):
 
     if eye_color:
         lines.append(f"Eye color: {eye_color}.")
+    if accent_color:
+        lines.append(f"Accent color: {accent_color}.")
+    if markings:
+        lines.append(f"Markings: {markings}.")
+    if accessories:
+        lines.append(f"Accessories: {accessories}.")
     if vibe:
         lines.append(f"Vibe: {vibe}.")
 
@@ -181,6 +191,20 @@ def _format_identity(pony, force_regular=False):
     return " ".join(lines)
 
 
+def _format_gait_intent(action_id):
+    if action_id == "walk":
+        return (
+            "Gait intent: relaxed walk, diagonal support pairs, small vertical bounce, "
+            "no airborne phase."
+        )
+    if action_id == "trot":
+        return (
+            "Gait intent: energetic trot, diagonal pairs move together, noticeable bounce, "
+            "brief suspension implied."
+        )
+    return ""
+
+
 def _format_action_cue(pony, action_id, frame_index, frame_count):
     base = f"Action: {action_id}."
     frame_hint = ""
@@ -192,6 +216,24 @@ def _format_action_cue(pony, action_id, frame_index, frame_count):
 
     if action_id == "sleep":
         return f"{base}{frame_hint} Sleeping, curled up or lying down, eyes closed."
+
+    if action_id == "eat":
+        return (
+            f"{base}{frame_hint} Eating pose, head lowered as if nibbling, "
+            "content expression, no props."
+        )
+
+    if action_id == "drink":
+        return (
+            f"{base}{frame_hint} Drinking pose, muzzle lowered as if sipping, "
+            "relaxed stance, no props."
+        )
+
+    if action_id == "vet":
+        return (
+            f"{base}{frame_hint} Clinic care pose, calm and cooperative, "
+            "standing or seated, no props."
+        )
 
     if action_id == "laugh":
         return f"{base}{frame_hint} Happy laugh, head tilt, bright smile."
@@ -255,11 +297,13 @@ def build_sprite_prompt(pony, action_id, frame_index, frame_count):
         phase = phases[frame_index % len(phases)]
         identity = _format_identity(pony, force_regular=True)
         canvas = _format_canvas(pony)
+        gait_intent = _format_gait_intent(action_id)
         exclusions = _format_phase_exclusions(phase["name"], phase["exclude"])
         return (
             f"{WALK_TROT_STYLE} {identity} "
             f"This image represents {phase['name']} of a {action_id} cycle. "
             f"This is one frame of a {action_id} cycle. "
+            f"{gait_intent} "
             f"Pose details: {phase['pose']}. "
             f"{exclusions} "
             f"{canvas}"

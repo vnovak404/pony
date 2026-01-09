@@ -503,7 +503,7 @@
         "kind": "building",
         "at": {
           "x": 17.12,
-          "y": 7.88
+          "y": 7.91
         },
         "sprite": "bakery_01",
         "locationId": "sunrise-bakery"
@@ -512,8 +512,8 @@
         "id": "restaurant",
         "kind": "food",
         "at": {
-          "x": 27.74,
-          "y": 16.03
+          "x": 27.41,
+          "y": 16.06
         },
         "sprite": "restaurant_01",
         "locationId": "pony-restaurant",
@@ -527,7 +527,7 @@
         "kind": "building",
         "at": {
           "x": 13.44,
-          "y": 7.85
+          "y": 8.0
         },
         "sprite": "lemonade_bar_01",
         "locationId": "lemonade-bar",
@@ -540,8 +540,8 @@
         "id": "library",
         "kind": "building",
         "at": {
-          "x": 23.4,
-          "y": 15.74
+          "x": 23.52,
+          "y": 15.95
         },
         "sprite": "library_01",
         "locationId": "sparkle-library"
@@ -560,7 +560,7 @@
         "id": "milk-honey-well",
         "kind": "landmark",
         "at": {
-          "x": 20.42,
+          "x": 20.45,
           "y": 15.69
         },
         "sprite": "well_01",
@@ -574,17 +574,20 @@
         "id": "clinic",
         "kind": "building",
         "at": {
-          "x": 23.98,
-          "y": 19.58
+          "x": 23.9,
+          "y": 18.93
         },
         "sprite": "clinic_01",
-        "locationId": "pony-clinic"
+        "locationId": "pony-clinic",
+        "drives": [
+          "health"
+        ]
       },
       {
         "id": "inn",
         "kind": "building",
         "at": {
-          "x": 17.14,
+          "x": 17.17,
           "y": 15.84
         },
         "sprite": "inn_01",
@@ -596,7 +599,7 @@
         "kind": "landmark",
         "at": {
           "x": 32.26,
-          "y": 15.83
+          "y": 15.86
         },
         "sprite": "pavilion_01",
         "locationId": "songbird-pavilion"
@@ -616,7 +619,7 @@
         "id": "observatory",
         "kind": "building",
         "at": {
-          "x": 29.83,
+          "x": 29.86,
           "y": 7.67
         },
         "sprite": "observatory_01",
@@ -688,7 +691,7 @@
         "kind": "nature",
         "at": {
           "x": 30.85,
-          "y": 12.78
+          "y": 12.81
         },
         "sprite": "lake_01",
         "locationId": "silver-lake",
@@ -718,7 +721,7 @@
         "kind": "house",
         "at": {
           "x": 8.27,
-          "y": 8.11
+          "y": 8.08
         },
         "spritePath": "/assets/world/houses/sunrise-loft.png",
         "label": "Sunrise Loft",
@@ -747,7 +750,7 @@
         "kind": "house",
         "at": {
           "x": 4.48,
-          "y": 12.0
+          "y": 12.03
         },
         "spritePath": "/assets/world/houses/rescue-cottage.png",
         "label": "Rescue Cottage",
@@ -775,7 +778,7 @@
         "kind": "house",
         "at": {
           "x": 7.74,
-          "y": 11.18
+          "y": 11.21
         },
         "spritePath": "/assets/world/houses/torrent-lodge.png",
         "label": "Torrent Lodge",

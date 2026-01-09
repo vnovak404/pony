@@ -255,6 +255,11 @@ def run_sprite_generator(slug, payload):
 def run_spritesheet_packer(slug, payload):
     columns = int(payload.get("columns", 8) or 8) if payload else 8
     frame_size = int(payload.get("frame_size", 512) or 512) if payload else 512
+    frames_subdir = payload.get("frames_subdir") if payload else None
+    fallback_subdir = payload.get("fallback_subdir") if payload else None
+    prefer_dense = payload.get("prefer_dense") if payload else None
+    max_size = payload.get("max_size") if payload else None
+    auto_flip = payload.get("auto_flip") if payload else None
 
     command = [
         sys.executable,
@@ -266,6 +271,16 @@ def run_spritesheet_packer(slug, payload):
         "--frame-size",
         str(frame_size),
     ]
+    if frames_subdir:
+        command += ["--frames-subdir", str(frames_subdir)]
+    if fallback_subdir:
+        command += ["--fallback-subdir", str(fallback_subdir)]
+    if prefer_dense is False:
+        command.append("--no-prefer-dense")
+    if max_size:
+        command += ["--max-size", str(max_size)]
+    if auto_flip:
+        command.append("--auto-flip")
     result = subprocess.run(
         command,
         cwd=ROOT,
@@ -274,6 +289,60 @@ def run_spritesheet_packer(slug, payload):
     )
     if result.returncode != 0:
         raise RuntimeError(result.stderr or result.stdout or "Spritesheet packing failed.")
+
+    return {
+        "stdout": _truncate_output(result.stdout),
+        "stderr": _truncate_output(result.stderr),
+    }
+
+
+def run_interpolator(slug, payload):
+    payload = payload or {}
+    command = [
+        sys.executable,
+        "scripts/interpolate_pony_sprites.py",
+        "--pony",
+        slug,
+    ]
+    actions = payload.get("actions")
+    if actions:
+        command += ["--actions", str(actions)]
+    input_subdir = payload.get("input_subdir")
+    if input_subdir:
+        command += ["--input-subdir", str(input_subdir)]
+    output_subdir = payload.get("output_subdir")
+    if output_subdir:
+        command += ["--output-subdir", str(output_subdir)]
+    walk_inbetweens = payload.get("walk_inbetweens")
+    if walk_inbetweens is not None:
+        command += ["--walk-inbetweens", str(walk_inbetweens)]
+    trot_inbetweens = payload.get("trot_inbetweens")
+    if trot_inbetweens is not None:
+        command += ["--trot-inbetweens", str(trot_inbetweens)]
+    pad = payload.get("pad")
+    if pad is not None:
+        command += ["--pad", str(pad)]
+    alpha_threshold = payload.get("alpha_threshold")
+    if alpha_threshold is not None:
+        command += ["--alpha-threshold", str(alpha_threshold)]
+    max_shift = payload.get("max_shift")
+    if max_shift is not None:
+        command += ["--max-shift", str(max_shift)]
+    if payload.get("force"):
+        command.append("--force")
+    if payload.get("no_qc"):
+        command.append("--no-qc")
+    if payload.get("dry_run"):
+        command.append("--dry-run")
+
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr or result.stdout or "Interpolation failed.")
 
     return {
         "stdout": _truncate_output(result.stdout),
@@ -419,7 +488,16 @@ def launch_async(target, *args):
 def run_post_create_tasks(slug, generate_house_variants=False):
     try:
         run_sprite_generator(slug, {"use_portrait": True})
-        run_spritesheet_packer(slug, {})
+        interpolation_ok = True
+        try:
+            run_interpolator(slug, {})
+        except Exception as exc:
+            interpolation_ok = False
+            print(f"Interpolation failed for {slug}: {exc}", file=sys.stderr)
+        if interpolation_ok:
+            run_spritesheet_packer(slug, {})
+        else:
+            run_spritesheet_packer(slug, {"frames_subdir": "frames", "prefer_dense": False})
     except Exception as exc:
         print(f"Sprite pipeline failed for {slug}: {exc}", file=sys.stderr)
     try:

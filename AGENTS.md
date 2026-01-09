@@ -11,7 +11,11 @@ This repository is currently empty aside from Git metadata. As code is added, ke
 If you introduce a different structure (e.g., `packages/` for a monorepo), document it in this file.
 
 ## Build, Test, and Development Commands
-No build or test commands exist yet. When you add tooling, document it here with examples, e.g.:
+No build or dev commands exist yet. Current tests:
+
+- `npm test` — run the Node.js test runner over `tests/`.
+
+When you add tooling, document it here with examples, e.g.:
 
 - `npm run dev` — run the local development server.
 - `npm test` — execute the test suite.
@@ -27,7 +31,7 @@ No style rules are defined yet. Until tooling is added:
 If you add formatters/linters (e.g., `prettier`, `ruff`, `golangci-lint`), list them and the exact commands.
 
 ## Testing Guidelines
-No test framework is configured. When adding tests:
+Tests use Node.js built-in `node:test`. When adding tests:
 
 - Keep test files next to code (e.g., `src/foo.test.ts`) or under `tests/`.
 - Use descriptive test names (e.g., `should_parse_valid_input`).
@@ -42,3 +46,8 @@ There is no commit history yet, so no conventions are established. Until specifi
 
 ## Configuration & Secrets
 Do not commit secrets. Store local configuration in `.env` files and add them to `.gitignore`.
+
+## Agent Instructions
+- Avoid creating files over 500 lines. If a file approaches 500 lines, split the logic into smaller modules instead of extending the file.
+- Before editing frontend JavaScript, read `docs/js-modules.md` and keep it updated with module/function changes.
+- Before editing Python scripts, read `docs/python-scripts.md` and keep it updated with module/function changes.

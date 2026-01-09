@@ -274,7 +274,7 @@
         "sheet": "assets/ponies/gleam-treasure/sheets/spritesheet.png",
         "meta": "assets/ponies/gleam-treasure/sheets/spritesheet.json"
       },
-      "sprite_flip": true,
+      "sprite_flip": false,
       "job": {
         "title": "race coach",
         "service": "trains speed and balance",
@@ -380,6 +380,7 @@
       "accent_color": "gold",
       "talent": "building homes",
       "personality": "strong and stern",
+      "accessories": "sturdy construction helmet",
       "job": {
         "title": "helper",
         "service": "helps with friendly pony tasks",
