@@ -99,11 +99,9 @@ export const createRenderer = ({
           sprite = spriteEntry.repair || spriteEntry.base;
         } else if (state && state.status === "needs_repair") {
           sprite = spriteEntry.ruined || spriteEntry.repair || spriteEntry.base;
-        } else if (
-          state &&
-          (state.status === "desperately_needs_repair" ||
-            state.status === "under_construction")
-        ) {
+        } else if (state && state.status === "desperately_needs_repair") {
+          sprite = spriteEntry.ruined || spriteEntry.repair || spriteEntry.base;
+        } else if (state && state.status === "under_construction") {
           sprite = spriteEntry.repair || spriteEntry.base;
         } else {
           sprite = spriteEntry.base;
