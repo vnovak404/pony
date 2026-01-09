@@ -14,3 +14,9 @@ assets/world/*
 !assets/ponies/
 assets/ponies/*
 !assets/ponies/*.png
+!assets/ui/
+assets/ui/*
+!assets/ui/icons/
+assets/ui/icons/*
+!assets/ui/icons/*.png
+assets/ui/**/.DS_Store

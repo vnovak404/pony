@@ -23,6 +23,7 @@ ICON_PROMPTS = {
     "hunger": "A shiny red apple with a green leaf.",
     "tired": "A sleepy crescent moon resting on a tiny pillow.",
     "boredom": "A colorful pinwheel toy with a short ribbon.",
+    "repair": "A tiny pony-safe hammer with a friendly horseshoe detail.",
 }
 
 

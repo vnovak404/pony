@@ -197,7 +197,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_ui_icons.py`
 
-- Purpose: generate UI icons for needs (health, thirst, hunger, tired, boredom).
+- Purpose: generate UI icons for needs (health, thirst, hunger, tired, boredom, repair).
 - Uses: `scripts/sprites/images_api.py`.
 - CLI:
   - `--icons` comma-separated icon IDs (default all).
