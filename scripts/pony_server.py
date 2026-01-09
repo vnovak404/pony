@@ -151,7 +151,7 @@ def build_pony(payload):
             },
         },
         "sprites": {
-            "sheet": f"assets/ponies/{slug}/sheets/spritesheet.png",
+            "sheet": f"assets/ponies/{slug}/sheets/spritesheet.webp",
             "meta": f"assets/ponies/{slug}/sheets/spritesheet.json",
         },
     }
@@ -471,7 +471,7 @@ def ensure_house_on_map(map_path, house, residents):
             "id": house["id"],
             "kind": "house",
             "at": {"x": round(spot["x"], 2), "y": round(spot["y"], 2)},
-            "spritePath": f"/assets/world/houses/{house['id']}.png",
+            "spritePath": f"/assets/world/houses/{house['id']}.webp",
             "label": house["name"],
             "residents": residents,
             "scale": 1.7 if house.get("shared") else 1.5,
@@ -547,6 +547,8 @@ class PonyHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split("?", 1)[0]
+        if path == "/api/health":
+            return self.send_json(HTTPStatus.OK, {"ok": True})
         if path == "/api/state":
             return self._handle_get_state()
         return super().do_GET()
@@ -816,7 +818,7 @@ class PonyHandler(SimpleHTTPRequestHandler):
         generate_variants = bool(is_new_house) and pony.get("species") == "unicorn"
         launch_async(run_post_create_tasks, pony["slug"], generate_variants)
 
-        image_path = f"{self.output_dir}/{pony['slug']}.png"
+        image_path = f"{self.output_dir}/{pony['slug']}.webp"
         self.send_json(
             HTTPStatus.CREATED,
             {"pony": pony, "image_path": image_path},

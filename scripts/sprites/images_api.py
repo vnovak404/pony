@@ -13,6 +13,8 @@ DEFAULT_EDIT_URL = "https://api.openai.com/v1/images/edits"
 DEFAULT_MODEL = os.getenv("OPENAI_SPRITE_MODEL", "gpt-image-1")
 DEFAULT_TIMEOUT = 120
 DEFAULT_RETRIES = 3
+DEFAULT_WEBP_QUALITY = 85
+DEFAULT_WEBP_METHOD = 6
 
 
 def load_env_value(path, key):
@@ -88,6 +90,56 @@ def _resize_image(path, target_size):
         resample = getattr(Image, "Resampling", Image).LANCZOS
         resized = image.resize((target_size, target_size), resample=resample)
         resized.save(image_path)
+
+
+def resize_image(path, target_size):
+    if not target_size:
+        return
+    _resize_image(path, target_size)
+
+
+def convert_to_webp(
+    source_path,
+    output_path=None,
+    *,
+    target_size=None,
+    quality=DEFAULT_WEBP_QUALITY,
+    method=DEFAULT_WEBP_METHOD,
+    lossless=False,
+    remove_source=True,
+):
+    try:
+        from PIL import Image
+    except ImportError as exc:
+        raise RuntimeError("Pillow is required for WebP conversion.") from exc
+
+    source_path = Path(source_path)
+    if output_path is None:
+        output_path = source_path.with_suffix(".webp")
+    else:
+        output_path = Path(output_path)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(source_path) as image:
+        if target_size:
+            image = image.convert("RGBA")
+            resample = getattr(Image, "Resampling", Image).LANCZOS
+            image = image.resize((target_size, target_size), resample=resample)
+        elif image.mode not in ("RGB", "RGBA"):
+            has_alpha = "A" in image.getbands()
+            image = image.convert("RGBA" if has_alpha else "RGB")
+        save_kwargs = {
+            "format": "WEBP",
+            "quality": quality,
+            "method": method,
+        }
+        if lossless:
+            save_kwargs["lossless"] = True
+        image.save(output_path, **save_kwargs)
+
+    if remove_source:
+        source_path.unlink(missing_ok=True)
+    return output_path
 
 
 def _log(message):

@@ -1,5 +1,7 @@
 // Pony Parade: map UI interactions (tooltips, drag/drop, commands).
 
+import { HAS_API, apiUrl } from "../api_mode.js";
+
 export const bindMapUI = ({
   ponyMap,
   mapTooltip,
@@ -154,8 +156,14 @@ export const bindMapUI = ({
   };
 
   const saveStructureLocation = async (item) => {
+    if (!HAS_API) {
+      if (mapStatus) {
+        mapStatus.textContent = "Map changes are local only.";
+      }
+      return { ok: true, skipped: true };
+    }
     try {
-      const response = await fetch(`/api/map/objects/${encodeURIComponent(item.id)}`, {
+      const response = await fetch(apiUrl(`/map/objects/${encodeURIComponent(item.id)}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ at: item.at }),
@@ -166,10 +174,12 @@ export const bindMapUI = ({
       if (mapStatus) {
         mapStatus.textContent = `Saved ${getStructureLabel(item)}.`;
       }
+      return { ok: true };
     } catch (error) {
       if (mapStatus) {
         mapStatus.textContent = "Unable to save map changes.";
       }
+      return { ok: false };
     }
   };
 

@@ -15,7 +15,7 @@
       "talent": "firefly guiding",
       "personality": "curious and gentle",
       "sprites": {
-        "sheet": "assets/ponies/golden-violet/sheets/spritesheet.png",
+        "sheet": "assets/ponies/golden-violet/sheets/spritesheet.webp",
         "meta": "assets/ponies/golden-violet/sheets/spritesheet.json"
       },
       "job": {
@@ -52,7 +52,7 @@
       "talent": "cloud sculpting",
       "personality": "playful and brave",
       "sprites": {
-        "sheet": "assets/ponies/sky-sprinter/sheets/spritesheet.png",
+        "sheet": "assets/ponies/sky-sprinter/sheets/spritesheet.webp",
         "meta": "assets/ponies/sky-sprinter/sheets/spritesheet.json"
       },
       "job": {
@@ -89,7 +89,7 @@
       "talent": "treasure spotting",
       "personality": "cheerful and helpful",
       "sprites": {
-        "sheet": "assets/ponies/sunny-pippin/sheets/spritesheet.png",
+        "sheet": "assets/ponies/sunny-pippin/sheets/spritesheet.webp",
         "meta": "assets/ponies/sunny-pippin/sheets/spritesheet.json"
       },
       "job": {
@@ -126,7 +126,7 @@
       "talent": "star catching",
       "personality": "calm and dreamy",
       "sprites": {
-        "sheet": "assets/ponies/moonbeam/sheets/spritesheet.png",
+        "sheet": "assets/ponies/moonbeam/sheets/spritesheet.webp",
         "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
       },
       "job": {
@@ -163,7 +163,7 @@
       "talent": "entertaining and clowning",
       "personality": "stubborn and quarrelsome",
       "sprites": {
-        "sheet": "assets/ponies/raging-torrent/sheets/spritesheet.png",
+        "sheet": "assets/ponies/raging-torrent/sheets/spritesheet.webp",
         "meta": "assets/ponies/raging-torrent/sheets/spritesheet.json"
       },
       "job": {
@@ -199,7 +199,7 @@
       "talent": "casting magic",
       "personality": "mysterious",
       "sprites": {
-        "sheet": "assets/ponies/blue-wonder/sheets/spritesheet.png",
+        "sheet": "assets/ponies/blue-wonder/sheets/spritesheet.webp",
         "meta": "assets/ponies/blue-wonder/sheets/spritesheet.json"
       },
       "job": {
@@ -235,7 +235,7 @@
       "talent": "animal rescuing",
       "personality": "kind and gentle",
       "sprites": {
-        "sheet": "assets/ponies/stellacorn/sheets/spritesheet.png",
+        "sheet": "assets/ponies/stellacorn/sheets/spritesheet.webp",
         "meta": "assets/ponies/stellacorn/sheets/spritesheet.json"
       },
       "job": {
@@ -271,10 +271,10 @@
       "talent": "racing",
       "personality": "brave",
       "sprites": {
-        "sheet": "assets/ponies/gleam-treasure/sheets/spritesheet.png",
+        "sheet": "assets/ponies/gleam-treasure/sheets/spritesheet.webp",
         "meta": "assets/ponies/gleam-treasure/sheets/spritesheet.json"
       },
-      "sprite_flip": false,
+      "sprite_flip": true,
       "job": {
         "title": "race coach",
         "service": "trains speed and balance",
@@ -308,7 +308,7 @@
       "talent": "gymnastics",
       "personality": "nice and friendly",
       "sprites": {
-        "sheet": "assets/ponies/pixie/sheets/spritesheet.png",
+        "sheet": "assets/ponies/pixie/sheets/spritesheet.webp",
         "meta": "assets/ponies/pixie/sheets/spritesheet.json"
       },
       "job": {
@@ -344,7 +344,7 @@
       "talent": "sparkle sprinkling",
       "personality": "kind and thoughtful",
       "sprites": {
-        "sheet": "assets/ponies/maria/sheets/spritesheet.png",
+        "sheet": "assets/ponies/maria/sheets/spritesheet.webp",
         "meta": "assets/ponies/maria/sheets/spritesheet.json"
       },
       "job": {
@@ -409,7 +409,7 @@
         }
       },
       "sprites": {
-        "sheet": "assets/ponies/taticorn/sheets/spritesheet.png",
+        "sheet": "assets/ponies/taticorn/sheets/spritesheet.webp",
         "meta": "assets/ponies/taticorn/sheets/spritesheet.json"
       }
     }

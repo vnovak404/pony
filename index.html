@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pony Parade</title>
+    <link rel="icon" href="assets/ui/icons/health.webp" type="image/webp" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -59,7 +60,7 @@
         <div class="pony-grid" id="pony-grid"></div>
       </section>
 
-      <section id="adventures" class="section">
+      <section id="adventures" class="section muted">
         <div class="section-title">
           <h2>Adventures to Try</h2>
           <p>Pick a quest and let the ponies guide the way.</p>
@@ -99,23 +100,38 @@
             </div>
             <div class="pony-command-stats" data-command-stats>
               <div class="pony-command-stat" data-stat="health">
-                <img src="/assets/ui/icons/health.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/health.webp" type="image/webp" />
+                  <img src="assets/ui/icons/health.webp" alt="" />
+                </picture>
                 <span class="pony-command-value">--</span>
               </div>
               <div class="pony-command-stat" data-stat="thirst">
-                <img src="/assets/ui/icons/thirst.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/thirst.webp" type="image/webp" />
+                  <img src="assets/ui/icons/thirst.webp" alt="" />
+                </picture>
                 <span class="pony-command-value">--</span>
               </div>
               <div class="pony-command-stat" data-stat="hunger">
-                <img src="/assets/ui/icons/hunger.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/hunger.webp" type="image/webp" />
+                  <img src="assets/ui/icons/hunger.webp" alt="" />
+                </picture>
                 <span class="pony-command-value">--</span>
               </div>
               <div class="pony-command-stat" data-stat="tiredness">
-                <img src="/assets/ui/icons/tired.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/tired.webp" type="image/webp" />
+                  <img src="assets/ui/icons/tired.webp" alt="" />
+                </picture>
                 <span class="pony-command-value">--</span>
               </div>
               <div class="pony-command-stat" data-stat="boredom">
-                <img src="/assets/ui/icons/boredom.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/boredom.webp" type="image/webp" />
+                  <img src="assets/ui/icons/boredom.webp" alt="" />
+                </picture>
                 <span class="pony-command-value">--</span>
               </div>
             </div>
@@ -127,7 +143,10 @@
                 aria-label="Eat"
                 title="Eat"
               >
-                <img src="/assets/ui/icons/hunger.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/hunger.webp" type="image/webp" />
+                  <img src="assets/ui/icons/hunger.webp" alt="" />
+                </picture>
               </button>
               <button
                 class="btn ghost small pony-command-btn"
@@ -136,7 +155,10 @@
                 aria-label="Drink"
                 title="Drink"
               >
-                <img src="/assets/ui/icons/thirst.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/thirst.webp" type="image/webp" />
+                  <img src="assets/ui/icons/thirst.webp" alt="" />
+                </picture>
               </button>
               <button
                 class="btn ghost small pony-command-btn"
@@ -145,7 +167,10 @@
                 aria-label="Vet Clinic"
                 title="Vet Clinic"
               >
-                <img src="/assets/ui/icons/health.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/health.webp" type="image/webp" />
+                  <img src="assets/ui/icons/health.webp" alt="" />
+                </picture>
               </button>
               <button
                 class="btn ghost small pony-command-btn"
@@ -154,7 +179,10 @@
                 aria-label="Frolic"
                 title="Frolic"
               >
-                <img src="/assets/ui/icons/boredom.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/boredom.webp" type="image/webp" />
+                  <img src="assets/ui/icons/boredom.webp" alt="" />
+                </picture>
               </button>
               <button
                 class="btn ghost small pony-command-btn"
@@ -163,7 +191,10 @@
                 aria-label="Rest"
                 title="Rest"
               >
-                <img src="/assets/ui/icons/tired.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/tired.webp" type="image/webp" />
+                  <img src="assets/ui/icons/tired.webp" alt="" />
+                </picture>
               </button>
               <button
                 class="btn ghost small pony-command-btn"
@@ -172,7 +203,10 @@
                 aria-label="Repair House"
                 title="Repair House"
               >
-                <img src="/assets/ui/icons/repair.png" alt="" />
+                <picture>
+                  <source srcset="assets/ui/icons/repair.webp" type="image/webp" />
+                  <img src="assets/ui/icons/repair.webp" alt="" />
+                </picture>
               </button>
               <button class="btn ghost small" type="button" data-command="clear">Clear</button>
               <button class="btn ghost small" type="button" data-command="close">
@@ -254,6 +288,16 @@
             <p id="pony-result" class="pony-result" role="status"></p>
           </div>
         </form>
+        <div class="creator-spotlight">
+          <picture>
+            <source srcset="assets/author/author.webp" type="image/webp" />
+            <img src="assets/author/author.jpeg" alt="Pony Parade creator portrait" />
+          </picture>
+          <div>
+            <h3>Meet the Creator</h3>
+            <p>Built by a 7-year-old designer with a huge imagination and a love of ponies.</p>
+          </div>
+        </div>
       </section>
     </main>
 

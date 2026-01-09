@@ -333,7 +333,9 @@ export const createActorRenderer = (context) => {
       const frame = frameEntry?.frame;
       if (!frame) return;
       const sheetIndex = Number.isFinite(frameEntry.sheet) ? frameEntry.sheet : 0;
-      const sheetImage = sprite.sheets ? sprite.sheets[sheetIndex] : sprite.sheet;
+      const sheetImage = sprite.sheets
+        ? sprite.sheets[sheetIndex] || sprite.sheets[0]
+        : sprite.sheet;
       if (!sheetImage) return;
 
       let from = actor.direction === 1 ? segment.from : segment.to;

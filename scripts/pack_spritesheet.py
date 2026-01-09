@@ -13,13 +13,13 @@ except ImportError as exc:
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.sprites import qc
+from scripts.sprites import images_api, qc
 from scripts.sprites.prompting import get_action_frame_order
 
 DEFAULT_ACTIONS = "data/pony_actions.json"
 DEFAULT_OUTPUT_ROOT = "assets/ponies"
-DEFAULT_FRAMES_SUBDIR = "frames_dense"
-DEFAULT_FALLBACK_SUBDIR = "frames"
+DEFAULT_FRAMES_SUBDIR = "frames"
+DEFAULT_FALLBACK_SUBDIR = "frames_dense"
 DEFAULT_COLUMNS = 8
 DEFAULT_FRAME_SIZE = 512
 DEFAULT_PADDING = 2
@@ -169,8 +169,7 @@ def collect_action_frames_with_fallback(
     return collect_action_frames(fallback_dir, action_id, prefer_dense)
 
 
-def pack_action_pages(
-    action_id,
+def pack_single_sheet(
     frames,
     names,
     sheets_dir,
@@ -179,68 +178,67 @@ def pack_action_pages(
     padding,
     max_size,
     auto_flip,
-    sheet_index_start,
     frames_meta,
 ):
     if not frames:
-        return [], sheet_index_start
+        return None
 
-    max_rows = max_rows_for_sheet(max_size, frame_size, padding)
     sheet_width, _ = calc_sheet_size(columns, 1, frame_size, padding)
     if sheet_width > max_size:
         raise SystemExit(
             f"Columns {columns} produce width {sheet_width}, exceeds max {max_size}."
         )
 
-    frames_per_sheet = columns * max_rows
-    sheet_entries = []
-    for page_index in range(0, len(frames), frames_per_sheet):
-        page_frames = frames[page_index : page_index + frames_per_sheet]
-        rows = math.ceil(len(page_frames) / columns)
-        sheet_width, sheet_height = calc_sheet_size(columns, rows, frame_size, padding)
-
-        sheet = Image.new("RGBA", (sheet_width, sheet_height), (0, 0, 0, 0))
-        for index, frame_path in enumerate(page_frames):
-            col = index % columns
-            row = index // columns
-            x = col * (frame_size + padding)
-            y = row * (frame_size + padding)
-
-            if auto_flip:
-                try:
-                    if qc.enforce_facing_right(frame_path):
-                        print(f"Auto-flipped {frame_path.name} to face right.")
-                except RuntimeError as exc:
-                    print(f"Facing check skipped for {frame_path.name}: {exc}")
-
-            with Image.open(frame_path) as frame:
-                if frame.size != (frame_size, frame_size):
-                    raise SystemExit(
-                        f"Frame {frame_path.name} has size {frame.size}, expected {frame_size}."
-                    )
-                sheet.paste(frame, (x, y))
-
-            global_index = page_index + index
-            frame_name = names[global_index]
-            frames_meta[frame_name] = {
-                "frame": {"x": x, "y": y, "w": frame_size, "h": frame_size},
-                "anchor": {"x": frame_size // 2, "y": frame_size - 32},
-                "sheet": sheet_index_start + len(sheet_entries),
-            }
-
-        image_name = f"{action_id}_{len(sheet_entries):02d}.png"
-        sheet_path = sheets_dir / image_name
-        sheet.save(sheet_path)
-        sheet_entries.append(
-            {
-                "image": image_name,
-                "action": action_id,
-                "size": {"w": sheet_width, "h": sheet_height},
-            }
+    rows = math.ceil(len(frames) / columns)
+    sheet_width, sheet_height = calc_sheet_size(columns, rows, frame_size, padding)
+    if sheet_height > max_size:
+        raise SystemExit(
+            f"Spritesheet height {sheet_height} exceeds max {max_size}."
         )
-        print(f"Wrote {sheet_path}")
 
-    return sheet_entries, sheet_index_start + len(sheet_entries)
+    sheet = Image.new("RGBA", (sheet_width, sheet_height), (0, 0, 0, 0))
+    for index, frame_path in enumerate(frames):
+        col = index % columns
+        row = index // columns
+        x = col * (frame_size + padding)
+        y = row * (frame_size + padding)
+
+        if auto_flip:
+            try:
+                if qc.enforce_facing_right(frame_path):
+                    print(f"Auto-flipped {frame_path.name} to face right.")
+            except RuntimeError as exc:
+                print(f"Facing check skipped for {frame_path.name}: {exc}")
+
+        with Image.open(frame_path) as frame:
+            if frame.size != (frame_size, frame_size):
+                raise SystemExit(
+                    f"Frame {frame_path.name} has size {frame.size}, expected {frame_size}."
+                )
+            sheet.paste(frame, (x, y))
+
+        frame_name = names[index]
+        frames_meta[frame_name] = {
+            "frame": {"x": x, "y": y, "w": frame_size, "h": frame_size},
+            "anchor": {"x": frame_size // 2, "y": frame_size - 32},
+            "sheet": 0,
+        }
+
+    image_name = "spritesheet.webp"
+    sheet_path = sheets_dir / "spritesheet.png"
+    sheet.save(sheet_path)
+    webp_path = sheets_dir / image_name
+    images_api.convert_to_webp(
+        sheet_path,
+        output_path=webp_path,
+        remove_source=True,
+    )
+    print(f"Wrote {webp_path}")
+    return {
+        "image": image_name,
+        "action": "all",
+        "size": {"w": sheet_width, "h": sheet_height},
+    }
 
 
 def pack_spritesheet(
@@ -273,8 +271,8 @@ def pack_spritesheet(
 
     frames_meta = {}
     animations = {}
-    sheet_entries = []
-    sheet_index = 0
+    all_frames = []
+    all_names = []
 
     for action_id in action_order:
         frames, names = collect_action_frames_with_fallback(
@@ -283,22 +281,22 @@ def pack_spritesheet(
         if not frames:
             continue
         animations[action_id] = names
-        entries, sheet_index = pack_action_pages(
-            action_id=action_id,
-            frames=frames,
-            names=names,
-            sheets_dir=sheets_dir,
-            frame_size=frame_size,
-            columns=columns,
-            padding=DEFAULT_PADDING,
-            max_size=max_size,
-            auto_flip=auto_flip,
-            sheet_index_start=sheet_index,
-            frames_meta=frames_meta,
-        )
-        sheet_entries.extend(entries)
+        all_frames.extend(frames)
+        all_names.extend(names)
 
-    if not sheet_entries:
+    sheet_entry = pack_single_sheet(
+        frames=all_frames,
+        names=all_names,
+        sheets_dir=sheets_dir,
+        frame_size=frame_size,
+        columns=columns,
+        padding=DEFAULT_PADDING,
+        max_size=max_size,
+        auto_flip=auto_flip,
+        frames_meta=frames_meta,
+    )
+
+    if not sheet_entry:
         print(f"No frames found for {pony_id}.")
         return False
 
@@ -317,12 +315,11 @@ def pack_spritesheet(
         else:
             fps[action_id] = fps_value
     meta = {
-        "images": [entry["image"] for entry in sheet_entries],
-        "sheets": sheet_entries,
+        "image": sheet_entry["image"],
+        "size": sheet_entry["size"],
+        "images": [sheet_entry["image"]],
+        "sheets": [sheet_entry],
     }
-    if sheet_entries:
-        meta["image"] = sheet_entries[0]["image"]
-        meta["size"] = sheet_entries[0]["size"]
 
     spritesheet_json = {
         "meta": meta,

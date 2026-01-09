@@ -1,7 +1,8 @@
 // Pony Parade: map rendering and interactions.
 
 import { ponyMap, mapStatus, mapTooltip } from "../dom.js";
-import { loadImage, loadJson, toTitleCase } from "../utils.js";
+import { loadImageWithFallback, loadJson, toTitleCase } from "../utils.js";
+import { HAS_API, apiUrl } from "../api_mode.js";
 import { createPathfinder } from "./pathfinding.js";
 import { bindMapUI } from "./ui.js";
 import { createActors, createActorRenderer } from "./actors.js";
@@ -238,7 +239,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
       id: "stellacorn-eating",
       pony: "stellacorn",
       trigger: "eat",
-      src: "/assets/ponies/stellacorn/animations/stellacorn-eating.mp4",
+      src: "assets/ponies/stellacorn/animations/stellacorn-eating.mp4",
       scale: 1.1,
       offset: { x: 0, y: -0.35 },
       anchor: "pony",
@@ -249,7 +250,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
       id: "stellacorn-splashing",
       pony: "stellacorn",
       trigger: "lake",
-      src: "/assets/ponies/stellacorn/animations/stella-corn-splashing.mp4",
+      src: "assets/ponies/stellacorn/animations/stella-corn-splashing.mp4",
       scale: 1.3,
       offset: { x: 0, y: -0.25 },
       anchor: "lake",
@@ -1047,13 +1048,13 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     structureItems.map(async (item) => {
       const spritePath = item.spritePath
         ? item.spritePath
-        : `/assets/world/structures/${item.sprite}.png`;
+        : `assets/world/structures/${item.sprite}.png`;
       try {
-        const base = await loadImage(spritePath);
+        const base = await loadImageWithFallback(spritePath);
         if (item.kind === "house") {
           const [repair, ruined] = await Promise.all([
-            loadImage(getVariantPath(spritePath, "repair")).catch(() => null),
-            loadImage(getVariantPath(spritePath, "ruined")).catch(() => null),
+            loadImageWithFallback(getVariantPath(spritePath, "repair")).catch(() => null),
+            loadImageWithFallback(getVariantPath(spritePath, "ruined")).catch(() => null),
           ]);
           structureSprites[item.id] = { base, repair, ruined };
         } else {
@@ -1071,7 +1072,9 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     decorItems.map(async (item) => {
       if (!item.sprite) return;
       try {
-        decorSprites[item.id] = await loadImage(`/assets/world/decor/${item.sprite}.png`);
+        decorSprites[item.id] = await loadImageWithFallback(
+          `assets/world/decor/${item.sprite}.png`
+        );
       } catch (error) {
         decorSprites[item.id] = null;
       }
@@ -1079,17 +1082,17 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   );
 
   const statusIconPaths = {
-    health: "/assets/ui/icons/health.png",
-    thirst: "/assets/ui/icons/thirst.png",
-    hunger: "/assets/ui/icons/hunger.png",
-    tiredness: "/assets/ui/icons/tired.png",
-    boredom: "/assets/ui/icons/boredom.png",
+    health: "assets/ui/icons/health.webp",
+    thirst: "assets/ui/icons/thirst.webp",
+    hunger: "assets/ui/icons/hunger.webp",
+    tiredness: "assets/ui/icons/tired.webp",
+    boredom: "assets/ui/icons/boredom.webp",
   };
   const statusIcons = {};
   await Promise.all(
     Object.entries(statusIconPaths).map(async ([key, path]) => {
       try {
-        statusIcons[key] = await loadImage(`${path}?v=${Date.now()}`);
+        statusIcons[key] = await loadImageWithFallback(path, { cacheBust: Date.now() });
       } catch (error) {
         statusIcons[key] = null;
       }
@@ -1106,24 +1109,22 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
         const metaPath = pony.sprites.meta;
         const meta = await loadJson(`${metaPath}?v=${cacheBust}`);
         const basePath = metaPath.slice(0, metaPath.lastIndexOf("/") + 1);
-        const imageNames =
-          meta.meta && Array.isArray(meta.meta.images) && meta.meta.images.length
-            ? meta.meta.images
-            : meta.meta && meta.meta.image
-              ? [meta.meta.image]
-              : [];
-        const sheetPaths = imageNames.length
-          ? imageNames.map((name) => `${basePath}${name}`)
-          : pony.sprites.sheet
-            ? [pony.sprites.sheet]
-            : [];
-        if (!sheetPaths.length) {
+        const metaImage = meta.meta && meta.meta.image ? meta.meta.image : "";
+        const sheetPath = pony.sprites.sheet
+          ? pony.sprites.sheet
+          : metaImage
+            ? metaImage.startsWith("/") || metaImage.startsWith("assets/")
+              ? metaImage
+              : `${basePath}${metaImage}`
+            : "";
+        if (!sheetPath) {
           return null;
         }
-        const sheets = await Promise.all(
-          sheetPaths.map((path) => loadImage(`${path}?v=${cacheBust}`))
-        );
-        const sheet = sheets[0];
+        const sheet = await loadImageWithFallback(sheetPath, { cacheBust });
+        if (!sheet) {
+          return null;
+        }
+        const sheets = [sheet];
         const moveType = meta.animations.walk
           ? "walk"
           : meta.animations.trot
@@ -1505,6 +1506,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   requestAnimationFrame(draw);
   const saveRuntimeState = async () => {
     if (!actors.length) return;
+    if (!HAS_API) return { ok: true, skipped: true };
     const payload = {
       version: 1,
       updatedAt: Date.now(),
@@ -1529,13 +1531,15 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
       };
     });
     try {
-      await fetch("/api/state", {
+      await fetch(apiUrl("/state"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      return { ok: true };
     } catch (error) {
       // Ignore save errors; map should keep running.
+      return { ok: false };
     }
   };
 

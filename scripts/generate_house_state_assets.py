@@ -13,6 +13,8 @@ from scripts.generate_pony_houses import (  # noqa: E402
 )
 from scripts.sprites import images_api  # noqa: E402
 
+DEFAULT_TARGET_SIZE = 512
+
 DEFAULT_DATA = ROOT / "data" / "ponies.json"
 DEFAULT_OUTPUT_DIR = ROOT / "assets" / "world" / "houses"
 DEFAULT_STATES = ("repair", "ruined")
@@ -57,7 +59,7 @@ def parse_args():
     parser.add_argument(
         "--size",
         default="auto",
-        help="Output size (e.g. 1024) or 'auto' (default: auto).",
+        help="Output size (e.g. 512) or 'auto' (default: auto).",
     )
     parser.add_argument("--force", action="store_true", help="Overwrite existing assets.")
     parser.add_argument("--dry-run", action="store_true", help="Print prompts only.")
@@ -95,17 +97,45 @@ def main():
     size_value = args.size
     if isinstance(size_value, str) and size_value.isdigit():
         size_value = int(size_value)
+    elif isinstance(size_value, str) and "x" in size_value.lower():
+        parts = size_value.lower().split("x", 1)
+        if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+            if parts[0] == parts[1]:
+                size_value = int(parts[0])
 
     for house in houses:
-        base_path = output_dir / f"{house['id']}.png"
+        base_webp = output_dir / f"{house['id']}.webp"
+        base_png = output_dir / f"{house['id']}.png"
+        base_path = base_webp if base_webp.exists() else base_png
         if not base_path.exists():
             print(f"Missing base house sprite: {base_path}")
             continue
+        try:
+            from PIL import Image
+        except ImportError:
+            print("Pillow is required for house variant generation.")
+            return 1
+        with Image.open(base_path) as base_image:
+            base_size = base_image.size[0]
+        if size_value == "auto":
+            target_size = min(base_size, DEFAULT_TARGET_SIZE)
+            request_size = "auto"
+        else:
+            target_size = size_value
+            request_size = size_value
+        temp_source = None
+        if base_path.suffix.lower() != ".png":
+            temp_source = base_path.with_suffix(".tmp.png")
+            with Image.open(base_path) as base_image:
+                base_image.convert("RGBA").save(temp_source)
+            source_path = temp_source
+        else:
+            source_path = base_path
         for state in states:
             if state not in STATE_DETAILS:
                 print(f"Unknown state: {state}")
                 continue
-            output_path = output_dir / f"{house['id']}_{state}.png"
+            output_path = output_dir / f"{house['id']}_{state}.webp"
             if output_path.exists() and not args.force:
                 print(f"Skipping existing {output_path}")
                 continue
@@ -113,8 +143,19 @@ def main():
             if args.dry_run:
                 print(f"[{house['id']}/{state}] {prompt}")
                 continue
-            images_api.generate_png_from_image(prompt, size_value, output_path, base_path)
+            temp_output = output_path.with_suffix(".png")
+            if temp_output.exists():
+                temp_output.unlink()
+            images_api.generate_png_from_image(prompt, request_size, temp_output, source_path)
+            images_api.convert_to_webp(
+                temp_output,
+                output_path=output_path,
+                target_size=target_size,
+                remove_source=True,
+            )
             print(f"Wrote {output_path}")
+        if temp_source and temp_source.exists():
+            temp_source.unlink()
 
     return 0
 

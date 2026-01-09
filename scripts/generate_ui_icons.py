@@ -8,7 +8,7 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.sprites import images_api  # noqa: E402
 
-DEFAULT_SIZE = "auto"
+DEFAULT_SIZE = 256
 OUTPUT_DIR = ROOT / "assets" / "ui" / "icons"
 
 ICON_STYLE = (
@@ -39,7 +39,7 @@ def parse_args():
     parser.add_argument(
         "--size",
         default=DEFAULT_SIZE,
-        help="Icon size (e.g. 1024) or 'auto' (default: auto).",
+        help=f"Icon size in pixels (default: {DEFAULT_SIZE}).",
     )
     parser.add_argument("--force", action="store_true", help="Overwrite existing icons.")
     parser.add_argument("--dry-run", action="store_true", help="Print prompts only.")
@@ -67,7 +67,7 @@ def main():
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     for key, base_prompt in icon_items.items():
-        output_path = OUTPUT_DIR / f"{key}.png"
+        output_path = OUTPUT_DIR / f"{key}.webp"
         if output_path.exists() and not args.force:
             print(f"[{key}] Skipping existing {output_path}.")
             continue
@@ -78,7 +78,16 @@ def main():
         size_value = args.size
         if isinstance(size_value, str) and size_value.isdigit():
             size_value = int(size_value)
-        images_api.generate_png(prompt, size_value, output_path)
+        temp_path = output_path.with_suffix(".png")
+        if temp_path.exists():
+            temp_path.unlink()
+        images_api.generate_png(prompt, size_value, temp_path)
+        images_api.convert_to_webp(
+            temp_path,
+            output_path=output_path,
+            target_size=size_value,
+            remove_source=True,
+        )
         print(f"[{key}] Wrote {output_path}.")
 
     return 0

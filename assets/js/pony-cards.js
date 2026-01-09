@@ -1,18 +1,31 @@
 // Pony Parade: pony card rendering and actions.
 
 import { ponyGrid } from "./dom.js";
-import { formatTalent, formatPersonality, loadImage, loadJson } from "./utils.js";
+import {
+  formatTalent,
+  formatPersonality,
+  getWebpCandidates,
+  loadImageCandidates,
+  loadJson,
+} from "./utils.js";
+import { HAS_API, apiUrl } from "./api_mode.js";
 
 export const renderPonyCard = (pony, imagePath, addToTop = false) => {
   if (!ponyGrid) return;
   const ponyId = pony.slug || "";
   const sheetPath = pony.sprites && pony.sprites.sheet ? pony.sprites.sheet : "";
   const metaPath = pony.sprites && pony.sprites.meta ? pony.sprites.meta : "";
+  const [primaryImage, fallbackImage] = getWebpCandidates(imagePath);
   const card = document.createElement("article");
   card.className = "pony-card pony-photo";
   card.innerHTML = `
     <div class="pony-art">
-      <img src="${imagePath}" alt="${pony.name} the ${pony.species}" loading="lazy" />
+      <img
+        src="${primaryImage || imagePath}"
+        data-fallback="${fallbackImage || ""}"
+        alt="${pony.name} the ${pony.species}"
+        loading="lazy"
+      />
     </div>
     <div class="pony-info">
       <h3>${pony.name}</h3>
@@ -47,12 +60,19 @@ export const renderPonyCard = (pony, imagePath, addToTop = false) => {
   } else {
     ponyGrid.append(card);
   }
+  const portrait = card.querySelector(".pony-art img");
+  if (portrait && fallbackImage) {
+    portrait.addEventListener("error", () => {
+      if (portrait.src.endsWith(fallbackImage)) return;
+      portrait.src = fallbackImage;
+    });
+  }
 };
 
 export const loadPonies = async () => {
   if (!ponyGrid) return;
   try {
-    const response = await fetch("/data/ponies.json");
+    const response = await fetch("data/ponies.json");
     if (!response.ok) {
       throw new Error("Unable to load pony data.");
     }
@@ -68,21 +88,14 @@ export const loadPonies = async () => {
 };
 
 const resolveSheetPath = (metaPath, meta, fallbackPath) => {
-  const sheets =
-    meta && meta.meta && Array.isArray(meta.meta.sheets) ? meta.meta.sheets : [];
+  const metaImage = meta && meta.meta && meta.meta.image ? meta.meta.image : "";
   const images =
     meta && meta.meta && Array.isArray(meta.meta.images) && meta.meta.images.length
       ? meta.meta.images
-      : meta && meta.meta && meta.meta.image
-        ? [meta.meta.image]
+      : metaImage
+        ? [metaImage]
         : [];
-  const preferredSheet =
-    sheets.find((sheet) => sheet.action === "trot") ||
-    sheets.find((sheet) => sheet.action === "walk") ||
-    sheets[0] ||
-    null;
-  const imageName =
-    preferredSheet && preferredSheet.image ? preferredSheet.image : images[0];
+  const imageName = images[0] || "";
   if (!imageName) {
     return fallbackPath;
   }
@@ -154,8 +167,13 @@ export const bindPonyCardActions = () => {
         if (!sheetPath) {
           throw new Error("Spritesheet path not set.");
         }
-        await loadImage(`${sheetPath}?t=${Date.now()}`);
-        image.src = `${sheetPath}?t=${Date.now()}`;
+        const sheetImage = await loadImageCandidates(getWebpCandidates(sheetPath), {
+          cacheBust: Date.now(),
+        });
+        if (!sheetImage) {
+          throw new Error("Spritesheet not found.");
+        }
+        image.src = sheetImage.src;
         image.hidden = false;
         status.textContent = "Spritesheet loaded.";
       } catch (error) {
@@ -171,13 +189,17 @@ export const bindPonyCardActions = () => {
     const action = button.dataset.ponyAction;
     const card = button.closest(".pony-card");
     if (!ponyId || !action) return;
+    if (!HAS_API) {
+      updateCardStatus(card, "Sprite generation is available in the local/dev version.");
+      return;
+    }
 
     updateCardStatus(card, "Working on sprites...");
     toggleCardButtons(card, true);
 
     try {
       const body = action === "sprites" ? { use_portrait: true } : {};
-      const response = await fetch(`/api/ponies/${ponyId}/${action}`, {
+      const response = await fetch(apiUrl(`/ponies/${ponyId}/${action}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

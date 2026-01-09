@@ -22,10 +22,19 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `pick(list)` — returns a random element from an array.
 - `unique(list)` — de-duplicates an array while preserving order.
 - `loadImage(src)` — Promise wrapper for image loading.
+- `getWebpCandidates(path)` — returns WebP-first fallback list for PNG paths.
+- `loadImageCandidates(paths, { cacheBust })` — loads the first available image path.
+- `loadImageWithFallback(path, options)` — loads WebP when present, falls back to PNG.
 - `loadJson(path)` — fetches JSON with `cache: "no-store"`.
 - `formatTalent(talent)` — normalizes talent text, ensuring an "-ing" phrase.
 - `formatPersonality(personality)` — returns a safe personality fallback.
 - `toTitleCase(value)` — converts identifiers to title case (hyphens/underscores to spaces).
+
+## `assets/js/api_mode.js`
+
+- `HAS_API` — module-level flag set by `detectApi`.
+- `detectApi()` — probes `/api/health` and stores availability (requires `{ "ok": true }`).
+- `apiUrl(path)` — prefixes `/api` for a given path.
 
 ## `assets/js/vibes.js`
 
@@ -44,13 +53,14 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/pony-form.js`
 
 - `initPonyForm()` — wires random name button, blur suggestions, and form submission flow.
+  - Pony creation uses `apiUrl("/ponies")` and is gated by `HAS_API`.
 - Internal data: `fieldInputs` maps form keys to DOM inputs.
 
 ## `assets/js/pony-cards.js`
 
 - `renderPonyCard(pony, imagePath, addToTop)` — builds the pony card markup and inserts it.
 - `loadPonies()` — fetches `/data/ponies.json` and renders all cards.
-- `bindPonyCardActions()` — handles sprite generation and spritesheet preview buttons.
+- `bindPonyCardActions()` — handles sprite generation and spritesheet preview buttons (API calls gated by `HAS_API`).
 - Internal helpers:
   - `resolveSheetPath(metaPath, meta, fallbackPath)` — picks a preview sheet (prefers trot/walk).
   - `updateCardStatus(card, message)` — status line updates.
@@ -66,15 +76,15 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - `loadMap()` — loads map + pony + world data, then calls `initMap`.
 - Internal helper:
-  - `loadRuntimeState()` — pulls persisted `/api/state` data if present.
+  - `loadRuntimeState()` — pulls persisted runtime state via `apiUrl("/state")` when `HAS_API` is true.
 
 ## `assets/js/map/core.js`
 
 - `initMap(mapData, ponies, locations, runtimeState)` — main map bootstrap:
-  - loads spritesheets (including multi-page sheets) and status icons
+  - loads spritesheet atlas per pony and status icons
   - builds structure/house indices and access points
   - creates actor state, command menu wiring, and render loop
-  - persists runtime state periodically
+  - persists runtime state periodically when `HAS_API` is true
 - Internal helpers (exhaustive list):
   - `getStructureLabel(item)` — returns a display label for structures/houses.
   - `resize()` — resizes the canvas to its container.
@@ -190,6 +200,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/map/ui.js`
 
 - `bindMapUI({...})` — wires pointer events, tooltips, drag/drop saving, and command menu actions.
+  - Map persistence posts are gated by `HAS_API` and use `apiUrl(...)`.
 - Internal helpers:
   - `hideTooltip()` — hides tooltip and resets its position.
   - `getCanvasPoint(event)` — maps pointer to canvas coordinates.

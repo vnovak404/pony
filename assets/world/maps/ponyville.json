@@ -708,7 +708,7 @@
           "x": 25.81,
           "y": 7.81
         },
-        "spritePath": "/assets/world/houses/starlight-manor.png",
+        "spritePath": "/assets/world/houses/starlight-manor.webp",
         "label": "Starlight Manor",
         "residents": [
           "Golden Violet",
@@ -723,7 +723,7 @@
           "x": 8.27,
           "y": 8.08
         },
-        "spritePath": "/assets/world/houses/sunrise-loft.png",
+        "spritePath": "/assets/world/houses/sunrise-loft.webp",
         "label": "Sunrise Loft",
         "residents": [
           "Sky Sprinter",
@@ -738,7 +738,7 @@
           "x": 13.43,
           "y": 15.7
         },
-        "spritePath": "/assets/world/houses/mystic-tower.png",
+        "spritePath": "/assets/world/houses/mystic-tower.webp",
         "label": "Mystic Tower",
         "residents": [
           "Catohorn"
@@ -752,7 +752,7 @@
           "x": 4.48,
           "y": 12.03
         },
-        "spritePath": "/assets/world/houses/rescue-cottage.png",
+        "spritePath": "/assets/world/houses/rescue-cottage.webp",
         "label": "Rescue Cottage",
         "residents": [
           "Stellacorn"
@@ -766,7 +766,7 @@
           "x": 36.4,
           "y": 12.5
         },
-        "spritePath": "/assets/world/houses/racers-roost.png",
+        "spritePath": "/assets/world/houses/racers-roost.webp",
         "label": "Racer's Roost",
         "residents": [
           "Gleam Treasure"
@@ -780,7 +780,7 @@
           "x": 7.74,
           "y": 11.21
         },
-        "spritePath": "/assets/world/houses/torrent-lodge.png",
+        "spritePath": "/assets/world/houses/torrent-lodge.webp",
         "label": "Torrent Lodge",
         "residents": [
           "Tiny Horn"
@@ -794,7 +794,7 @@
           "x": 28.04,
           "y": 19.2
         },
-        "spritePath": "/assets/world/houses/acrobat-atelier.png",
+        "spritePath": "/assets/world/houses/acrobat-atelier.webp",
         "label": "Acrobat Atelier",
         "residents": [
           "Pixie"
@@ -808,7 +808,7 @@
           "x": 20.32,
           "y": 19.11
         },
-        "spritePath": "/assets/world/houses/kindness-cottage.png",
+        "spritePath": "/assets/world/houses/kindness-cottage.webp",
         "label": "Kindness Cottage",
         "residents": [
           "Maria"
@@ -822,7 +822,7 @@
           "x": 22.57,
           "y": 7.83
         },
-        "spritePath": "/assets/world/houses/house-taticorn.png",
+        "spritePath": "/assets/world/houses/house-taticorn.webp",
         "label": "Taticorn's House",
         "residents": [
           "Taticorn"

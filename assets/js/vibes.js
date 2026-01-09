@@ -49,7 +49,7 @@ const setVibeData = (data) => {
 
 const loadVibes = async () => {
   try {
-    const response = await fetch("/data/pony_vibes.json");
+    const response = await fetch("data/pony_vibes.json");
     if (!response.ok) {
       throw new Error("Unable to load vibe data.");
     }

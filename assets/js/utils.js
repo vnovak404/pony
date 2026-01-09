@@ -11,6 +11,39 @@ export const loadImage = (src) =>
     image.src = src;
   });
 
+const appendCacheBust = (path, cacheBust) => {
+  if (!cacheBust) return path;
+  return path.includes("?") ? `${path}&v=${cacheBust}` : `${path}?v=${cacheBust}`;
+};
+
+export const getWebpCandidates = (path) => {
+  if (!path) return [];
+  const [base, query = ""] = path.split("?");
+  const suffix = query ? `?${query}` : "";
+  if (base.endsWith(".png")) {
+    return [`${base.slice(0, -4)}.webp${suffix}`, `${base}${suffix}`];
+  }
+  return [path];
+};
+
+export const loadImageCandidates = async (paths, { cacheBust } = {}) => {
+  let lastError = null;
+  for (const path of paths) {
+    try {
+      return await loadImage(appendCacheBust(path, cacheBust));
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  if (lastError) {
+    throw lastError;
+  }
+  throw new Error("Failed to load image candidates.");
+};
+
+export const loadImageWithFallback = (path, options) =>
+  loadImageCandidates(getWebpCandidates(path), options);
+
 export const loadJson = async (path) => {
   const response = await fetch(path, { cache: "no-store" });
   if (!response.ok) {

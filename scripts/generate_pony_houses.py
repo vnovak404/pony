@@ -161,14 +161,23 @@ def main():
 
     for house in houses:
         prompt = build_house_prompt(house)
-        output_path = output_dir / f"{house['id']}.png"
+        output_path = output_dir / f"{house['id']}.webp"
         if output_path.exists() and not args.force:
             print(f"Skipping existing {output_path}")
             continue
         if args.dry_run:
             print(f"[{house['id']}] {prompt}")
             continue
-        images_api.generate_png(prompt, args.size, output_path)
+        temp_path = output_path.with_suffix(".png")
+        if temp_path.exists():
+            temp_path.unlink()
+        images_api.generate_png(prompt, args.size, temp_path)
+        images_api.convert_to_webp(
+            temp_path,
+            output_path=output_path,
+            target_size=args.size,
+            remove_source=True,
+        )
         print(f"Wrote {output_path}")
 
     return 0

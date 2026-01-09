@@ -6,13 +6,14 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_pony_images.py`
 
-- Purpose: generate hero portrait PNGs for ponies/unicorns from `data/ponies.json`.
+- Purpose: generate hero portrait WebP images for ponies/unicorns from `data/ponies.json`.
 - Uses: OpenAI Images API via raw `urllib` requests.
 - Environment: `OPENAI_API_KEY` (from env or `.env`).
 - CLI:
   - `--data` path to `data/ponies.json` (default `data/ponies.json`).
   - `--output-dir` output folder (default `assets/ponies`).
   - `--model`, `--size`, `--quality`, `--count` for API settings.
+  - `--target-size` final output size in pixels (default 512).
   - `--only` pony slugs to generate (comma separated).
   - `--extra-prompt` appended prompt text.
   - `--sleep` seconds between requests.
@@ -23,16 +24,18 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Key functions:
   - `load_pony_data(path)` — loads style + ponies from JSON.
   - `is_gpt_image_model(model)` — model gate for response format.
+  - `resolve_request_size(model, size)` — ensures valid API sizes for gpt-image-1.
   - `load_env_value(path, key)` — parses `.env` style files.
   - `slugify(name)` — slug helper for filenames.
   - `build_prompt(pony, style, extra_prompt)` — constructs portrait prompt.
   - `request_images(...)` — POSTs to the Images API and returns data payload.
-  - `save_images(image_data, output_dir, slug, overwrite)` — writes PNG files.
+  - `save_images(image_data, output_dir, slug, overwrite, target_size)` — writes WebP files.
   - `parse_args()` / `main()` — CLI entrypoint.
 - Example usage:
   - `python3 scripts/generate_pony_images.py`
   - `python3 scripts/generate_pony_images.py --only golden-violet`
   - `python3 scripts/generate_pony_images.py --size 1024x1024 --quality auto`
+  - `python3 scripts/generate_pony_images.py --target-size 512`
   - `python3 scripts/generate_pony_images.py --dry-run`
 
 ## `scripts/generate_pony_sprites.py`
@@ -68,15 +71,15 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/pack_spritesheet.py`
 
-- Purpose: pack sprite frames into action-scoped spritesheet PNGs + JSON metadata.
+- Purpose: pack sprite frames into a single spritesheet WebP + JSON metadata.
 - Uses: Pillow for image IO, `scripts/sprites/qc.py`, `scripts/sprites/prompting.py`.
-- Output: `spritesheet.json` includes `meta.images`/`meta.sheets` plus per-frame `sheet` indices.
+- Output: `spritesheet.webp` + `spritesheet.json` (PNG is temporary and removed).
 - CLI:
   - `--pony` pony slug (optional; all ponies with frames by default).
   - `--columns` spritesheet columns (default 8).
   - `--frame-size` frame size in pixels (default 512).
-  - `--frames-subdir` frames subdirectory under each pony (default `frames_dense`).
-  - `--fallback-subdir` fallback frames subdirectory for missing actions (default `frames`).
+  - `--frames-subdir` frames subdirectory under each pony (default `frames`).
+  - `--fallback-subdir` fallback frames subdirectory for missing actions (default `frames_dense`).
   - `--prefer-dense` prefer numeric dense frames when explicit keyframes exist (default on).
   - `--no-prefer-dense` prefer explicit keyframes when both exist.
   - `--max-size` max sheet width/height in pixels (default 8192).
@@ -88,14 +91,60 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Key functions:
   - `load_json(path)` — loads action data.
   - `collect_action_frames(frames_dir, action_id, prefer_dense)` — orders frames for one action.
-  - `pack_action_pages(...)` — splits an action across sheets if needed.
-  - `pack_spritesheet(pony_id, frame_size, columns, action_data, auto_flip, frames_subdir, prefer_dense, max_size, fallback_subdir, retime, max_fps)` — writes PNGs + JSON.
+  - `pack_single_sheet(...)` — packs all frames into one spritesheet.
+  - `pack_spritesheet(pony_id, frame_size, columns, action_data, auto_flip, frames_subdir, prefer_dense, max_size, fallback_subdir, retime, max_fps)` — writes WebP + JSON.
   - `main()` — iterates ponies and packs sheets.
 - Example usage:
   - `python3 scripts/pack_spritesheet.py --pony golden-violet`
   - `python3 scripts/pack_spritesheet.py --columns 6 --frame-size 512`
   - `python3 scripts/pack_spritesheet.py --pony golden-violet --max-size 8192`
-  - `python3 scripts/pack_spritesheet.py --pony golden-violet --fallback-subdir frames --no-prefer-dense`
+  - `python3 scripts/pack_spritesheet.py --pony golden-violet --fallback-subdir frames_dense --no-prefer-dense`
+
+## `scripts/validate_spritesheets.py`
+
+- Purpose: validate spritesheet WebP/JSON pairs for each pony and required actions.
+- Checks:
+  - `spritesheet.webp` (or `.png`) + `spritesheet.json` exist per pony.
+  - JSON parses and includes animations/frames.
+  - Each action has frames or falls back to idle.
+- Example usage:
+  - `python3 scripts/validate_spritesheets.py`
+
+## `scripts/build_public.py`
+
+- Purpose: build a minimal `public/` folder for static deployment.
+- Output includes:
+  - `index.html`, `styles.css`
+  - `assets/js/`, `assets/ui/`, `assets/world/` (prefers `.webp` for image assets)
+  - `assets/ponies/*.webp` (falls back to `.png` if no WebP)
+  - `assets/ponies/<pony>/sheets/spritesheet.webp` + `spritesheet.json`
+  - `data/*.json` (excluding `runtime_state.json`)
+- CLI:
+  - `--output` output directory (default: `public`)
+  - `--clean` delete output directory before copying
+- Example usage:
+  - `python3 scripts/build_public.py --clean`
+
+## `scripts/convert_assets_webp.py`
+
+- Purpose: generate `.webp` copies of asset images under `assets/`.
+- Defaults:
+  - converts `.png`, `.jpg`, `.jpeg`
+  - skips `frames/` and `frames_dense/` unless `--include-frames` is set
+- CLI:
+  - `--root` assets root (default `assets/`).
+  - `--quality` lossy quality (default 85).
+  - `--lossless` use lossless WebP.
+  - `--method` compression method 0-6 (default 6).
+  - `--force` overwrite existing `.webp`.
+  - `--include-frames` include pony frame directories.
+  - `--prune-source` delete source images after conversion.
+  - `--dry-run` print planned conversions.
+- Example usage:
+  - `python3 scripts/convert_assets_webp.py --dry-run`
+  - `python3 scripts/convert_assets_webp.py --quality 82`
+  - `python3 scripts/convert_assets_webp.py --lossless --include-frames`
+  - `python3 scripts/convert_assets_webp.py --prune-source`
 
 ## `scripts/interpolate_pony_sprites.py`
 
@@ -133,7 +182,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_structure_assets.py`
 
-- Purpose: generate building and map decor PNG assets.
+- Purpose: generate building and map decor WebP assets.
 - Uses: `scripts/sprites/images_api.py`.
 - CLI:
   - `--output-dir` override target folder.
@@ -150,7 +199,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_pony_houses.py`
 
-- Purpose: generate per-house sprites based on resident pony traits.
+- Purpose: generate per-house WebP sprites based on resident pony traits.
 - Uses: `scripts/sprites/images_api.py`.
 - Environment: `OPENAI_API_KEY`.
 - CLI:
@@ -175,7 +224,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_house_state_assets.py`
 
-- Purpose: generate repair/ruined variants for house sprites.
+- Purpose: generate repair/ruined WebP variants for house sprites.
 - Uses: `scripts/generate_pony_houses.py` for house collection + style bible.
 - Uses: `scripts/sprites/images_api.py` (image edit endpoint).
 - CLI:
@@ -198,16 +247,16 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_ui_icons.py`
 
-- Purpose: generate UI icons for needs (health, thirst, hunger, tired, boredom, repair).
+- Purpose: generate UI WebP icons for needs (health, thirst, hunger, tired, boredom, repair).
 - Uses: `scripts/sprites/images_api.py`.
 - CLI:
   - `--icons` comma-separated icon IDs (default all).
-  - `--size` output size or `"auto"`.
+  - `--size` output size (default 256).
   - `--force` overwrite.
   - `--dry-run` print prompts only.
 - Key functions:
   - `build_prompt(base)` — combines prompt with shared style.
-  - `main()` — iterates icons and writes PNGs.
+  - `main()` — iterates icons and writes WebP files.
 - Example usage:
   - `python3 scripts/generate_ui_icons.py`
   - `python3 scripts/generate_ui_icons.py --icons health,thirst`
@@ -232,6 +281,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `POST /api/map/objects/<id>` — persist drag/drop map changes.
   - `GET /api/state` — fetch persisted runtime state.
   - `POST /api/state` — save runtime state payload.
+  - `GET /api/health` — health check (returns `{ "ok": true }`).
 - Key functions:
   - `slugify(name)` — slug helper.
   - `load_data(path)` / `save_data(path, payload)` — JSON IO helpers.
@@ -272,6 +322,8 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `_parse_target_size(size)` — numeric size parsing.
   - `_resolve_request_size(model, size)` — adapts size by model rules.
   - `_resize_image(path, target_size)` — post-resize for `gpt-image-*`.
+  - `resize_image(path, target_size)` — public wrapper for resizing.
+  - `convert_to_webp(source_path, output_path, ...)` — convert images to WebP.
   - `_request_images(payload, api_key)` — JSON POST to generations endpoint.
   - `_encode_multipart(fields, files)` — builds edit payload body.
   - `_request_edit(fields, files, api_key)` — multipart POST to edits endpoint.

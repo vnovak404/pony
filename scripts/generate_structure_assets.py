@@ -204,12 +204,21 @@ def main():
     for name, prompt in items.items():
         if only and name not in only:
             continue
-        path = target_dir / f"{name}.png"
-        if path.exists() and not args.force:
-            print(f"Skipping existing {path}")
+        output_path = target_dir / f"{name}.webp"
+        if output_path.exists() and not args.force:
+            print(f"Skipping existing {output_path}")
             continue
-        images_api.generate_png(prompt, args.size, path)
-        print(f"Wrote {path}")
+        temp_path = output_path.with_suffix(".png")
+        if temp_path.exists():
+            temp_path.unlink()
+        images_api.generate_png(prompt, args.size, temp_path)
+        images_api.convert_to_webp(
+            temp_path,
+            output_path=output_path,
+            target_size=args.size,
+            remove_source=True,
+        )
+        print(f"Wrote {output_path}")
 
     return 0
 

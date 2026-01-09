@@ -7,12 +7,19 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 DEFAULT_MODEL = "gpt-image-1"
 DEFAULT_SIZE = "1024x1024"
+DEFAULT_TARGET_SIZE = 512
 DEFAULT_QUALITY = "auto"
 DEFAULT_API_URL = "https://api.openai.com/v1/images/generations"
 DEFAULT_ENV_PATH = ".env"
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from scripts.sprites import images_api  # noqa: E402
 
 
 def load_pony_data(path):
@@ -25,6 +32,21 @@ def load_pony_data(path):
 
 def is_gpt_image_model(model):
     return bool(model) and model.startswith("gpt-image-")
+
+
+def resolve_request_size(model, size):
+    if is_gpt_image_model(model):
+        if isinstance(size, str) and size in {
+            "auto",
+            "1024x1024",
+            "1024x1536",
+            "1536x1024",
+        }:
+            return size
+        return "1024x1024"
+    if isinstance(size, int):
+        return f"{size}x{size}"
+    return str(size)
 
 
 def load_env_value(path, key):
@@ -131,7 +153,7 @@ def request_images(api_url, api_key, prompt, model, size, quality, count):
         raise RuntimeError(message) from exc
 
 
-def save_images(image_data, output_dir, slug, overwrite):
+def save_images(image_data, output_dir, slug, overwrite, target_size):
     paths = []
     for idx, entry in enumerate(image_data, start=1):
         b64_json = entry.get("b64_json")
@@ -140,23 +162,32 @@ def save_images(image_data, output_dir, slug, overwrite):
             if not url:
                 continue
         suffix = f"-{idx}" if len(image_data) > 1 else ""
-        filename = f"{slug}{suffix}.png"
+        filename = f"{slug}{suffix}.webp"
         path = os.path.join(output_dir, filename)
         if os.path.exists(path) and not overwrite:
             print(f"Skipping existing file: {path}")
             continue
+        temp_path = os.path.splitext(path)[0] + ".png"
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
         if b64_json:
-            with open(path, "wb") as handle:
+            with open(temp_path, "wb") as handle:
                 handle.write(base64.b64decode(b64_json))
         else:
             try:
                 with urllib.request.urlopen(url, timeout=120) as response:
                     content = response.read()
-                with open(path, "wb") as handle:
+                with open(temp_path, "wb") as handle:
                     handle.write(content)
             except urllib.error.URLError as exc:
                 print(f"Failed to download image for {slug}: {exc}")
                 continue
+        images_api.convert_to_webp(
+            temp_path,
+            output_path=path,
+            target_size=target_size,
+            remove_source=True,
+        )
         paths.append(path)
     return paths
 
@@ -184,6 +215,12 @@ def parse_args():
         "--size",
         default=DEFAULT_SIZE,
         help=f"Image size (default: {DEFAULT_SIZE}).",
+    )
+    parser.add_argument(
+        "--target-size",
+        type=int,
+        default=DEFAULT_TARGET_SIZE,
+        help=f"Final output size in pixels (default: {DEFAULT_TARGET_SIZE}).",
     )
     parser.add_argument(
         "--quality",
@@ -271,11 +308,17 @@ def main():
             api_key,
             prompt,
             model,
-            args.size,
+            resolve_request_size(model, args.size),
             args.quality,
             args.count,
         )
-        paths = save_images(image_data, args.output_dir, slug, args.overwrite)
+        paths = save_images(
+            image_data,
+            args.output_dir,
+            slug,
+            args.overwrite,
+            args.target_size,
+        )
         for path in paths:
             print(f"Saved {path}")
 

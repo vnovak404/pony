@@ -3,10 +3,12 @@
 import { ponyMap, mapStatus } from "../dom.js";
 import { loadJson } from "../utils.js";
 import { initMap } from "./core.js";
+import { HAS_API, apiUrl } from "../api_mode.js";
 
 const loadRuntimeState = async () => {
+  if (!HAS_API) return null;
   try {
-    const response = await fetch("/api/state", { cache: "no-store" });
+    const response = await fetch(apiUrl("/state"), { cache: "no-store" });
     if (!response.ok) return null;
     const payload = await response.json();
     if (!payload || typeof payload !== "object") return null;
@@ -20,12 +22,12 @@ export const loadMap = async () => {
   if (!ponyMap || !mapStatus) return;
   mapStatus.textContent = "Loading map...";
   try {
-    const mapData = await loadJson("/assets/world/maps/ponyville.json");
-    const ponyData = await loadJson("/data/ponies.json");
+    const mapData = await loadJson("assets/world/maps/ponyville.json");
+    const ponyData = await loadJson("data/ponies.json");
     const runtimeState = await loadRuntimeState();
     let locationData = { locations: [] };
     try {
-      locationData = await loadJson("/data/world_locations.json");
+      locationData = await loadJson("data/world_locations.json");
     } catch (error) {
       locationData = { locations: [] };
     }

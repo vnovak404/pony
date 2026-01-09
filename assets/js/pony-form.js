@@ -13,6 +13,7 @@ import {
 } from "./dom.js";
 import { ensureVibes, applySuggestions, buildRandomName } from "./vibes.js";
 import { renderPonyCard } from "./pony-cards.js";
+import { HAS_API, apiUrl } from "./api_mode.js";
 
 const fieldInputs = {
   body_color: ponyBodyInput,
@@ -45,6 +46,10 @@ export const initPonyForm = () => {
   if (ponyForm) {
     ponyForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (!HAS_API) {
+        alert("Pony creation is available in the local/dev version.");
+        return;
+      }
       if (ponyResult) {
         ponyResult.textContent = "Creating your pony...";
       }
@@ -63,7 +68,7 @@ export const initPonyForm = () => {
       }
 
       try {
-        const response = await fetch("/api/ponies", {
+        const response = await fetch(apiUrl("/ponies"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
