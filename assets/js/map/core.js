@@ -1,7 +1,12 @@
 // Pony Parade: map rendering and interactions.
 
 import { ponyMap, mapStatus, mapTooltip } from "../dom.js";
-import { loadImageWithFallback, loadJson, toTitleCase } from "../utils.js";
+import {
+  getWebpCandidates,
+  loadImageWithFallback,
+  loadJson,
+  toTitleCase,
+} from "../utils.js";
 import { HAS_API, apiUrl } from "../api_mode.js";
 import { createPathfinder } from "./pathfinding.js";
 import { bindMapUI } from "./ui.js";
@@ -45,6 +50,14 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   const FUN_DURATION_MAX = 4200;
   const FUN_COOLDOWN_MIN = 7000;
   const FUN_COOLDOWN_MAX = 10000;
+  const WORK_RADIUS_TILES = 0.6;
+  const WORK_DURATION_MIN = 30000;
+  const WORK_DURATION_MAX = 30000;
+  const WORK_COOLDOWN_MIN = 15000;
+  const WORK_COOLDOWN_MAX = 25000;
+  const WORK_RESTOCK_MIN = 2;
+  const WORK_RESTOCK_MAX = 4;
+  const WORK_RESTOCK_THRESHOLD = 0.3;
   const BOREDOM_RATE = 0.0003;
   const BOREDOM_THRESHOLD_DEFAULT = 60;
   const HEALTH_DECAY_RATE = 0.00008;
@@ -60,6 +73,68 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     }
   });
   const runtimeHouses = runtimeState && runtimeState.houses ? runtimeState.houses : {};
+  const runtimeInventory =
+    runtimeState && runtimeState.inventory ? runtimeState.inventory : {};
+  const inventoryState = new Map();
+  const DEFAULT_INVENTORY_MAX = 12;
+  const DEFAULT_INVENTORY_START = 9;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const getInventoryConfig = (location) => {
+    if (!location || typeof location !== "object") {
+      return { max: DEFAULT_INVENTORY_MAX, start: DEFAULT_INVENTORY_START };
+    }
+    const inventory = location.inventory || {};
+    const max = Number.isFinite(inventory.max) ? inventory.max : DEFAULT_INVENTORY_MAX;
+    const start = Number.isFinite(inventory.start) ? inventory.start : DEFAULT_INVENTORY_START;
+    return { max, start };
+  };
+  const ensureInventoryEntry = (key, location) => {
+    if (!key) return null;
+    if (inventoryState.has(key)) return inventoryState.get(key);
+    const config = getInventoryConfig(location);
+    const max = Math.max(1, Math.floor(config.max));
+    const start = clamp(Math.floor(config.start), 0, max);
+    const saved = runtimeInventory[key];
+    const current = Number.isFinite(saved?.current)
+      ? clamp(Math.floor(saved.current), 0, max)
+      : start;
+    const entry = { current, max };
+    inventoryState.set(key, entry);
+    return entry;
+  };
+  const getSpotInventoryKey = (spot) => {
+    if (!spot) return null;
+    if (spot.locationId) return spot.locationId;
+    if (spot.id) return spot.id;
+    return null;
+  };
+  const getSpotInventory = (spot) => {
+    if (!spot) return null;
+    const key = getSpotInventoryKey(spot);
+    if (!key) return null;
+    const location = spot.locationId ? locationIndex.get(spot.locationId) : null;
+    return ensureInventoryEntry(key, location);
+  };
+  const isSpotStocked = (spot) => {
+    const inventory = getSpotInventory(spot);
+    if (!inventory) return true;
+    return inventory.current > 0;
+  };
+  const consumeSpotInventory = (spot, amount = 1) => {
+    const inventory = getSpotInventory(spot);
+    if (!inventory) return true;
+    if (inventory.current < amount) return false;
+    inventory.current = Math.max(0, inventory.current - amount);
+    return true;
+  };
+  const restockSpotInventory = (spot, amount = 1) => {
+    const inventory = getSpotInventory(spot);
+    if (!inventory) return false;
+    const next = Math.min(inventory.max, inventory.current + amount);
+    const changed = next !== inventory.current;
+    inventory.current = next;
+    return changed;
+  };
 
   const getStructureLabel = (item) => {
     if (!item) return "Ponyville";
@@ -152,6 +227,8 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     }
     return false;
   };
+  const isInventorySpot = (item) =>
+    Boolean(item && (isFoodSpot(item) || isDrinkSpot(item) || isFunSpot(item)));
   const isHealthSpot = (item) => {
     if (!item) return false;
     if (item.kind === "clinic") return true;
@@ -168,6 +245,25 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   const drinkSpotById = new Map(drinkSpots.map((spot) => [spot.id, spot]));
   const funSpots = objects.filter((item) => isFunSpot(item));
   const funSpotById = new Map(funSpots.map((spot) => [spot.id, spot]));
+  const spotByLocationId = new Map();
+  const registerSpotLocation = (spot) => {
+    if (!spot || !spot.locationId) return;
+    if (!spotByLocationId.has(spot.locationId)) {
+      spotByLocationId.set(spot.locationId, spot);
+    }
+  };
+  foodSpots.forEach((spot) => {
+    registerSpotLocation(spot);
+    getSpotInventory(spot);
+  });
+  drinkSpots.forEach((spot) => {
+    registerSpotLocation(spot);
+    getSpotInventory(spot);
+  });
+  funSpots.forEach((spot) => {
+    registerSpotLocation(spot);
+    getSpotInventory(spot);
+  });
   const healthSpots = objects.filter((item) => isHealthSpot(item));
   const healthSpotById = new Map(healthSpots.map((spot) => [spot.id, spot]));
   const roadSegments = roads.map((segment) => {
@@ -668,6 +764,11 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     return healthAccessPoints.get(healthId) || null;
   };
 
+  const getSpotForLocationId = (locationId) => {
+    if (!locationId) return null;
+    return spotByLocationId.get(locationId) || null;
+  };
+
   const getTaskTargetPoint = (actor) => {
     if (!actor || !actor.task) return null;
     const task = actor.task;
@@ -680,6 +781,14 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     if (task.type === "drink") return getDrinkTargetPoint(task.drinkId);
     if (task.type === "fun") return getFunTargetPoint(task.funId);
     if (task.type === "vet") return getHealthTargetPoint(task.clinicId);
+    if (task.type === "work") {
+      const spot = getSpotForLocationId(task.locationId);
+      if (!spot) return null;
+      if (isFoodSpot(spot)) return getFoodTargetPoint(spot.id);
+      if (isDrinkSpot(spot)) return getDrinkTargetPoint(spot.id);
+      if (isFunSpot(spot)) return getFunTargetPoint(spot.id);
+      return null;
+    }
     if (task.type === "repair") return getHouseTargetPoint(task.houseId);
     if (task.houseId) return getHouseTargetPoint(task.houseId);
     return null;
@@ -755,8 +864,10 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   };
   const pickFoodSpot = (actor, position) => {
     if (!foodSpots.length) return null;
+    const availableSpots = foodSpots.filter((spot) => isSpotStocked(spot));
+    if (!availableSpots.length) return null;
     const preferences = normalizePreferenceList(actor.foodPreference);
-    const scored = foodSpots
+    const scored = availableSpots
       .map((spot) => {
         const accessPoint = getFoodSpotAccessPoint(spot);
         let score = Math.hypot(
@@ -775,8 +886,10 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   };
   const pickDrinkSpot = (actor, position) => {
     if (!drinkSpots.length) return null;
+    const availableSpots = drinkSpots.filter((spot) => isSpotStocked(spot));
+    if (!availableSpots.length) return null;
     const preferences = normalizePreferenceList(actor.drinkPreference);
-    const scored = drinkSpots
+    const scored = availableSpots
       .map((spot) => {
         const accessPoint = getDrinkSpotAccessPoint(spot);
         let score = Math.hypot(
@@ -796,7 +909,9 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
 
   const pickFunSpot = (actor, position) => {
     if (!funSpots.length) return null;
-    const scored = funSpots
+    const availableSpots = funSpots.filter((spot) => isSpotStocked(spot));
+    if (!availableSpots.length) return null;
+    const scored = availableSpots
       .map((spot) => {
         const accessPoint = getFunSpotAccessPoint(spot);
         const score = Math.hypot(
@@ -934,9 +1049,30 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     if (command === "repair") {
       const ponySlug = (actor.sprite?.pony?.slug || "").toLowerCase();
       if (ponySlug !== "taticorn") {
-        if (mapStatus) {
-          mapStatus.textContent = "This pony cannot repair houses.";
+        const jobLocationId = actor.jobLocationId;
+        if (!jobLocationId) {
+          if (mapStatus) {
+            mapStatus.textContent = "This pony doesn't have a job assignment.";
+          }
+          return;
         }
+        const jobSpot = getSpotForLocationId(jobLocationId);
+        if (!jobSpot) {
+          if (mapStatus) {
+            mapStatus.textContent = "No job spot found for this pony.";
+          }
+          return;
+        }
+        const inventory = getSpotInventory(jobSpot);
+        const ratio =
+          inventory && inventory.max > 0 ? inventory.current / inventory.max : 0;
+        if (inventory && ratio > WORK_RESTOCK_THRESHOLD && mapStatus) {
+          mapStatus.textContent = `Supplies look good at ${getStructureLabel(
+            jobSpot
+          )}.`;
+        }
+        actor.task = { type: "work", locationId: jobLocationId, manual: true };
+        actor.workCooldownUntil = 0;
         return;
       }
       const target = findRepairTarget({ allowHealthy: true });
@@ -1185,6 +1321,13 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     funThresholdDefault: BOREDOM_THRESHOLD_DEFAULT,
     healthThresholdDefault: HEALTH_THRESHOLD_DEFAULT,
   });
+  const actorBySlug = new Map();
+  actors.forEach((actor) => {
+    const slug = actor.sprite?.pony?.slug;
+    if (slug) {
+      actorBySlug.set(slug, actor);
+    }
+  });
   let lastPointer = null;
   const commandMenu = document.getElementById("pony-command-menu");
   const commandTitle = commandMenu
@@ -1222,6 +1365,10 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     if (task && task.type === "fun") {
       const spot = funSpotById.get(task.funId);
       return spot ? `Heading: ${getStructureLabel(spot)}` : "Heading: Fun spot";
+    }
+    if (task && task.type === "work") {
+      const spot = getSpotForLocationId(task.locationId);
+      return spot ? `Heading: Stocking ${getStructureLabel(spot)}` : "Heading: Stocking";
     }
     if (task && task.type === "vet") {
       const spot = healthSpotById.get(task.clinicId);
@@ -1307,7 +1454,13 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     }
     if (commandRepairButton) {
       const ponySlug = (actor?.sprite?.pony?.slug || "").toLowerCase();
-      commandRepairButton.hidden = ponySlug !== "taticorn";
+      const isBuilder = ponySlug === "taticorn";
+      commandRepairButton.hidden = false;
+      commandRepairButton.title = isBuilder ? "Repair House" : "Work shift";
+      commandRepairButton.setAttribute(
+        "aria-label",
+        isBuilder ? "Repair House" : "Work shift"
+      );
     }
     updateCommandStats(performance.now());
     commandMenu.hidden = false;
@@ -1324,6 +1477,71 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     commandMenu.style.left = `${left}px`;
     commandMenu.style.top = `${top}px`;
   };
+
+  const renderPonyQuickbar = () => {
+    const quickbar = document.getElementById("pony-quickbar");
+    if (!quickbar) return;
+    const list =
+      quickbar.querySelector("[data-pony-quickbar-list]") || quickbar;
+    list.innerHTML = "";
+    actors.forEach((actor) => {
+      const pony = actor.sprite?.pony;
+      if (!pony || !pony.slug) return;
+      const imagePath = `assets/ponies/${pony.slug}.png`;
+      const [primaryImage, fallbackImage] = getWebpCandidates(imagePath);
+      const button = document.createElement("button");
+      const ponyName = pony.name || "Pony";
+      button.type = "button";
+      button.className = "pony-miniicon";
+      button.dataset.ponySlug = pony.slug;
+      button.dataset.ponyName = ponyName;
+      button.title = ponyName;
+      button.setAttribute("aria-label", `Commands for ${ponyName}`);
+      const img = document.createElement("img");
+      img.src = primaryImage || imagePath;
+      img.alt = ponyName;
+      img.loading = "lazy";
+      if (fallbackImage) {
+        img.dataset.fallback = fallbackImage;
+        img.addEventListener("error", () => {
+          if (img.src.endsWith(fallbackImage)) return;
+          img.src = fallbackImage;
+        });
+      }
+      button.appendChild(img);
+      list.appendChild(button);
+    });
+  };
+
+  const bindPonyQuickbar = () => {
+    const quickbar = document.getElementById("pony-quickbar");
+    if (!quickbar) return;
+    const list =
+      quickbar.querySelector("[data-pony-quickbar-list]") || quickbar;
+    list.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+    list.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-pony-slug]");
+      if (!button) return;
+      event.preventDefault();
+      const slug = button.dataset.ponySlug;
+      if (!slug) return;
+      const actor = actorBySlug.get(slug);
+      if (!actor) return;
+      if (commandMenu && commandTarget === actor && !commandMenu.hidden) {
+        hideCommandMenu();
+        return;
+      }
+      const rect = button.getBoundingClientRect();
+      const clientX = rect.left + rect.width / 2;
+      const clientY = rect.top + rect.height / 2;
+      showCommandMenu(actor, clientX, clientY);
+    });
+  };
+
+  renderPonyQuickbar();
+  bindPonyQuickbar();
 
   const structureScale = {
     building: 1.8,
@@ -1412,6 +1630,10 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     drinkSpots,
     funSpots,
     healthSpots,
+    getSpotInventory,
+    consumeSpotInventory,
+    restockSpotInventory,
+    getSpotForLocationId,
     getHouseTargetPoint,
     getFoodSpotAccessPoint,
     getDrinkSpotAccessPoint,
@@ -1461,6 +1683,14 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     DRINK_DURATION_MAX,
     DRINK_COOLDOWN_MIN,
     DRINK_COOLDOWN_MAX,
+    WORK_RADIUS_TILES,
+    WORK_DURATION_MIN,
+    WORK_DURATION_MAX,
+    WORK_COOLDOWN_MIN,
+    WORK_COOLDOWN_MAX,
+    WORK_RESTOCK_MIN,
+    WORK_RESTOCK_MAX,
+    WORK_RESTOCK_THRESHOLD,
     FUN_RADIUS_TILES,
     FUN_DURATION_MIN,
     FUN_DURATION_MAX,
@@ -1487,6 +1717,8 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     structureScale,
     houseStates,
     getStructureLabel,
+    getSpotInventory,
+    isInventorySpot,
     updateHouseStates,
     renderActors: drawActors,
     commandMenu,
@@ -1512,6 +1744,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
       updatedAt: Date.now(),
       ponies: {},
       houses: {},
+      inventory: {},
     };
     actors.forEach((actor) => {
       const slug = actor.sprite.pony.slug;
@@ -1528,6 +1761,12 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
         condition: state.condition,
         status: state.status,
         repairingUntil: state.repairingUntil || 0,
+      };
+    });
+    inventoryState.forEach((entry, key) => {
+      payload.inventory[key] = {
+        current: entry.current,
+        max: entry.max,
       };
     });
     try {
@@ -1553,6 +1792,15 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
         const health = Math.round(state.condition * 100);
         const statusLabel = formatHouseStatus(state);
         label = `${label} — House health ${health}% (${statusLabel})`;
+      }
+    }
+    if (
+      hit.item &&
+      (isFoodSpot(hit.item) || isDrinkSpot(hit.item) || isFunSpot(hit.item))
+    ) {
+      const inventory = getSpotInventory(hit.item);
+      if (inventory) {
+        label = `${label} — Stock ${inventory.current}/${inventory.max}`;
       }
     }
     return label;

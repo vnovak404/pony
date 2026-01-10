@@ -7,6 +7,7 @@ import {
   getWebpCandidates,
   loadImageCandidates,
   loadJson,
+  toTitleCase,
 } from "./utils.js";
 import { HAS_API, apiUrl } from "./api_mode.js";
 
@@ -15,6 +16,15 @@ export const renderPonyCard = (pony, imagePath, addToTop = false) => {
   const ponyId = pony.slug || "";
   const sheetPath = pony.sprites && pony.sprites.sheet ? pony.sprites.sheet : "";
   const metaPath = pony.sprites && pony.sprites.meta ? pony.sprites.meta : "";
+  const jobTitle = pony.job && pony.job.title ? toTitleCase(pony.job.title) : "";
+  const jobService = pony.job && pony.job.service ? pony.job.service : "";
+  const jobLine =
+    jobTitle && jobService
+      ? `${jobTitle} - ${jobService}`
+      : jobTitle || jobService;
+  const jobMarkup = jobLine
+    ? `<p class="pony-job"><span class="pony-job-label">Job:</span> ${jobLine}</p>`
+    : "";
   const [primaryImage, fallbackImage] = getWebpCandidates(imagePath);
   const card = document.createElement("article");
   card.className = "pony-card pony-photo";
@@ -32,6 +42,7 @@ export const renderPonyCard = (pony, imagePath, addToTop = false) => {
       <p>${formatPersonality(pony.personality)} ${pony.species} who loves ${formatTalent(
         pony.talent
       )}.</p>
+      ${jobMarkup}
       <p class="pony-skill">Colors: ${pony.body_color} + ${pony.mane_color}</p>
     </div>
     ${
