@@ -80,90 +80,83 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ## `assets/js/map/core.js`
 
-- `initMap(mapData, ponies, locations, runtimeState)` — main map bootstrap:
-  - loads spritesheet atlas per pony and status icons
-  - builds structure/house indices and access points
-  - tracks inventory for food/drink/fun spots and job stocking
-  - creates actor state, command menu wiring, and render loop
-  - persists runtime state periodically when `HAS_API` is true
-- Internal helpers (exhaustive list):
-  - `getStructureLabel(item)` — returns a display label for structures/houses.
-  - `resize()` — resizes the canvas to its container.
-  - `isInnObject(item)` — identifies inn objects.
-  - `isFoodSpot(item)` — identifies food structures or locations.
-  - `isDrinkSpot(item)` — identifies drink structures or locations.
-  - `isFunSpot(item)` — identifies fun/recreation locations.
-  - `isInventorySpot(item)` — identifies spots that track inventory.
-  - `isHealthSpot(item)` — identifies clinic/health locations.
-  - `endpointKey(point)` — builds a string key for a road endpoint.
-  - `addEndpoint(point, segment, end)` — indexes road endpoints for intersection lookup.
-  - `isOffMap(point)` — checks if a point is off the map bounds.
-  - `updateLakeState(item)` — caches lake anchor + splash radius for VFX.
-  - `createVideo(src, loop)` — creates a configured `HTMLVideoElement`.
-  - `pickNextSegment(choices, targetPoint, preferTarget)` — intersection routing choice logic.
-  - `pickNeedCandidate(candidates)` — resolves need priority with wash margin.
-  - `normalizeText(value)` — normalizes strings for preference matching.
-  - `normalizePreferenceList(preference)` — normalizes preference arrays.
-  - `matchesSpotPreference(spot, preferences)` — preference check for a spot.
-  - `getInventoryConfig(location)` — resolves inventory defaults for a location.
-  - `ensureInventoryEntry(key, location)` — seeds or loads inventory state for a spot.
-  - `getSpotInventoryKey(spot)` — resolves an inventory key for a spot.
-  - `getSpotInventory(spot)` — returns current inventory entry for a spot.
-  - `isSpotStocked(spot)` — checks if a spot has inventory remaining.
-  - `consumeSpotInventory(spot, amount)` — decrements inventory for a spot.
-  - `restockSpotInventory(spot, amount)` — increments inventory for a spot.
-  - `innSleepSpots()` — IIFE that seeds inn sleep spot offsets.
-  - `claimInnSpot()` — claims a free inn sleep spot.
-  - `releaseInnSpot(index)` — releases a claimed inn spot.
-  - `formatHouseStatus(state)` — formats house condition/status text.
-  - `getHouseSpots(houseId)` — returns cached sleep spots per house.
-  - `claimHouseSpot(houseId)` — claims a free house sleep spot.
-  - `releaseHouseSpot(houseId, index)` — releases a claimed house spot.
-  - `nearestPointOnSegment(point, segment)` — returns nearest point on a segment.
-  - `projectPointOnSegment(point, segment)` — projection math helper (used by nearest-point).
-  - `findNearestSegmentToPoint(point)` — returns the closest road segment + projection info.
-  - `snapActorToNearestSegment(actor, point)` — aligns actor to nearest road segment.
-  - `computeAccessPoint(target)` — snaps a structure target to the nearest road point.
-  - `updateInnAccessPoint()` — recomputes inn access point.
-  - `getInnTargetPoint()` — returns cached inn access point.
-  - `buildHouseAccessPoints()` — precomputes house access points.
-  - `getHouseTargetPoint(houseId)` — returns cached house access point.
-  - `buildFoodAccessPoints()` — precomputes food access points.
-  - `getFoodTargetPoint(foodId)` — returns cached food access point.
-  - `buildDrinkAccessPoints()` — precomputes drink access points.
-  - `getDrinkTargetPoint(drinkId)` — returns cached drink access point.
-  - `buildFunAccessPoints()` — precomputes fun access points.
-  - `getFunTargetPoint(funId)` — returns cached fun access point.
-  - `buildHealthAccessPoints()` — precomputes clinic access points.
-  - `getHealthTargetPoint(healthId)` — returns cached clinic access point.
-  - `getSpotForLocationId(locationId)` — resolves a job spot for a location id.
-  - `getTaskTargetPoint(actor)` — resolves target point from task payload.
-  - `updateAccessPointForItem(item)` — recomputes access points after drag updates.
-  - `getFoodSpotAccessPoint(spot)` — returns access point for a food spot.
-  - `getDrinkSpotAccessPoint(spot)` — returns access point for a drink spot.
-  - `getFunSpotAccessPoint(spot)` — returns access point for a fun spot.
-  - `getHealthSpotAccessPoint(spot)` — returns access point for a clinic spot.
-  - `getSpotOffset(spot, key)` — resolves per-spot positional offset.
-  - `pickFoodSpot(actor, position)` — picks a food target by distance/preferences.
-  - `pickDrinkSpot(actor, position)` — picks a drink target by distance/preferences.
-  - `pickFunSpot(actor, position)` — picks a fun target by distance.
-  - `pickHealthSpot(actor, position)` — picks a clinic target by distance.
-  - `getCriticalNeedTask(actor, position)` — urgent task selection at max need.
-  - `getActorPosition(actor)` — returns current actor position for task decisions.
-  - `assignManualTask(actor, command)` — converts a manual command (eat/drink/fun/rest/vet/repair) into a task.
-  - `findRepairTarget()` — selects a house in need of repair.
-  - `updateHouseStates(delta, now)` — decays/repairs house condition over time.
-  - `getVariantPath(path, suffix)` — builds sprite variant file paths.
-  - `hideCommandMenu()` — hides the command menu.
-  - `resolveTaskLabel(actor, now)` — returns the UI "Heading:" line.
-  - `updateCommandStats(now)` — updates the command menu stat display.
-  - `showCommandMenu(actor, clientX, clientY)` — positions and shows the menu.
-  - `renderPonyQuickbar()` — builds the pony miniicon row below the map.
-  - `bindPonyQuickbar()` — opens the command menu from quickbar clicks.
-  - `setVideoActive(entry, video, active)` — starts/stops VFX videos.
-  - `drawVideoOverlay(video, config, x, y)` — draws VFX frames on the map.
-  - `draw(now)` — animation frame callback that renders each tick.
-  - `getTooltipLabel(hit)` — returns tooltip text with house status detail.
+- `initMap(mapData, ponies, locations, runtimeState)` — orchestrates map bootstrap (scaling, indices, assets, actors, render loop, runtime saves).
+
+## `assets/js/map/config.js`
+
+- `MAP_CONFIG` — simulation constants (rates, thresholds, intervals).
+- `SUPPLY_TYPE_FOOD`, `SUPPLY_TYPE_DRINK`, `SUPPLY_TYPE_REPAIR` — supply identifiers.
+- `SUPPLY_SOURCE_BY_TYPE` — location id mapping for supply sources.
+
+## `assets/js/map/locations.js`
+
+- `buildLocationIndex(locations)` — returns `Map(id -> location)`.
+- `createStructureLabeler(locationIndex)` — returns `getStructureLabel(item)`.
+
+## `assets/js/map/inventory.js`
+
+- `createInventoryState({ locationIndex, runtimeState })` — inventory state factory.
+  - returns `inventoryState`, `getSpotInventory`, `isSpotStocked`, `consumeSpotInventory`, `restockSpotInventory`.
+
+## `assets/js/map/spots.js`
+
+- `createSpotHelpers(locationIndex)` — returns spot predicates (`isFoodSpot`, `isDrinkSpot`, `isFunSpot`, `isSupplySource`, etc) + `getSupplyTypesForSpot`.
+- `createSpotIndex({ objects, getSpotInventory, helpers })` — returns spot arrays/maps + `spotByLocationId`.
+
+## `assets/js/map/roads.js`
+
+- `createRoadNetwork({ mapData, roads, mapWidth, mapHeight })` — road + pathfinding helpers.
+  - returns `roadSegments`, `tileKey`, `findNearestRoadTile`, `buildTilePath`, `advanceAlongPath`, `endpointIndex`, `endpointKey`, `isOffMap`, `pickNextSegment`, `computeAccessPoint`, `findNearestSegmentToPoint`, `snapActorToNearestSegment`.
+
+## `assets/js/map/houses.js`
+
+- `createHouseState({ mapData, objects, runtimeState, config })` — house state + sleep spot helpers.
+  - returns `houseObjects`, `housesById`, `houseStates`, `formatHouseStatus`, `innSleepSpots`, `claimInnSpot`, `releaseInnSpot`, `claimHouseSpot`, `releaseHouseSpot`, `findRepairTarget`, `updateHouseStates`.
+
+## `assets/js/map/access.js`
+
+- `createAccessPoints({...})` — builds access point maps.
+  - returns `getInnTargetPoint`, `getHouseTargetPoint`, `getFoodTargetPoint`, `getDrinkTargetPoint`, `getFunTargetPoint`, `getHealthTargetPoint`, `getSupplyTargetPoint`, `getSupplySpotAccessPoint`, `getFoodSpotAccessPoint`, `getDrinkSpotAccessPoint`, `getFunSpotAccessPoint`, `getHealthSpotAccessPoint`, `updateAccessPointForItem`.
+
+## `assets/js/map/needs.js`
+
+- `createNeedHelpers({...})` — need prioritization + spot selection.
+  - returns `pickNeedCandidate`, `normalizePreferenceList`, `matchesSpotPreference`, `pickFoodSpot`, `pickDrinkSpot`, `pickFunSpot`, `pickHealthSpot`, `getCriticalNeedTask`.
+
+## `assets/js/map/tasks.js`
+
+- `createTaskHelpers({...})` — task selection utilities and manual commands.
+  - returns `getSpotForLocationId`, `getSupplySourceForType`, `getRestockSupplyType`, `createRestockTask`, `createRepairTask`, `getTaskTargetPoint`, `getActorPosition`, `assignManualTask`.
+
+## `assets/js/map/assets.js`
+
+- `loadStructureSprites({...})` — loads building/house sprites with repair variants.
+- `loadDecorSprites({...})` — loads decor sprites.
+- `loadStatusIcons({...})` — loads stat icon sprites.
+- `loadPonySprites({...})` — loads pony spritesheets + animation metadata.
+
+## `assets/js/map/command-menu.js`
+
+- `createCommandMenu({...})` — command menu state + quickbar wiring.
+  - returns `commandMenu`, `getCommandTarget`, `setCommandTarget`, `lastCommandStatsUpdate`, `hideCommandMenu`, `showCommandMenu`, `resolveTaskLabel`, `updateCommandStats`, `renderPonyQuickbar`, `bindPonyQuickbar`.
+
+## `assets/js/map/vfx.js`
+
+- `createVfxState({...})` — VFX registry + lake state.
+  - returns `lakeState`, `updateLakeState`, `VFX_REGISTRY`, `vfxVideos`, `vfxByKey`, `setVideoActive`, `drawVideoOverlay`.
+
+## `assets/js/map/runtime.js`
+
+- `createRuntimeSaver({...})` — persists runtime state.
+  - returns `saveRuntimeState`, `start`.
+
+## `assets/js/map/helpers.js`
+
+- `createSpotOffset(mapData)` — returns `getSpotOffset(spot, key)`.
+- `structureScale` — scale map for structure rendering.
+- `createDragState()` — initializes drag state.
+- `createTooltipLabel({...})` — builds tooltip label formatter.
+- `createMapScale({...})` — manages canvas resize and returns `getScale()`.
 
 ## `assets/js/map/pathfinding.js`
 
@@ -185,19 +178,61 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ## `assets/js/map/actors/core.js`
 
+- Purpose: re-export `createActors` (state) + `createActorRenderer` (renderer).
+
+## `assets/js/map/actors/state.js`
+
 - `createActors({ sprites, roadSegments, mapWidth, runtimeState, maxActors, ... })` — seeds actor state, position, speed, stats, and drive thresholds.
-- Internal helpers in `createActors`:
-  - `getSavedState(slug)` — returns persisted state for a pony slug.
-  - `clamp(value, min, max)` — clamps numeric values (used for saved progress).
-- `createActorRenderer(context)` — wires actor simulation and returns `{ drawActors }`.
-- Internal helpers in `createActorRenderer`:
-  - `drawActors(delta, now)` — per-frame update + draw:
-    - updates needs (health/hunger/thirst/boredom/tiredness)
-    - assigns manual, urgent, and auto tasks
-    - builds or clears pathfinding state
-    - advances movement along a path or road segment
-    - handles eat/drink/rest/fun/work/repair sequences, inventory use, and cooldowns
-    - draws sprite frames, labels, and any VFX overlays
+
+## `assets/js/map/actors/supply.js`
+
+- `createSupplyHelpers({...})` — supply task helpers.
+  - returns `pickSupplyProducer`, `findSupplyNeed`, `getRestockSupplyType`, `createRestockTask`, `createRepairTask`.
+
+## `assets/js/map/actors/tasks.js`
+
+- `createTaskHelpers({...})` — task selection/validation.
+  - returns `updateActorTask`.
+
+## `assets/js/map/actors/movement.js`
+
+- `createMovementHandler({...})` — pathing + wandering movement.
+  - returns `updateActorMovement`.
+
+## `assets/js/map/actors/actions-needs.js`
+
+- `createNeedActions({...})` — need actions.
+  - returns `handleEatTask`, `handleDrinkTask`, `handleFunTask`, `handleVetTask`.
+
+## `assets/js/map/actors/actions-work.js`
+
+- `createWorkActions({...})` — work actions.
+  - returns `handleRestockTask`, `handleSupplyTask`, `handleRepairPickupTask`, `handleWorkTask`, `handleRepairTask`.
+
+## `assets/js/map/actors/actions-rest.js`
+
+- `createRestActions({...})` — rest actions.
+  - returns `handleInnRest`, `handleHomeRest`.
+
+## `assets/js/map/actors/actions.js`
+
+- `createActionHandlers({...})` — orchestrates action handlers.
+  - returns `handleActorActions`.
+
+## `assets/js/map/actors/updater.js`
+
+- `createActorUpdater({...})` — per-actor update loop.
+  - returns `updateActor`.
+
+## `assets/js/map/actors/draw.js`
+
+- `createActorDrawer({...})` — sprite + label rendering.
+  - returns `drawActor`.
+  - respects `pony.sprite_flip` and optional `pony.sprite_flip_actions` for per-action mirroring.
+
+## `assets/js/map/actors/renderer.js`
+
+- `createActorRenderer(context)` — wires update + draw and returns `{ drawActors }`.
 
 ## `assets/js/map/draw.js`
 

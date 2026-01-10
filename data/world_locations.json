@@ -34,8 +34,23 @@
     },
     {
       "id": "windmill-farm",
-      "name": "Windmill Farm",
-      "tags": ["nature", "harvest", "outskirts"]
+      "name": "Pumpkin & Carrot Farm",
+      "tags": ["farm", "harvest", "outskirts", "supply"]
+    },
+    {
+      "id": "honeybee-field",
+      "name": "Honeybee Field",
+      "tags": ["farm", "meadow", "outskirts", "supply"]
+    },
+    {
+      "id": "cow-pasture",
+      "name": "Cow Pasture & Lemon Orchard",
+      "tags": ["farm", "pasture", "outskirts", "supply"]
+    },
+    {
+      "id": "sugar-cane-field",
+      "name": "Sugar Cane Field",
+      "tags": ["farm", "outskirts", "supply"]
     },
     {
       "id": "rainbow-bridge",
@@ -59,8 +74,30 @@
     },
     {
       "id": "market-square",
-      "name": "Market Square",
-      "tags": ["town", "shopping", "busy"]
+      "name": "Pony Pantry",
+      "tags": ["supply", "storage", "town"],
+      "inventory": {
+        "max": 20,
+        "start": 16
+      }
+    },
+    {
+      "id": "water-tower",
+      "name": "Water Tower",
+      "tags": ["supply", "water", "town"],
+      "inventory": {
+        "max": 18,
+        "start": 12
+      }
+    },
+    {
+      "id": "lumberyard",
+      "name": "Lumberyard",
+      "tags": ["supply", "repair", "outskirts"],
+      "inventory": {
+        "max": 16,
+        "start": 10
+      }
     },
     {
       "id": "pony-clinic",
@@ -93,7 +130,7 @@
     {
       "id": "whispering-forest",
       "name": "Whispering Forest",
-      "tags": ["nature", "shade", "outskirts", "recreation"],
+      "tags": ["nature", "shade", "outskirts", "recreation", "lumber"],
       "inventory": {
         "max": 10,
         "start": 8

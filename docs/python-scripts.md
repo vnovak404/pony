@@ -114,7 +114,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 - Purpose: build a minimal `public/` folder for static deployment.
 - Output includes:
-  - `index.html`, `styles.css`
+  - `index.html`, `styles.css`, `styles/` (CSS partials)
   - `assets/js/`, `assets/ui/`, `assets/world/` (prefers `.webp` for image assets)
   - `assets/ponies/*.webp` (falls back to `.png` if no WebP)
   - `assets/ponies/<pony>/sheets/spritesheet.webp` + `spritesheet.json`
@@ -184,12 +184,14 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 - Purpose: generate building and map decor WebP assets.
 - Uses: `scripts/sprites/images_api.py`.
+- Prompts: `scripts/structure_prompts.json` (editable).
 - CLI:
   - `--output-dir` override target folder.
   - `--size` output size (default 512).
   - `--force` overwrite existing assets.
   - `--only` comma-separated IDs.
   - `--decor` generate `DECOR` instead of `STRUCTURES`.
+  - `--prompts` path to JSON prompt definitions (default `scripts/structure_prompts.json`).
 - Key functions:
   - `parse_args()` / `main()` — dispatches assets from `STRUCTURES` or `DECOR`.
 - Example usage:
@@ -267,6 +269,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 - Purpose: local HTTP server for creating ponies, triggering sprite generation,
   saving map edits, and persisting runtime state.
+- Entry point: `scripts/pony_server.py` (wrapper for `scripts/pony_server/app.py`).
 - CLI:
   - `--host`, `--port` for server binding.
   - `--data` ponies JSON path.
@@ -282,28 +285,14 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `GET /api/state` — fetch persisted runtime state.
   - `POST /api/state` — save runtime state payload.
   - `GET /api/health` — health check (returns `{ "ok": true }`).
-- Key functions:
-  - `slugify(name)` — slug helper.
-  - `load_data(path)` / `save_data(path, payload)` — JSON IO helpers.
-  - `sanitize_value(value, fallback, max_len)` — input sanitizer.
-  - `normalize_name(name)` — name collision normalization.
-  - `build_pony(payload)` — constructs a pony record with drives, stats, sprites.
-  - `run_generator(args, slug)` — runs `generate_pony_images.py`.
-  - `_coerce_actions(actions)` — normalizes action lists for CLI.
-  - `_truncate_output(text, limit)` — output limiter for API responses.
-  - `run_sprite_generator(slug, payload)` — runs `generate_pony_sprites.py`.
-  - `run_interpolator(slug, payload)` — runs `interpolate_pony_sprites.py`.
-  - `run_spritesheet_packer(slug, payload)` — runs `pack_spritesheet.py`.
-  - `run_house_generator(slug)` — runs `generate_pony_houses.py`.
-  - `run_house_state_generator(slug)` — runs `generate_house_state_assets.py`.
-  - `ensure_output_dir(path)` / `ensure_pony_asset_dirs(slug)` — directory creation.
-  - `assign_house(ponies, pony)` — assigns pony to a house, possibly shared.
-  - `ensure_house_on_map(map_path, house, residents)` — updates map JSON with house.
-  - `launch_async(target, *args)` — fire-and-forget worker thread.
-  - `run_post_create_tasks(slug, generate_house_variants)` — async sprite + interpolation + pack + house jobs.
-  - `load_json_body(handler)` — JSON body parser.
-  - `PonyHandler` — HTTP handler with `_handle_*` endpoints.
-  - `parse_args()` / `main()` — CLI entrypoint.
+- Modules:
+  - `scripts/pony_server/config.py` — defaults + constants.
+  - `scripts/pony_server/utils.py` — `slugify`, `sanitize_value`, `normalize_name`.
+  - `scripts/pony_server/io.py` — `load_data`, `save_data`, `load_json_body`.
+  - `scripts/pony_server/pony.py` — `build_pony`, `assign_house`, `ensure_house_on_map`, `ensure_output_dir`, `ensure_pony_asset_dirs`.
+  - `scripts/pony_server/generators.py` — `run_generator`, `run_sprite_generator`, `run_spritesheet_packer`, `run_interpolator`, `run_house_generator`, `run_house_state_generator`, `run_post_create_tasks`, `launch_async`.
+  - `scripts/pony_server/handler.py` — `PonyHandler` endpoints.
+  - `scripts/pony_server/app.py` — `parse_args()` / `main()`.
 - Example usage:
   - `python3 scripts/pony_server.py`
   - `python3 scripts/pony_server.py --port 8001`

@@ -1,0 +1,30 @@
+@media (max-width: 720px) {
+  .nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    justify-content: flex-start;
+  }
+
+  .pony-form {
+    grid-template-columns: 1fr;
+  }
+
+  .creator-spotlight {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .creator-spotlight img {
+    margin: 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -114,6 +114,7 @@ def main():
 
     copy_file(ROOT / "index.html", output_dir / "index.html")
     copy_file(ROOT / "styles.css", output_dir / "styles.css")
+    copy_tree(ROOT / "styles", output_dir / "styles")
     if (ROOT / "_headers").exists():
         copy_file(ROOT / "_headers", output_dir / "_headers")
 

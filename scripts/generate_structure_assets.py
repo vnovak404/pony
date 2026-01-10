@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -10,153 +11,33 @@ from scripts.sprites import images_api  # noqa: E402
 
 STRUCTURE_OUTPUT_DIR = ROOT / "assets" / "world" / "structures"
 DECOR_OUTPUT_DIR = ROOT / "assets" / "world" / "decor"
+DEFAULT_PROMPTS_PATH = ROOT / "scripts" / "structure_prompts.json"
 
-BASE_BUILDING_PROMPT = (
-    "Storybook pony village building, front view, centered, clean silhouette. "
-    "Pony-friendly scale with wide doorways, rounded steps, and safe ramps. "
-    "Decorated with gentle pony, unicorn, or horse motifs (no letters). "
-    "Transparent background, no ground, no text, no border."
-)
 
-BASE_SCENERY_PROMPT = (
-    "Storybook pony village map decoration, front view, centered, clean silhouette. "
-    "Pony-friendly scale with rounded forms and gentle curves. "
-    "Decorated with subtle pony, unicorn, or horse motifs (no letters). "
-    "Transparent background, no ground, no text, no border."
-)
+def load_prompts(path):
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except FileNotFoundError:
+        print(f"Prompt file not found: {path}", file=sys.stderr)
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON in {path}: {exc}", file=sys.stderr)
+    return None
 
-STRUCTURES = {
-    "inn_01": (
-        "Cozy pony inn, two-story cottage, warm windows, curved roof, wooden door, "
-        "tiny hanging sign with no letters, horseshoe trim. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "bakery_01": (
-        "Pony bakery, warm glow, striped awning, bread basket on the window ledge, "
-        "round doorway, carrot and apple motifs, no text signage. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "restaurant_01": (
-        "Pony restaurant, cozy cafe facade, arched windows, lanterns, "
-        "outdoor patio table with empty plates, chalkboard sign with no letters, "
-        "horseshoe trim and pony motifs. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "picnic_01": (
-        "Pony picnic spot, gingham blanket, wicker basket, fruit and treats, "
-        "low table and cushions, pony motif bunting with no letters. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "library_01": (
-        "Pony library, tall arched windows, book icon plaque with no letters, "
-        "classic roof, friendly lanterns, unicorn star motif. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "market_01": (
-        "Pony market stall, wooden frame, colorful canopy, crates of fruit, "
-        "simple banner with no letters, hoofprint bunting. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "clinic_01": (
-        "Pony clinic, soft roof, heart symbol window with no letters, "
-        "clean door, friendly porch, gentle horse motif. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "pavilion_01": (
-        "Pony garden pavilion gazebo, round roof, open columns, string lights, "
-        "decorative trim, unicorn swirl finial. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "race_track_01": (
-        "Pony race track, oval dirt track with low rails, tiny pennant flags with no letters, "
-        "hoofprint lane markers, little winners podium with no text, pony motifs. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "observatory_01": (
-        "Pony observatory, domed roof, telescope silhouette, star emblem with no letters, "
-        "arched doorway, crescent horse motif. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "lemonade_bar_01": (
-        "Pony lemonade bar, small kiosk with striped canopy, glass jars, lemon slices, "
-        "round counter height for ponies, horseshoe accents, no text signage. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "well_01": (
-        "Milk and honey pony well, rounded stone fountain, twin spouts pouring milk and honey, "
-        "gentle pony carvings, bucket and ladle, cozy village charm, no text signage. "
-        + BASE_BUILDING_PROMPT
-    ),
-    "forest_01": (
-        "Whimsical pony forest cluster, round-canopy trees, tiny lanterns, "
-        "gentle trail stones, carved horseshoe motif, no text. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "lake_01": (
-        "Calm pony lake, smooth water oval, lily pads, small stone bridge, "
-        "reed clusters, subtle pony motif, no text. "
-        + BASE_SCENERY_PROMPT
-    ),
-}
 
-DECOR = {
-    "tree_01": (
-        "Round-canopy pony tree with soft leaves and a sturdy trunk, small pony charm on the bark. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "tree_02": (
-        "Tall pony village tree with layered foliage and curved branches, tiny horseshoe ornament. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "tree_03": (
-        "Cherry-blossom pony tree with gentle petals and curved trunk, pony ribbon detail. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "tree_04": (
-        "Willow pony tree with drooping leaves, soft lanterns tucked in the branches. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "hill_01": (
-        "Rolling pony hill with soft grassy slope, a few daisies, gentle shadowing. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "hill_02": (
-        "Layered pony hill with two rounded tiers, small heart-shaped bush. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "hill_03": (
-        "Wide pony hill with smooth crest, tiny pathway notch, pastel grass. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "patch_01": (
-        "Grassy pony patch, soft oval turf with small flowers and clover. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "patch_02": (
-        "Meadow pony patch with bright grass tufts and a few sparkle flowers. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "patch_03": (
-        "Calm pony patch with mossy tones and rounded edge stones. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "patch_04": (
-        "Sunny pony patch with tiny mushrooms and gentle grass blades. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "marker_01": (
-        "Pony road marker signpost with blank sign, horseshoe topper, wooden post. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "marker_02": (
-        "Pony road marker with twin arrow boards, blank signs, star topper. "
-        + BASE_SCENERY_PROMPT
-    ),
-    "marker_03": (
-        "Short pony road marker with rounded signboard, blank face, heart finial. "
-        + BASE_SCENERY_PROMPT
-    ),
-}
+def build_prompt(entry, base_prompts):
+    if isinstance(entry, str):
+        return entry.strip()
+    if not isinstance(entry, dict):
+        return ""
+    prompt = str(entry.get("prompt", "")).strip()
+    base_key = entry.get("base")
+    base_prompt = str(base_prompts.get(base_key, "")).strip() if base_key else ""
+    if base_prompt and prompt:
+        return f"{prompt} {base_prompt}".strip()
+    if base_prompt:
+        return base_prompt
+    return prompt
 
 
 def parse_args():
@@ -189,6 +70,11 @@ def parse_args():
         action="store_true",
         help="Generate landscape decor assets instead of structures.",
     )
+    parser.add_argument(
+        "--prompts",
+        default=str(DEFAULT_PROMPTS_PATH),
+        help="Path to the JSON prompt definitions.",
+    )
     return parser.parse_args()
 
 
@@ -197,12 +83,20 @@ def main():
     output_dir = Path(args.output_dir) if args.output_dir else None
     only = {item.strip() for item in args.only.split(",") if item.strip()}
 
-    items = DECOR if args.decor else STRUCTURES
+    prompt_data = load_prompts(Path(args.prompts))
+    if not prompt_data:
+        return 1
+    base_prompts = prompt_data.get("base", {})
+    items = prompt_data.get("decor" if args.decor else "structures", {})
     target_dir = output_dir or (DECOR_OUTPUT_DIR if args.decor else STRUCTURE_OUTPUT_DIR)
     target_dir.mkdir(parents=True, exist_ok=True)
 
-    for name, prompt in items.items():
+    for name, entry in items.items():
         if only and name not in only:
+            continue
+        prompt = build_prompt(entry, base_prompts)
+        if not prompt:
+            print(f"Skipping {name}: empty prompt")
             continue
         output_path = target_dir / f"{name}.webp"
         if output_path.exists() and not args.force:

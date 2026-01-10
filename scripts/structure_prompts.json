@@ -1,0 +1,150 @@
+{
+  "base": {
+    "building": "Storybook pony village building, front view, centered, clean silhouette. Pony-friendly scale with wide doorways, rounded steps, and safe ramps. Decorated with gentle pony, unicorn, or horse motifs (no letters). Transparent background, no ground, no text, no border.",
+    "scenery": "Storybook pony village map decoration, front view, centered, clean silhouette. Pony-friendly scale with rounded forms and gentle curves. Decorated with subtle pony, unicorn, or horse motifs (no letters). Transparent background, no ground, no text, no border."
+  },
+  "structures": {
+    "inn_01": {
+      "prompt": "Cozy pony inn, two-story cottage, warm windows, curved roof, wooden door, tiny hanging sign with no letters, horseshoe trim.",
+      "base": "building"
+    },
+    "bakery_01": {
+      "prompt": "Pony bakery, warm glow, striped awning, bread basket on the window ledge, round doorway, carrot and apple motifs, no text signage.",
+      "base": "building"
+    },
+    "restaurant_01": {
+      "prompt": "Pony restaurant, cozy cafe facade, arched windows, lanterns, outdoor patio table with empty plates, chalkboard sign with no letters, horseshoe trim and pony motifs.",
+      "base": "building"
+    },
+    "picnic_01": {
+      "prompt": "Pony picnic spot, gingham blanket, wicker basket, fruit and treats, low table and cushions, pony motif bunting with no letters.",
+      "base": "scenery"
+    },
+    "library_01": {
+      "prompt": "Pony library, tall arched windows, book icon plaque with no letters, classic roof, friendly lanterns, unicorn star motif.",
+      "base": "building"
+    },
+    "market_01": {
+      "prompt": "Pony market stall, wooden frame, colorful canopy, crates of fruit, simple banner with no letters, hoofprint bunting.",
+      "base": "building"
+    },
+    "pantry_01": {
+      "prompt": "Pony pantry and market storehouse, cozy timber building with wide double doors, stacked barrels, baskets of apples and carrots, hanging lanterns, horseshoe brackets, covered shelf with jars; 2D game asset, cute pony-friendly style.",
+      "base": "building"
+    },
+    "clinic_01": {
+      "prompt": "Pony clinic, soft roof, heart symbol window with no letters, clean door, friendly porch, gentle horse motif.",
+      "base": "building"
+    },
+    "pavilion_01": {
+      "prompt": "Pony garden pavilion gazebo, round roof, open columns, string lights, decorative trim, unicorn swirl finial.",
+      "base": "building"
+    },
+    "race_track_01": {
+      "prompt": "Pony race track, oval dirt track with low rails, tiny pennant flags with no letters, hoofprint lane markers, little winners podium with no text, pony motifs.",
+      "base": "building"
+    },
+    "observatory_01": {
+      "prompt": "Pony observatory, domed roof, telescope silhouette, star emblem with no letters, arched doorway, crescent horse motif.",
+      "base": "building"
+    },
+    "lumberyard_01": {
+      "prompt": "Pony lumberyard supply depot, open timber shed with log stacks, sawhorse rack, bundled planks tied with twine, repair supplies crates, small handcart; 2D game asset, cute pony-friendly style.",
+      "base": "building"
+    },
+    "farm_01": {
+      "prompt": "Windmill farm with pumpkin and carrot plots, small barn, wooden windmill with fabric blades, tidy crop rows, watering trough, friendly scarecrow with no text; 2D game asset, cute pony-friendly style.",
+      "base": "building"
+    },
+    "honeybee_field_01": {
+      "prompt": "Honeybee flower field with beehives, honeycomb frames, wildflowers, honey jars, gentle fence, tiny smoke puffs from a beekeeper bellows, friendly bees; 2D game asset, cute pony-friendly style.",
+      "base": "scenery"
+    },
+    "cow_pasture_01": {
+      "prompt": "Cow pasture with soft rolling grass, low wooden fence, milk pails, hay bales, grazing cow silhouettes, small shade tree, water trough; 2D game asset, cute pony-friendly style.",
+      "base": "scenery"
+    },
+    "lemon_orchard_01": {
+      "prompt": "Lemon orchard with short citrus trees, bright lemons, woven baskets, rustic arbor, light string lanterns, cobblestone path; 2D game asset, cute pony-friendly style.",
+      "base": "scenery"
+    },
+    "sugar_cane_field_01": {
+      "prompt": "Sugar cane field with tall green stalks, tied bundles, wooden cart, small press wheel, reeds and soft grass; 2D game asset, cute pony-friendly style.",
+      "base": "scenery"
+    },
+    "lemonade_bar_01": {
+      "prompt": "Pony lemonade bar, small kiosk with striped canopy, glass jars, lemon slices, round counter height for ponies, horseshoe accents, no text signage.",
+      "base": "building"
+    },
+    "well_01": {
+      "prompt": "Milk and honey pony well, rounded stone fountain, twin spouts pouring milk and honey, gentle pony carvings, bucket and ladle, cozy village charm, no text signage.",
+      "base": "building"
+    },
+    "forest_01": {
+      "prompt": "Whimsical pony forest cluster, round-canopy trees, tiny lanterns, gentle trail stones, carved horseshoe motif, no text.",
+      "base": "scenery"
+    },
+    "lake_01": {
+      "prompt": "Calm pony lake, smooth water oval, lily pads, small stone bridge, reed clusters, subtle pony motif, no text.",
+      "base": "scenery"
+    }
+  },
+  "decor": {
+    "tree_01": {
+      "prompt": "Round-canopy pony tree with soft leaves and a sturdy trunk, small pony charm on the bark.",
+      "base": "scenery"
+    },
+    "tree_02": {
+      "prompt": "Tall pony village tree with layered foliage and curved branches, tiny horseshoe ornament.",
+      "base": "scenery"
+    },
+    "tree_03": {
+      "prompt": "Cherry-blossom pony tree with gentle petals and curved trunk, pony ribbon detail.",
+      "base": "scenery"
+    },
+    "tree_04": {
+      "prompt": "Willow pony tree with drooping leaves, soft lanterns tucked in the branches.",
+      "base": "scenery"
+    },
+    "hill_01": {
+      "prompt": "Rolling pony hill with soft grassy slope, a few daisies, gentle shadowing.",
+      "base": "scenery"
+    },
+    "hill_02": {
+      "prompt": "Layered pony hill with two rounded tiers, small heart-shaped bush.",
+      "base": "scenery"
+    },
+    "hill_03": {
+      "prompt": "Wide pony hill with smooth crest, tiny pathway notch, pastel grass.",
+      "base": "scenery"
+    },
+    "patch_01": {
+      "prompt": "Grassy pony patch, soft oval turf with small flowers and clover.",
+      "base": "scenery"
+    },
+    "patch_02": {
+      "prompt": "Meadow pony patch with bright grass tufts and a few sparkle flowers.",
+      "base": "scenery"
+    },
+    "patch_03": {
+      "prompt": "Calm pony patch with mossy tones and rounded edge stones.",
+      "base": "scenery"
+    },
+    "patch_04": {
+      "prompt": "Sunny pony patch with tiny mushrooms and gentle grass blades.",
+      "base": "scenery"
+    },
+    "marker_01": {
+      "prompt": "Pony road marker signpost with blank sign, horseshoe topper, wooden post.",
+      "base": "scenery"
+    },
+    "marker_02": {
+      "prompt": "Pony road marker with twin arrow boards, blank signs, star topper.",
+      "base": "scenery"
+    },
+    "marker_03": {
+      "prompt": "Short pony road marker with rounded signboard, blank face, heart finial.",
+      "base": "scenery"
+    }
+  }
+}

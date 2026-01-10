@@ -140,11 +140,14 @@
       "accent_color": "twilight purple",
       "talent": "star catching",
       "personality": "calm and dreamy",
-      "sprites": {
-        "sheet": "assets/ponies/moonbeam/sheets/spritesheet.webp",
-        "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
-      },
-      "job": {
+  "sprites": {
+    "sheet": "assets/ponies/moonbeam/sheets/spritesheet.webp",
+    "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
+  },
+  "sprite_flip_actions": [
+    "trot"
+  ],
+  "job": {
         "title": "stargazer",
         "service": "tracks wishes and tends the Milk & Honey Well",
         "paid_in": "pony coins",

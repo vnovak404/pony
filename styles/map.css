@@ -1,0 +1,241 @@
+.map {
+  background: linear-gradient(180deg, rgba(255, 246, 218, 0.55), rgba(230, 245, 224, 0.8));
+  padding: 70px 10px;
+}
+
+.map-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 16px;
+  border: 2px solid rgba(44, 33, 54, 0.08);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
+  position: relative;
+}
+
+.pony-quickbar {
+  margin-top: 6px;
+  display: grid;
+  gap: 10px;
+}
+
+.pony-quickbar-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pony-miniicon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid rgba(44, 33, 54, 0.12);
+  background: #fff;
+  padding: 2px;
+  box-shadow: 0 10px 18px rgba(44, 33, 54, 0.12);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pony-miniicon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+
+.pony-miniicon::after,
+.pony-miniicon::before {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.pony-miniicon::after {
+  content: attr(data-pony-name);
+  bottom: calc(100% + 10px);
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(44, 33, 54, 0.92);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 16px rgba(28, 18, 40, 0.2);
+}
+
+.pony-miniicon::before {
+  content: "";
+  bottom: calc(100% + 2px);
+  width: 10px;
+  height: 10px;
+  background: rgba(44, 33, 54, 0.92);
+  transform: translate(-50%, -6px) rotate(45deg);
+  border-radius: 2px;
+}
+
+.pony-miniicon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 20px rgba(44, 33, 54, 0.16);
+}
+
+.pony-miniicon:hover::after,
+.pony-miniicon:focus-visible::after,
+.pony-miniicon:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, -10px);
+}
+
+.pony-miniicon:hover::before,
+.pony-miniicon:focus-visible::before {
+  opacity: 1;
+  transform: translate(-50%, -10px) rotate(45deg);
+}
+
+.pony-miniicon:focus-visible {
+  outline: 2px solid rgba(240, 168, 62, 0.85);
+  outline-offset: 3px;
+}
+
+.pony-command-menu {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  top: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(44, 33, 54, 0.12);
+  box-shadow: 0 16px 30px rgba(28, 18, 40, 0.18);
+  display: grid;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.pony-command-menu[hidden] {
+  display: none;
+}
+
+.pony-command-title {
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+
+.pony-command-target {
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.pony-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pony-command-stats {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pony-command-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(122, 77, 255, 0.1);
+}
+
+.pony-command-stat img {
+  width: 22px;
+  height: 22px;
+}
+
+.pony-command-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.pony-command-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.pony-command-menu .btn.small {
+  padding: 6px 14px;
+}
+
+.map-controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.map-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(122, 77, 255, 0.2);
+  background: rgba(122, 77, 255, 0.08);
+}
+
+.map-toggle input {
+  accent-color: var(--secondary);
+}
+
+.map-card canvas {
+  width: 100%;
+  border-radius: 18px;
+  border: 2px solid rgba(44, 33, 54, 0.1);
+  background: #f4ffec;
+  touch-action: none;
+}
+
+.map-status {
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.map-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(30, 24, 38, 0.92);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-9999px, -9999px);
+  transition: opacity 0.15s ease;
+  box-shadow: 0 8px 18px rgba(22, 15, 32, 0.25);
+  z-index: 3;
+}
+
+.map-tooltip.is-visible {
+  opacity: 1;
+}

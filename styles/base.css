@@ -1,0 +1,74 @@
+:root {
+  color-scheme: light;
+  --bg: #fff6da;
+  --bg-deep: #e7d8ff;
+  --primary: #f5c400;
+  --secondary: #7a4dff;
+  --ink: #2c2136;
+  --ink-soft: #4e3f5f;
+  --card: #fff9ee;
+  --shadow: 0 24px 60px rgba(60, 36, 80, 0.18);
+  --radius: 24px;
+  --font-title: "Comic Sans MS", "Trebuchet MS", cursive;
+  --font-body: "Trebuchet MS", "Georgia", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: radial-gradient(circle at top right, #fff1a8, transparent 50%),
+    radial-gradient(circle at 18% 14%, #d9c7ff, transparent 45%),
+    linear-gradient(160deg, var(--bg), var(--bg-deep));
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-title);
+  margin: 0 0 16px;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+}
+
+.sky {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sky::before,
+.sky::after {
+  content: "";
+  position: absolute;
+  inset: -30% -10% auto -10%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
+  opacity: 0.7;
+  animation: drift 18s ease-in-out infinite;
+}
+
+.sky::after {
+  inset: auto -20% -40% -20%;
+  height: 60%;
+  animation-delay: -6s;
+}
+
+.glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 239, 172, 0.6), transparent 70%);
+  top: 20px;
+  right: 12%;
+  filter: blur(2px);
+  animation: pulse 6s ease-in-out infinite;
+}
