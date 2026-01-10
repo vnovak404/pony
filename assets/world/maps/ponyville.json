@@ -540,8 +540,8 @@
         "id": "library",
         "kind": "building",
         "at": {
-          "x": 23.52,
-          "y": 15.95
+          "x": 23.38,
+          "y": 15.81
         },
         "sprite": "library_01",
         "locationId": "sparkle-library"
@@ -550,8 +550,8 @@
         "id": "market",
         "kind": "building",
         "at": {
-          "x": 9.98,
-          "y": 15.87
+          "x": 7.8,
+          "y": 17.37
         },
         "sprite": "market_01",
         "locationId": "market-square"
@@ -560,7 +560,7 @@
         "id": "milk-honey-well",
         "kind": "landmark",
         "at": {
-          "x": 20.45,
+          "x": 20.49,
           "y": 15.69
         },
         "sprite": "well_01",
@@ -587,8 +587,8 @@
         "id": "inn",
         "kind": "building",
         "at": {
-          "x": 17.17,
-          "y": 15.84
+          "x": 16.99,
+          "y": 15.88
         },
         "sprite": "inn_01",
         "locationId": "moonlit-inn",
@@ -599,7 +599,7 @@
         "kind": "landmark",
         "at": {
           "x": 32.26,
-          "y": 15.86
+          "y": 15.82
         },
         "sprite": "pavilion_01",
         "locationId": "songbird-pavilion"
@@ -620,7 +620,7 @@
         "kind": "building",
         "at": {
           "x": 29.86,
-          "y": 7.67
+          "y": 7.59
         },
         "sprite": "observatory_01",
         "locationId": "starlight-observatory"
@@ -691,7 +691,7 @@
         "kind": "nature",
         "at": {
           "x": 30.85,
-          "y": 12.81
+          "y": 12.74
         },
         "sprite": "lake_01",
         "locationId": "silver-lake",
@@ -706,7 +706,7 @@
         "kind": "house",
         "at": {
           "x": 25.81,
-          "y": 7.81
+          "y": 7.7
         },
         "spritePath": "/assets/world/houses/starlight-manor.webp",
         "label": "Starlight Manor",
@@ -735,7 +735,7 @@
         "id": "mystic-tower",
         "kind": "house",
         "at": {
-          "x": 13.43,
+          "x": 13.47,
           "y": 15.7
         },
         "spritePath": "/assets/world/houses/mystic-tower.webp",
@@ -778,7 +778,7 @@
         "kind": "house",
         "at": {
           "x": 7.74,
-          "y": 11.21
+          "y": 11.43
         },
         "spritePath": "/assets/world/houses/torrent-lodge.webp",
         "label": "Torrent Lodge",

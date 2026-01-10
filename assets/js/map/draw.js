@@ -14,6 +14,8 @@ export const createRenderer = ({
   structureScale,
   houseStates,
   getStructureLabel,
+  getSpotInventory,
+  isInventorySpot,
   updateHouseStates,
   renderActors,
   commandMenu,
@@ -130,6 +132,41 @@ export const createRenderer = ({
     structureBounds = nextBounds;
   };
 
+  const drawInventoryBars = (scale) => {
+    if (!isInventorySpot || !getSpotInventory) return;
+    if (!structureBounds.length) return;
+    structureBounds.forEach((entry) => {
+      const item = entry.item;
+      if (!isInventorySpot(item)) return;
+      const inventory = getSpotInventory(item);
+      if (!inventory || !Number.isFinite(inventory.max) || inventory.max <= 0) return;
+      const ratio = Math.max(0, Math.min(1, inventory.current / inventory.max));
+      const barWidth = Math.max(36, mapData.meta.tileSize * scale * 0.32);
+      const barHeight = Math.max(6, mapData.meta.tileSize * scale * 0.08);
+      const barX = entry.anchorX - barWidth * 0.5;
+      const barY = entry.anchorY - barHeight - Math.max(6, barHeight * 0.9);
+      const fillWidth = Math.max(0, (barWidth - 2) * ratio);
+      let fillColor = "#e24b4b";
+      if (ratio >= 0.66) {
+        fillColor = "#4aa96c";
+      } else if (ratio >= 0.33) {
+        fillColor = "#e1b33b";
+      }
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+      ctx.shadowBlur = Math.max(2, barHeight);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+      ctx.strokeStyle = "rgba(90, 60, 40, 0.9)";
+      ctx.lineWidth = Math.max(1, barHeight * 0.2);
+      ctx.fillRect(barX, barY, barWidth, barHeight);
+      ctx.strokeRect(barX, barY, barWidth, barHeight);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(barX + 1, barY + 1, fillWidth, barHeight - 2);
+      ctx.restore();
+    });
+  };
+
   const drawFrame = (delta, now) => {
     const scale = getScale();
     ctx.clearRect(0, 0, ponyMap.width, ponyMap.height);
@@ -140,6 +177,7 @@ export const createRenderer = ({
     drawStructures(scale);
     updateHouseStates(delta, now);
     renderActors(delta, now);
+    drawInventoryBars(scale);
     if (commandMenu && !commandMenu.hidden && getCommandTarget()) {
       const lastTick = lastCommandStatsUpdateRef?.value ?? 0;
       if (now - lastTick > 500) {

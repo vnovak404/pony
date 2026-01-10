@@ -83,6 +83,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `initMap(mapData, ponies, locations, runtimeState)` — main map bootstrap:
   - loads spritesheet atlas per pony and status icons
   - builds structure/house indices and access points
+  - tracks inventory for food/drink/fun spots and job stocking
   - creates actor state, command menu wiring, and render loop
   - persists runtime state periodically when `HAS_API` is true
 - Internal helpers (exhaustive list):
@@ -92,6 +93,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
   - `isFoodSpot(item)` — identifies food structures or locations.
   - `isDrinkSpot(item)` — identifies drink structures or locations.
   - `isFunSpot(item)` — identifies fun/recreation locations.
+  - `isInventorySpot(item)` — identifies spots that track inventory.
   - `isHealthSpot(item)` — identifies clinic/health locations.
   - `endpointKey(point)` — builds a string key for a road endpoint.
   - `addEndpoint(point, segment, end)` — indexes road endpoints for intersection lookup.
@@ -103,6 +105,13 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
   - `normalizeText(value)` — normalizes strings for preference matching.
   - `normalizePreferenceList(preference)` — normalizes preference arrays.
   - `matchesSpotPreference(spot, preferences)` — preference check for a spot.
+  - `getInventoryConfig(location)` — resolves inventory defaults for a location.
+  - `ensureInventoryEntry(key, location)` — seeds or loads inventory state for a spot.
+  - `getSpotInventoryKey(spot)` — resolves an inventory key for a spot.
+  - `getSpotInventory(spot)` — returns current inventory entry for a spot.
+  - `isSpotStocked(spot)` — checks if a spot has inventory remaining.
+  - `consumeSpotInventory(spot, amount)` — decrements inventory for a spot.
+  - `restockSpotInventory(spot, amount)` — increments inventory for a spot.
   - `innSleepSpots()` — IIFE that seeds inn sleep spot offsets.
   - `claimInnSpot()` — claims a free inn sleep spot.
   - `releaseInnSpot(index)` — releases a claimed inn spot.
@@ -127,6 +136,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
   - `getFunTargetPoint(funId)` — returns cached fun access point.
   - `buildHealthAccessPoints()` — precomputes clinic access points.
   - `getHealthTargetPoint(healthId)` — returns cached clinic access point.
+  - `getSpotForLocationId(locationId)` — resolves a job spot for a location id.
   - `getTaskTargetPoint(actor)` — resolves target point from task payload.
   - `updateAccessPointForItem(item)` — recomputes access points after drag updates.
   - `getFoodSpotAccessPoint(spot)` — returns access point for a food spot.
@@ -148,6 +158,8 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
   - `resolveTaskLabel(actor, now)` — returns the UI "Heading:" line.
   - `updateCommandStats(now)` — updates the command menu stat display.
   - `showCommandMenu(actor, clientX, clientY)` — positions and shows the menu.
+  - `renderPonyQuickbar()` — builds the pony miniicon row below the map.
+  - `bindPonyQuickbar()` — opens the command menu from quickbar clicks.
   - `setVideoActive(entry, video, active)` — starts/stops VFX videos.
   - `drawVideoOverlay(video, config, x, y)` — draws VFX frames on the map.
   - `draw(now)` — animation frame callback that renders each tick.
@@ -184,7 +196,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
     - assigns manual, urgent, and auto tasks
     - builds or clears pathfinding state
     - advances movement along a path or road segment
-    - handles eat/drink/rest/fun/repair sequences and cooldowns
+    - handles eat/drink/rest/fun/work/repair sequences, inventory use, and cooldowns
     - draws sprite frames, labels, and any VFX overlays
 
 ## `assets/js/map/draw.js`
@@ -194,6 +206,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
   - `drawRoads(scale)` — paints road segments and highlights.
   - `drawDecor(scale)` — paints decor assets.
   - `drawStructures(scale)` — paints structures/houses and tracks hit bounds.
+  - `drawInventoryBars(scale)` — draws stock bars for inventory spots.
   - `drawFrame(delta, now)` — paints the full frame and runs per-frame updates.
   - `getStructureBounds()` — returns current structure hit-boxes.
 

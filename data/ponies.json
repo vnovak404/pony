@@ -20,8 +20,13 @@
       },
       "job": {
         "title": "lantern guide",
-        "service": "leads firefly lantern tours",
-        "paid_in": "glow tokens"
+        "service": "leads firefly lantern tours and keeps the Lemonade Bar stocked",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "lemonade-bar"
       },
       "house": {
         "id": "starlight-manor",
@@ -57,8 +62,13 @@
       },
       "job": {
         "title": "cloud sculptor",
-        "service": "shapes parade clouds",
-        "paid_in": "sky tickets"
+        "service": "shapes parade clouds and hosts Sunny Picnic Grove lunches",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        },
+        "locationId": "picnic-grove"
       },
       "house": {
         "id": "sunrise-loft",
@@ -94,8 +104,13 @@
       },
       "job": {
         "title": "home builder",
-        "service": "builds and renovates pony houses",
-        "paid_in": "cupcake coins"
+        "service": "builds and renovates pony houses, plus keeps the Golden Spoon pantry stocked",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 12,
+          "max": 15
+        },
+        "locationId": "pony-restaurant"
       },
       "house": {
         "id": "sunrise-loft",
@@ -131,8 +146,13 @@
       },
       "job": {
         "title": "stargazer",
-        "service": "tracks wishes and star stories",
-        "paid_in": "moon charms"
+        "service": "tracks wishes and tends the Milk & Honey Well",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "milk-honey-well"
       },
       "house": {
         "id": "starlight-manor",
@@ -169,7 +189,11 @@
       "job": {
         "title": "storm trainer",
         "service": "teaches strong-water safety",
-        "paid_in": "storm badges"
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        }
       },
       "house": {
         "id": "torrent-lodge",
@@ -204,8 +228,13 @@
       },
       "job": {
         "title": "arcane helper",
-        "service": "fixes magical mishaps",
-        "paid_in": "crystal notes"
+        "service": "fixes magical mishaps and keeps Silver Lake sparkling",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "silver-lake"
       },
       "house": {
         "id": "mystic-tower",
@@ -240,8 +269,13 @@
       },
       "job": {
         "title": "animal rescuer",
-        "service": "rescues and shelters critters",
-        "paid_in": "care tokens"
+        "service": "rescues and shelters critters near Whispering Forest",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        },
+        "locationId": "whispering-forest"
       },
       "house": {
         "id": "rescue-cottage",
@@ -277,8 +311,13 @@
       "sprite_flip": true,
       "job": {
         "title": "race coach",
-        "service": "trains speed and balance",
-        "paid_in": "ribbon points"
+        "service": "trains speed and balance at Ponyville Race Track",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 12,
+          "max": 15
+        },
+        "locationId": "pony-race-track"
       },
       "house": {
         "id": "racers-roost",
@@ -313,8 +352,13 @@
       },
       "job": {
         "title": "acrobat tutor",
-        "service": "teaches flips and balance",
-        "paid_in": "sparkle stars"
+        "service": "teaches flips and balance at Songbird Pavilion",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        },
+        "locationId": "songbird-pavilion"
       },
       "house": {
         "id": "acrobat-atelier",
@@ -349,8 +393,13 @@
       },
       "job": {
         "title": "kindness chef",
-        "service": "bakes comfort treats",
-        "paid_in": "thank-you notes"
+        "service": "bakes comfort treats at Sunrise Bakery",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "sunrise-bakery"
       },
       "house": {
         "id": "kindness-cottage",
@@ -384,7 +433,11 @@
       "job": {
         "title": "helper",
         "service": "helps with friendly pony tasks",
-        "paid_in": "kindness tokens"
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 12,
+          "max": 16
+        }
       },
       "stats": {
         "health": 92,

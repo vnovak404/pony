@@ -99,6 +99,10 @@ export const createActors = ({
     };
     return {
       sprite,
+      jobLocationId:
+        sprite.pony.job && sprite.pony.job.locationId
+          ? sprite.pony.job.locationId
+          : null,
       segment,
       t: savedT !== null ? savedT : Math.random(),
       baseSpeed: startSpeed,
@@ -126,6 +130,10 @@ export const createActors = ({
       repairUntil: 0,
       repairTargetId: null,
       repairOffset: { x: 0, y: 0 },
+      workUntil: 0,
+      workTargetId: null,
+      workOffset: { x: 0, y: 0 },
+      workCooldownUntil: 0,
       eatUntil: 0,
       eatTargetId: null,
       eatOffset: { x: 0, y: 0 },
@@ -181,6 +189,10 @@ export const createActorRenderer = (context) => {
     drinkSpots,
     funSpots,
     healthSpots,
+    getSpotInventory,
+    consumeSpotInventory,
+    restockSpotInventory,
+    getSpotForLocationId,
     getHouseTargetPoint,
     getFoodSpotAccessPoint,
     getDrinkSpotAccessPoint,
@@ -230,6 +242,14 @@ export const createActorRenderer = (context) => {
     DRINK_DURATION_MAX,
     DRINK_COOLDOWN_MIN,
     DRINK_COOLDOWN_MAX,
+    WORK_RADIUS_TILES,
+    WORK_DURATION_MIN,
+    WORK_DURATION_MAX,
+    WORK_COOLDOWN_MIN,
+    WORK_COOLDOWN_MAX,
+    WORK_RESTOCK_MIN,
+    WORK_RESTOCK_MAX,
+    WORK_RESTOCK_THRESHOLD,
     FUN_RADIUS_TILES,
     FUN_DURATION_MIN,
     FUN_DURATION_MAX,
@@ -260,6 +280,7 @@ export const createActorRenderer = (context) => {
       const drinking = actor.drinkUntil > now;
       const playing = actor.funUntil > now;
       const healing = actor.vetUntil > now;
+      const working = actor.workUntil > now;
       const repairing = actor.repairUntil > now;
       if (!sleeping && actor.sleepSpotOwner) {
         if (actor.sleepSpotOwner.kind === "inn") {
@@ -282,6 +303,10 @@ export const createActorRenderer = (context) => {
       if (!playing && actor.funTargetId) {
         actor.funTargetId = null;
         actor.funOffset = { x: 0, y: 0 };
+      }
+      if (!working && actor.workTargetId) {
+        actor.workTargetId = null;
+        actor.workOffset = { x: 0, y: 0 };
       }
       if (!healing && actor.vetTargetId) {
         actor.vetTargetId = null;
@@ -356,6 +381,7 @@ export const createActorRenderer = (context) => {
       let startedDrinking = false;
       let startedFun = false;
       let startedHealing = false;
+      let startedWorking = false;
       let startedRepairing = false;
 
       if (sleeping && actor.restTarget) {
@@ -408,6 +434,16 @@ export const createActorRenderer = (context) => {
           actor.vetUntil = 0;
           actor.vetTargetId = null;
           actor.vetOffset = { x: 0, y: 0 };
+        }
+      } else if (working && actor.workTargetId) {
+        const spot = getSpotForLocationId(actor.workTargetId);
+        if (spot) {
+          x = spot.at.x * mapData.meta.tileSize + actor.workOffset.x;
+          y = spot.at.y * mapData.meta.tileSize + actor.workOffset.y;
+        } else {
+          actor.workUntil = 0;
+          actor.workTargetId = null;
+          actor.workOffset = { x: 0, y: 0 };
         }
       } else if (repairing && actor.repairTargetId) {
         const house = housesById.get(actor.repairTargetId);
@@ -525,6 +561,19 @@ export const createActorRenderer = (context) => {
             if (target) {
               actor.task = { type: "repair", houseId: target.id };
             }
+          } else if (actor.jobLocationId) {
+            const jobSpot = getSpotForLocationId(actor.jobLocationId);
+            const inventory = jobSpot ? getSpotInventory(jobSpot) : null;
+            const ratio =
+              inventory && inventory.max > 0 ? inventory.current / inventory.max : 0;
+            const needsStock =
+              jobSpot &&
+              inventory &&
+              ratio <= WORK_RESTOCK_THRESHOLD &&
+              now > actor.workCooldownUntil;
+            if (needsStock) {
+              actor.task = { type: "work", locationId: actor.jobLocationId };
+            }
           }
         }
 
@@ -564,6 +613,13 @@ export const createActorRenderer = (context) => {
         if (actor.task && actor.task.type === "vet") {
           const spot = healthSpotById.get(actor.task.clinicId);
           if (!spot) {
+            actor.task = null;
+          }
+        }
+        if (actor.task && actor.task.type === "work") {
+          const spot = getSpotForLocationId(actor.task.locationId);
+          const inventory = spot ? getSpotInventory(spot) : null;
+          if (!spot || !inventory || inventory.current >= inventory.max) {
             actor.task = null;
           }
         }
@@ -677,28 +733,38 @@ export const createActorRenderer = (context) => {
             const eatRadiusTiles = spot.eatRadius || EAT_RADIUS_TILES;
             const eatRadius = mapData.meta.tileSize * eatRadiusTiles;
             if (distToFood < eatRadius && now > actor.eatCooldownUntil) {
-              let eatDuration =
-                EAT_DURATION_MIN + Math.random() * (EAT_DURATION_MAX - EAT_DURATION_MIN);
-              const vfxEntry = vfxByKey.get(`${sprite.pony.slug}:eat`);
-              const vfxVideo = vfxEntry ? vfxVideos.get(vfxEntry.id) : null;
-              if (vfxVideo && Number.isFinite(vfxVideo.duration) && vfxVideo.duration > 0) {
-                eatDuration = vfxVideo.duration * 1000;
+              if (!consumeSpotInventory(spot, 1)) {
+                actor.eatCooldownUntil = now + 1500 + Math.random() * 1000;
+                actor.task = null;
+              } else {
+                let eatDuration =
+                  EAT_DURATION_MIN +
+                  Math.random() * (EAT_DURATION_MAX - EAT_DURATION_MIN);
+                const vfxEntry = vfxByKey.get(`${sprite.pony.slug}:eat`);
+                const vfxVideo = vfxEntry ? vfxVideos.get(vfxEntry.id) : null;
+                if (
+                  vfxVideo &&
+                  Number.isFinite(vfxVideo.duration) &&
+                  vfxVideo.duration > 0
+                ) {
+                  eatDuration = vfxVideo.duration * 1000;
+                }
+                actor.eatUntil = now + eatDuration;
+                actor.eatCooldownUntil =
+                  actor.eatUntil +
+                  EAT_COOLDOWN_MIN +
+                  Math.random() * (EAT_COOLDOWN_MAX - EAT_COOLDOWN_MIN);
+                actor.eatTargetId = spot.id;
+                actor.eatOffset = {
+                  x: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                  y: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                };
+                actor.frameIndex = 0;
+                actor.lastFrame = 0;
+                actor.stats.hunger = 0;
+                actor.task = null;
+                startedEating = true;
               }
-              actor.eatUntil = now + eatDuration;
-              actor.eatCooldownUntil =
-                actor.eatUntil +
-                EAT_COOLDOWN_MIN +
-                Math.random() * (EAT_COOLDOWN_MAX - EAT_COOLDOWN_MIN);
-              actor.eatTargetId = spot.id;
-              actor.eatOffset = {
-                x: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
-                y: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
-              };
-              actor.frameIndex = 0;
-              actor.lastFrame = 0;
-              actor.stats.hunger = 0;
-              actor.task = null;
-              startedEating = true;
             }
           }
         }
@@ -713,24 +779,29 @@ export const createActorRenderer = (context) => {
             const drinkRadiusTiles = spot.drinkRadius || DRINK_RADIUS_TILES;
             const drinkRadius = mapData.meta.tileSize * drinkRadiusTiles;
             if (distToDrink < drinkRadius && now > actor.drinkCooldownUntil) {
-              const drinkDuration =
-                DRINK_DURATION_MIN +
-                Math.random() * (DRINK_DURATION_MAX - DRINK_DURATION_MIN);
-              actor.drinkUntil = now + drinkDuration;
-              actor.drinkCooldownUntil =
-                actor.drinkUntil +
-                DRINK_COOLDOWN_MIN +
-                Math.random() * (DRINK_COOLDOWN_MAX - DRINK_COOLDOWN_MIN);
-              actor.drinkTargetId = spot.id;
-              actor.drinkOffset = {
-                x: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
-                y: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
-              };
-              actor.frameIndex = 0;
-              actor.lastFrame = 0;
-              actor.stats.thirst = 0;
-              actor.task = null;
-              startedDrinking = true;
+              if (!consumeSpotInventory(spot, 1)) {
+                actor.drinkCooldownUntil = now + 1500 + Math.random() * 1000;
+                actor.task = null;
+              } else {
+                const drinkDuration =
+                  DRINK_DURATION_MIN +
+                  Math.random() * (DRINK_DURATION_MAX - DRINK_DURATION_MIN);
+                actor.drinkUntil = now + drinkDuration;
+                actor.drinkCooldownUntil =
+                  actor.drinkUntil +
+                  DRINK_COOLDOWN_MIN +
+                  Math.random() * (DRINK_COOLDOWN_MAX - DRINK_COOLDOWN_MIN);
+                actor.drinkTargetId = spot.id;
+                actor.drinkOffset = {
+                  x: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                  y: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                };
+                actor.frameIndex = 0;
+                actor.lastFrame = 0;
+                actor.stats.thirst = 0;
+                actor.task = null;
+                startedDrinking = true;
+              }
             }
           }
         }
@@ -745,25 +816,89 @@ export const createActorRenderer = (context) => {
             const funRadiusTiles = spot.funRadius || FUN_RADIUS_TILES;
             const funRadius = mapData.meta.tileSize * funRadiusTiles;
             if (distToFun < funRadius && now > actor.funCooldownUntil) {
-              const baseOffset = getSpotOffset(spot, "funOffset");
-              const funDuration =
-                FUN_DURATION_MIN + Math.random() * (FUN_DURATION_MAX - FUN_DURATION_MIN);
-              actor.funUntil = now + funDuration;
-              actor.funCooldownUntil =
-                actor.funUntil +
-                FUN_COOLDOWN_MIN +
-                Math.random() * (FUN_COOLDOWN_MAX - FUN_COOLDOWN_MIN);
-              actor.funTargetId = spot.id;
-              actor.funOffset = {
-                x: baseOffset.x + (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
-                y: baseOffset.y + (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
-              };
-              actor.frameIndex = 0;
-              actor.lastFrame = 0;
-              actor.stats.boredom = 0;
-              actor.task = null;
-              startedFun = true;
+              if (!consumeSpotInventory(spot, 1)) {
+                actor.funCooldownUntil = now + 1500 + Math.random() * 1000;
+                actor.task = null;
+              } else {
+                const baseOffset = getSpotOffset(spot, "funOffset");
+                const funDuration =
+                  FUN_DURATION_MIN +
+                  Math.random() * (FUN_DURATION_MAX - FUN_DURATION_MIN);
+                actor.funUntil = now + funDuration;
+                actor.funCooldownUntil =
+                  actor.funUntil +
+                  FUN_COOLDOWN_MIN +
+                  Math.random() * (FUN_COOLDOWN_MAX - FUN_COOLDOWN_MIN);
+                actor.funTargetId = spot.id;
+                actor.funOffset = {
+                  x:
+                    baseOffset.x + (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                  y:
+                    baseOffset.y + (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                };
+                actor.frameIndex = 0;
+                actor.lastFrame = 0;
+                actor.stats.boredom = 0;
+                actor.task = null;
+                startedFun = true;
+              }
             }
+          }
+        }
+
+        if (actor.task && actor.task.type === "work") {
+          const spot = getSpotForLocationId(actor.task.locationId);
+          if (spot) {
+            const inventory = getSpotInventory(spot);
+            if (!inventory || inventory.current >= inventory.max) {
+              actor.task = null;
+            } else {
+              const accessPoint = foodSpotById.has(spot.id)
+                ? getFoodSpotAccessPoint(spot)
+                : drinkSpotById.has(spot.id)
+                  ? getDrinkSpotAccessPoint(spot)
+                  : funSpotById.has(spot.id)
+                    ? getFunSpotAccessPoint(spot)
+                    : null;
+              const workX = accessPoint
+                ? accessPoint.x
+                : spot.at.x * mapData.meta.tileSize;
+              const workY = accessPoint
+                ? accessPoint.y
+                : spot.at.y * mapData.meta.tileSize;
+              const distToWork = Math.hypot(x - workX, y - workY);
+              const workRadius = mapData.meta.tileSize * WORK_RADIUS_TILES;
+              if (distToWork < workRadius && now > actor.workCooldownUntil) {
+                const restockAmount =
+                  WORK_RESTOCK_MIN +
+                  Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1));
+                const restocked = restockSpotInventory(spot, restockAmount);
+                if (restocked) {
+                  const workDuration =
+                    WORK_DURATION_MIN +
+                    Math.random() * (WORK_DURATION_MAX - WORK_DURATION_MIN);
+                  actor.workUntil = now + workDuration;
+                  actor.workCooldownUntil =
+                    actor.workUntil +
+                    WORK_COOLDOWN_MIN +
+                    Math.random() * (WORK_COOLDOWN_MAX - WORK_COOLDOWN_MIN);
+                  actor.workTargetId = actor.task.locationId;
+                  actor.workOffset = {
+                    x: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                    y: (Math.random() - 0.5) * mapData.meta.tileSize * 0.2,
+                  };
+                  actor.frameIndex = 0;
+                  actor.lastFrame = 0;
+                  actor.task = null;
+                  startedWorking = true;
+                } else {
+                  actor.workCooldownUntil = now + 1500 + Math.random() * 1500;
+                  actor.task = null;
+                }
+              }
+            }
+          } else {
+            actor.task = null;
           }
         }
 
@@ -807,6 +942,7 @@ export const createActorRenderer = (context) => {
           !startedEating &&
           !startedDrinking &&
           !startedFun &&
+          !startedWorking &&
           !startedHealing &&
           !startedRepairing &&
           !skipAutoRest
@@ -873,6 +1009,7 @@ export const createActorRenderer = (context) => {
           !startedEating &&
           !startedDrinking &&
           !startedFun &&
+          !startedWorking &&
           !startedHealing &&
           !startedRepairing &&
           !skipAutoRest &&
