@@ -87,6 +87,8 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `MAP_CONFIG` — simulation constants (rates, thresholds, intervals).
 - `SUPPLY_TYPE_FOOD`, `SUPPLY_TYPE_DRINK`, `SUPPLY_TYPE_REPAIR` — supply identifiers.
 - `SUPPLY_SOURCE_BY_TYPE` — location id mapping for supply sources.
+- `SUPPLY_RECIPES_BY_TYPE`, `SUPPLY_RECIPES_BY_LOCATION` — ingredient recipes for restocking.
+- `PRODUCER_INGREDIENT_OUTPUTS`, `INGREDIENT_DESTINATIONS`, `UNLIMITED_INGREDIENTS` — ingredient flow config.
 
 ## `assets/js/map/locations.js`
 
@@ -96,7 +98,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/map/inventory.js`
 
 - `createInventoryState({ locationIndex, runtimeState })` — inventory state factory.
-  - returns `inventoryState`, `getSpotInventory`, `isSpotStocked`, `consumeSpotInventory`, `restockSpotInventory`.
+  - returns `inventoryState`, `ingredientState`, `getSpotInventory`, `getIngredientEntry`, `getSpotIngredients`, `isSpotStocked`, `consumeSpotInventory`, `restockSpotInventory`, `restockIngredient`, `consumeIngredients`.
 
 ## `assets/js/map/spots.js`
 
@@ -187,7 +189,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/map/actors/supply.js`
 
 - `createSupplyHelpers({...})` — supply task helpers.
-  - returns `pickSupplyProducer`, `findSupplyNeed`, `getRestockSupplyType`, `createRestockTask`, `createRepairTask`.
+  - returns `pickSupplyProducer`, `findSupplyNeed`, `getRestockSupplyType`, `createRestockTask`, `createRepairTask`, `getRestockRecipe`, `getSupplyAvailable`, `consumeSupplyFromSource`, `getProducerIngredients`, `getIngredientDestination`.
 
 ## `assets/js/map/actors/tasks.js`
 

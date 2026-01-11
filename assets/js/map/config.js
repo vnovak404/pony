@@ -58,3 +58,45 @@ export const SUPPLY_SOURCE_BY_TYPE = {
   [SUPPLY_TYPE_DRINK]: "water-tower",
   [SUPPLY_TYPE_REPAIR]: "lumberyard",
 };
+
+export const SUPPLY_RECIPES_BY_TYPE = {
+  [SUPPLY_TYPE_FOOD]: {
+    required: { produce: 1 },
+  },
+  [SUPPLY_TYPE_DRINK]: {
+    required: { water: 1 },
+  },
+  [SUPPLY_TYPE_REPAIR]: {
+    required: { lumber: 1 },
+  },
+};
+
+export const SUPPLY_RECIPES_BY_LOCATION = {
+  "lemonade-bar": {
+    required: { water: 1, lemon: 1 },
+    options: [{ sugar: 1 }, { honey: 1 }],
+  },
+  "milk-honey-well": {
+    required: { milk: 1, honey: 1 },
+  },
+};
+
+export const PRODUCER_INGREDIENT_OUTPUTS = {
+  "windmill-farm": ["produce"],
+  "honeybee-field": ["honey"],
+  "cow-pasture": ["milk", "lemon"],
+  "sugar-cane-field": ["sugar"],
+  "whispering-forest": ["lumber"],
+};
+
+export const INGREDIENT_DESTINATIONS = {
+  produce: "market-square",
+  water: "water-tower",
+  lemon: "water-tower",
+  sugar: "water-tower",
+  honey: "water-tower",
+  milk: "water-tower",
+  lumber: "lumberyard",
+};
+
+export const UNLIMITED_INGREDIENTS = ["water"];

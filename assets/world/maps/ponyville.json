@@ -553,7 +553,7 @@
           "x": 8.83,
           "y": 15.94
         },
-        "sprite": "pantry_01",
+        "sprite": "market_01",
         "locationId": "market-square",
         "supplyRole": "source",
         "supplyTypes": [
@@ -567,7 +567,7 @@
           "x": 11.05,
           "y": 18.63
         },
-        "sprite": "well_01",
+        "sprite": "water_tower_01",
         "locationId": "water-tower",
         "supplyRole": "source",
         "supplyTypes": [
@@ -665,7 +665,7 @@
         "kind": "location",
         "at": {
           "x": 8.14,
-          "y": 2.62
+          "y": 3.97
         },
         "sprite": "farm_01",
         "locationId": "windmill-farm",
@@ -690,7 +690,8 @@
         "locationId": "honeybee-field",
         "supplyRole": "producer",
         "supplyTypes": [
-          "food"
+          "food",
+          "drink"
         ],
         "allowedSpecies": [
           "pony",
@@ -702,8 +703,8 @@
         "id": "cow-pasture",
         "kind": "location",
         "at": {
-          "x": 3.9,
-          "y": 6.8
+          "x": 8.08,
+          "y": 19.01
         },
         "sprite": "cow_pasture_01",
         "locationId": "cow-pasture",

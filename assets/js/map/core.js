@@ -6,7 +6,16 @@ import { HAS_API, apiUrl } from "../api_mode.js";
 import { createActors, createActorRenderer } from "./actors.js";
 import { createRenderer } from "./draw.js";
 import { bindMapUI } from "./ui.js";
-import { MAP_CONFIG, SUPPLY_SOURCE_BY_TYPE, SUPPLY_TYPE_REPAIR } from "./config.js";
+import {
+  MAP_CONFIG,
+  SUPPLY_SOURCE_BY_TYPE,
+  SUPPLY_TYPE_REPAIR,
+  SUPPLY_RECIPES_BY_LOCATION,
+  SUPPLY_RECIPES_BY_TYPE,
+  PRODUCER_INGREDIENT_OUTPUTS,
+  INGREDIENT_DESTINATIONS,
+  UNLIMITED_INGREDIENTS,
+} from "./config.js";
 import { buildLocationIndex, createStructureLabeler } from "./locations.js";
 import { createInventoryState } from "./inventory.js";
 import { createSpotHelpers, createSpotIndex } from "./spots.js";
@@ -91,10 +100,15 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
 
   const {
     inventoryState,
+    ingredientState,
     getSpotInventory,
+    getIngredientEntry,
+    getSpotIngredients,
     isSpotStocked,
     consumeSpotInventory,
     restockSpotInventory,
+    restockIngredient,
+    consumeIngredients,
   } = createInventoryState({ locationIndex, runtimeState });
 
   const roads = (mapData.layers.roads && mapData.layers.roads.segments) || [];
@@ -324,8 +338,11 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     funSpots,
     healthSpots,
     getSpotInventory,
+    getIngredientEntry,
+    consumeIngredients,
     consumeSpotInventory,
     restockSpotInventory,
+    restockIngredient,
     supplyProducers,
     getSpotForLocationId: taskHelpers.getSpotForLocationId,
     getSupplySourceForType: taskHelpers.getSupplySourceForType,
@@ -365,6 +382,11 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     isDrinkSpot: spotHelpers.isDrinkSpot,
     isFunSpot: spotHelpers.isFunSpot,
     isSupplySpot: spotHelpers.isSupplySpot,
+    SUPPLY_RECIPES_BY_LOCATION,
+    SUPPLY_RECIPES_BY_TYPE,
+    PRODUCER_INGREDIENT_OUTPUTS,
+    INGREDIENT_DESTINATIONS,
+    UNLIMITED_INGREDIENTS,
     HUNGER_RATE,
     THIRST_RATE,
     BOREDOM_RATE,
@@ -444,6 +466,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     actors,
     houseStates: houseState.houseStates,
     inventoryState,
+    ingredientState,
     intervalMs: STATE_SAVE_INTERVAL,
   });
   runtimeSaver.start();

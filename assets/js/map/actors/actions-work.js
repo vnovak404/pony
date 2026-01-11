@@ -16,6 +16,11 @@ export const createWorkActions = (context) => {
     getSupplySpotAccessPoint,
     getSupplySourceForType,
     getSupplyTypesForSpot,
+    getProducerIngredients,
+    getIngredientDestination,
+    getSupplyAvailable,
+    consumeSupplyFromSource,
+    getIngredientEntry,
     foodSpotById,
     drinkSpotById,
     funSpotById,
@@ -29,6 +34,7 @@ export const createWorkActions = (context) => {
     WORK_COOLDOWN_MAX,
     WORK_RESTOCK_MIN,
     WORK_RESTOCK_MAX,
+    restockIngredient,
   } = context;
 
   const handleRestockTask = (actor, now, position) => {
@@ -68,13 +74,28 @@ export const createWorkActions = (context) => {
         WORK_RESTOCK_MIN +
           Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1))
       );
-      const carryAmount = Math.min(desiredAmount, sourceInventory.current);
+      const available = getSupplyAvailable
+        ? getSupplyAvailable(sourceSpot, targetSpot, actor.task.supplyType)
+        : sourceInventory.current;
+      const cappedAvailable = Number.isFinite(available)
+        ? available
+        : available === Infinity
+          ? desiredAmount
+          : 0;
+      const carryAmount = Math.min(desiredAmount, cappedAvailable);
       if (carryAmount <= 0) {
         actor.workCooldownUntil = now + 1500 + Math.random() * 1500;
         actor.task = null;
         return false;
       }
-      consumeSpotInventory(sourceSpot, carryAmount);
+      const consumed = consumeSupplyFromSource
+        ? consumeSupplyFromSource(sourceSpot, targetSpot, actor.task.supplyType, carryAmount)
+        : consumeSpotInventory(sourceSpot, carryAmount);
+      if (!consumed) {
+        actor.workCooldownUntil = now + 1500 + Math.random() * 1500;
+        actor.task = null;
+        return false;
+      }
       const perItemDuration =
         WORK_DURATION_PER_ITEM_MIN +
         Math.random() * (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
@@ -136,24 +157,34 @@ export const createWorkActions = (context) => {
     const distToWork = Math.hypot(position.x - workX, position.y - workY);
     const workRadius = mapData.meta.tileSize * WORK_RADIUS_TILES;
     if (distToWork >= workRadius || now <= actor.workCooldownUntil) return false;
-    const supplyTypes = Array.isArray(actor.task.supplyTypes)
-      ? actor.task.supplyTypes
-      : getSupplyTypesForSpot(producer);
     let totalRestocked = 0;
-    supplyTypes.forEach((type) => {
-      const sourceSpot = getSupplySourceForType(type);
-      const inventory = sourceSpot ? getSpotInventory(sourceSpot) : null;
-      if (!sourceSpot || !inventory) return;
-      const restockNeed = Math.max(0, inventory.max - inventory.current);
+    const ingredients = Array.isArray(actor.task.ingredients)
+      ? actor.task.ingredients
+      : getProducerIngredients
+        ? getProducerIngredients(producer)
+        : [];
+    ingredients.forEach((ingredient) => {
+      const destinationId = getIngredientDestination
+        ? getIngredientDestination(ingredient)
+        : null;
+      const destinationSpot = destinationId
+        ? getSpotForLocationId(destinationId)
+        : null;
+      const entry =
+        destinationSpot && getIngredientEntry
+          ? getIngredientEntry(destinationSpot, ingredient)
+          : null;
+      if (!destinationSpot || !entry || !restockIngredient) return;
+      const restockNeed = Math.max(0, entry.max - entry.current);
       if (restockNeed <= 0) return;
       const restockAmount = Math.min(
         restockNeed,
         WORK_RESTOCK_MIN +
           Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1))
       );
-      const restocked = restockSpotInventory(sourceSpot, restockAmount);
-      if (restocked) {
-        totalRestocked += restockAmount;
+      const added = restockIngredient(destinationSpot, ingredient, restockAmount);
+      if (added > 0) {
+        totalRestocked += added;
       }
     });
     if (totalRestocked > 0) {
@@ -198,7 +229,18 @@ export const createWorkActions = (context) => {
     const distToWork = Math.hypot(position.x - workX, position.y - workY);
     const workRadius = mapData.meta.tileSize * WORK_RADIUS_TILES;
     if (distToWork >= workRadius || now <= actor.workCooldownUntil) return false;
-    if (!consumeSpotInventory(sourceSpot, 1)) {
+    const available = getSupplyAvailable
+      ? getSupplyAvailable(sourceSpot, null, "repair")
+      : 0;
+    if (Number.isFinite(available) && available <= 0) {
+      actor.workCooldownUntil = now + 1500 + Math.random() * 1500;
+      actor.task = null;
+      return false;
+    }
+    const consumed = consumeSupplyFromSource
+      ? consumeSupplyFromSource(sourceSpot, null, "repair", 1)
+      : consumeSpotInventory(sourceSpot, 1);
+    if (!consumed) {
       actor.workCooldownUntil = now + 1500 + Math.random() * 1500;
       actor.task = null;
       return false;

@@ -6,6 +6,7 @@ export const createRuntimeSaver = ({
   actors,
   houseStates,
   inventoryState,
+  ingredientState,
   intervalMs,
 }) => {
   const saveRuntimeState = async () => {
@@ -17,6 +18,7 @@ export const createRuntimeSaver = ({
       ponies: {},
       houses: {},
       inventory: {},
+      ingredients: {},
     };
     actors.forEach((actor) => {
       const slug = actor.sprite.pony.slug;
@@ -37,6 +39,16 @@ export const createRuntimeSaver = ({
     });
     inventoryState.forEach((entry, key) => {
       payload.inventory[key] = {
+        current: entry.current,
+        max: entry.max,
+      };
+    });
+    ingredientState.forEach((entry) => {
+      if (!entry || !entry.locationId || !entry.ingredient) return;
+      if (!payload.ingredients[entry.locationId]) {
+        payload.ingredients[entry.locationId] = {};
+      }
+      payload.ingredients[entry.locationId][entry.ingredient] = {
         current: entry.current,
         max: entry.max,
       };

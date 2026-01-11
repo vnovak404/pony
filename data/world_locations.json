@@ -74,11 +74,17 @@
     },
     {
       "id": "market-square",
-      "name": "Pony Pantry",
+      "name": "Market Square",
       "tags": ["supply", "storage", "town"],
       "inventory": {
         "max": 20,
         "start": 16
+      },
+      "ingredients": {
+        "produce": {
+          "max": 40,
+          "start": 24
+        }
       }
     },
     {
@@ -88,6 +94,28 @@
       "inventory": {
         "max": 18,
         "start": 12
+      },
+      "ingredients": {
+        "water": {
+          "max": 60,
+          "start": 60
+        },
+        "lemon": {
+          "max": 30,
+          "start": 12
+        },
+        "sugar": {
+          "max": 30,
+          "start": 10
+        },
+        "honey": {
+          "max": 30,
+          "start": 8
+        },
+        "milk": {
+          "max": 30,
+          "start": 8
+        }
       }
     },
     {
@@ -97,6 +125,12 @@
       "inventory": {
         "max": 16,
         "start": 10
+      },
+      "ingredients": {
+        "lumber": {
+          "max": 30,
+          "start": 12
+        }
       }
     },
     {

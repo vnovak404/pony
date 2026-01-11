@@ -27,6 +27,9 @@ export const createTaskHelpers = (context) => {
     createRepairTask,
     findSupplyNeed,
     pickSupplyProducer,
+    getSupplyAvailable,
+    getIngredientDestination,
+    getProducerIngredients,
     WORK_RESTOCK_THRESHOLD,
     BOREDOM_THRESHOLD_DEFAULT,
     EAT_THRESHOLD_DEFAULT,
@@ -144,13 +147,30 @@ export const createTaskHelpers = (context) => {
       if (!actor.task && now > actor.workCooldownUntil) {
         const supplyNeed = findSupplyNeed();
         if (supplyNeed) {
-          const producer = pickSupplyProducer(supplyNeed.type, actor, position);
+          const ingredient = supplyNeed.ingredient || null;
+          let supplyType = supplyNeed.type || null;
+          if (!supplyType && ingredient && getIngredientDestination) {
+            const destinationId = getIngredientDestination(ingredient);
+            const destinationSpot = destinationId
+              ? getSpotForLocationId(destinationId)
+              : null;
+            const types = destinationSpot ? getSupplyTypesForSpot(destinationSpot) : [];
+            supplyType = types[0] || null;
+          }
+          const producer = supplyType
+            ? pickSupplyProducer(supplyType, actor, position, ingredient)
+            : null;
           if (producer && producer.locationId) {
             const supplyTypes = getSupplyTypesForSpot(producer);
+            const ingredients = getProducerIngredients
+              ? getProducerIngredients(producer)
+              : null;
             actor.task = {
               type: "supply",
               locationId: producer.locationId,
               supplyTypes,
+              ingredients,
+              ingredient,
             };
           }
         }
@@ -204,7 +224,19 @@ export const createTaskHelpers = (context) => {
         ? getSpotForLocationId(actor.task.sourceLocationId)
         : null;
       const inventory = targetSpot ? getSpotInventory(targetSpot) : null;
-      if (!targetSpot || !sourceSpot || !inventory || inventory.current >= inventory.max) {
+      const available =
+        sourceSpot && getSupplyAvailable
+          ? getSupplyAvailable(sourceSpot, targetSpot, actor.task.supplyType)
+          : 0;
+      const hasSupply =
+        Number.isFinite(available) ? available > 0 : available === Infinity;
+      if (
+        !targetSpot ||
+        !sourceSpot ||
+        !inventory ||
+        inventory.current >= inventory.max ||
+        !hasSupply
+      ) {
         actor.task = null;
       }
     }
@@ -218,8 +250,13 @@ export const createTaskHelpers = (context) => {
       const sourceSpot = actor.task.sourceLocationId
         ? getSpotForLocationId(actor.task.sourceLocationId)
         : null;
-      const inventory = sourceSpot ? getSpotInventory(sourceSpot) : null;
-      if (!sourceSpot || !inventory || inventory.current <= 0) {
+      const available =
+        sourceSpot && getSupplyAvailable
+          ? getSupplyAvailable(sourceSpot, null, "repair")
+          : 0;
+      const hasSupply =
+        Number.isFinite(available) ? available > 0 : available === Infinity;
+      if (!sourceSpot || !hasSupply) {
         actor.task = null;
       }
     }

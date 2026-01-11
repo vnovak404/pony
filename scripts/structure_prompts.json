@@ -52,6 +52,10 @@
       "prompt": "Pony lumberyard supply depot, open timber shed with log stacks, sawhorse rack, bundled planks tied with twine, repair supplies crates, small handcart; 2D game asset, cute pony-friendly style.",
       "base": "building"
     },
+    "water_tower_01": {
+      "prompt": "Pony village water tower, round timber tank on sturdy stilts, curved ladder, small spout with bucket, safety railings, horseshoe trim; 2D game asset, cute pony-friendly style.",
+      "base": "building"
+    },
     "farm_01": {
       "prompt": "Windmill farm with pumpkin and carrot plots, small barn, wooden windmill with fabric blades, tidy crop rows, watering trough, friendly scarecrow with no text; 2D game asset, cute pony-friendly style.",
       "base": "building"
