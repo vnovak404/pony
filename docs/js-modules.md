@@ -89,7 +89,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `SUPPLY_TYPE_FOOD`, `SUPPLY_TYPE_DRINK`, `SUPPLY_TYPE_REPAIR` — supply identifiers.
 - `SUPPLY_SOURCE_BY_TYPE` — location id mapping for supply sources.
 - `SUPPLY_RECIPES_BY_TYPE`, `SUPPLY_RECIPES_BY_LOCATION` — ingredient recipes for restocking.
-- `PRODUCER_INGREDIENT_OUTPUTS`, `INGREDIENT_WORK_DURATION_MULTIPLIERS`, `INGREDIENT_RESTOCK_MULTIPLIERS`, `INGREDIENT_ICON_MAP`, `INGREDIENT_SUPPLY_TYPES`, `INGREDIENT_DESTINATIONS`, `UNLIMITED_INGREDIENTS` — ingredient flow config.
+- `PRODUCER_INGREDIENT_OUTPUTS`, `INGREDIENT_WORK_DURATION_MULTIPLIERS`, `INGREDIENT_RESTOCK_MULTIPLIERS`, `INGREDIENT_ICON_MAP`, `LOCATION_SERVICE_ICONS`, `LOCATION_UPKEEP_ICONS`, `INGREDIENT_SUPPLY_TYPES`, `INGREDIENT_DESTINATIONS`, `UNLIMITED_INGREDIENTS` — ingredient + tooltip icon config.
 
 ## `assets/js/map/decor.js`
 
@@ -104,6 +104,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - `createInventoryState({ locationIndex, runtimeState })` — inventory state factory.
   - returns `inventoryState`, `ingredientState`, `getSpotInventory`, `getIngredientEntry`, `getSpotIngredients`, `isSpotStocked`, `consumeSpotInventory`, `restockSpotInventory`, `restockIngredient`, `consumeIngredients`.
+  - Inventory entries are only created when a location defines an `inventory` block.
 
 ## `assets/js/map/spots.js`
 
@@ -148,6 +149,11 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `createCommandMenu({...})` — command menu state + quickbar wiring.
   - returns `commandMenu`, `getCommandTarget`, `setCommandTarget`, `lastCommandStatsUpdate`, `hideCommandMenu`, `showCommandMenu`, `resolveTaskLabel`, `updateCommandStats`, `renderPonyQuickbar`, `bindPonyQuickbar`.
 
+## `assets/js/map/magic-wand.js`
+
+- `createMagicWand({...})` — global reset helper for supplies/repairs/stats.
+  - returns `applyMagicWand`, `bindMagicWandButton`.
+
 ## `assets/js/map/vfx.js`
 
 - `createVfxState({...})` — VFX registry + lake state.
@@ -158,6 +164,16 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `createRuntimeSaver({...})` — persists runtime state.
   - returns `saveRuntimeState`, `start`.
   - saves both `inventory` and `ingredients` snapshots.
+
+## `assets/js/map/pony-loader.js`
+
+- `createPonyLoader({...})` — async pony sprite loading + actor seeding.
+  - returns `loadPonyActors`.
+
+## `assets/js/map/supply-metrics.js`
+
+- `createSupplyLogger({...})` — timed supply metrics logging.
+  - returns `logSupplyStatus`.
 
 ## `assets/js/map/helpers.js`
 
@@ -238,6 +254,11 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `createActorDrawer({...})` — sprite + label rendering.
   - returns `drawActor`.
   - respects `pony.sprite_flip` and optional `pony.sprite_flip_actions` for per-action mirroring.
+
+## `assets/js/map/actor-pipeline.js`
+
+- `createActorPipeline({...})` — builds the actor renderer context from map systems.
+  - returns `drawActors`.
 
 ## `assets/js/map/actors/renderer.js`
 

@@ -513,8 +513,8 @@
         "id": "restaurant",
         "kind": "food",
         "at": {
-          "x": 27.41,
-          "y": 16.06
+          "x": 29.26,
+          "y": 15.97
         },
         "sprite": "restaurant_01",
         "locationId": "pony-restaurant",
@@ -541,11 +541,15 @@
         "id": "library",
         "kind": "building",
         "at": {
-          "x": 23.38,
-          "y": 15.81
+          "x": 24.02,
+          "y": 15.87
         },
         "sprite": "library_01",
-        "locationId": "sparkle-library"
+        "locationId": "sparkle-library",
+        "drives": [
+          "fun"
+        ],
+        "funChance": 0.35
       },
       {
         "id": "market",
@@ -596,8 +600,8 @@
         "id": "clinic",
         "kind": "building",
         "at": {
-          "x": 24.28,
-          "y": 19.39
+          "x": 24.05,
+          "y": 19.68
         },
         "sprite": "clinic_01",
         "locationId": "pony-clinic",
@@ -641,18 +645,22 @@
         "id": "observatory",
         "kind": "building",
         "at": {
-          "x": 30.54,
-          "y": 7.7
+          "x": 35.59,
+          "y": 18.69
         },
         "sprite": "observatory_01",
-        "locationId": "starlight-observatory"
+        "locationId": "starlight-observatory",
+        "drives": [
+          "fun"
+        ],
+        "funChance": 0.25
       },
       {
         "id": "farm",
         "kind": "location",
         "at": {
-          "x": 13.61,
-          "y": 18.96
+          "x": 7.93,
+          "y": 18.87
         },
         "sprite": "farm_01",
         "locationId": "windmill-farm",
@@ -670,8 +678,8 @@
         "id": "honeybee-field",
         "kind": "location",
         "at": {
-          "x": 4.48,
-          "y": 21.52
+          "x": 4.36,
+          "y": 18.38
         },
         "sprite": "honeybee_field_01",
         "locationId": "honeybee-field",
@@ -690,8 +698,8 @@
         "id": "cow-pasture",
         "kind": "location",
         "at": {
-          "x": 8.05,
-          "y": 18.68
+          "x": 13.53,
+          "y": 18.65
         },
         "sprite": "cow_pasture_01",
         "locationId": "cow-pasture",
@@ -728,8 +736,8 @@
         "id": "sugar-cane-field",
         "kind": "location",
         "at": {
-          "x": 7.57,
-          "y": 21.07
+          "x": 4.63,
+          "y": 20.61
         },
         "sprite": "sugar_cane_field_01",
         "locationId": "sugar-cane-field",
@@ -765,8 +773,8 @@
         "id": "crystal-creek",
         "kind": "location",
         "at": {
-          "x": 7.6,
-          "y": 24.0
+          "x": 29.49,
+          "y": 8.11
         },
         "sprite": "crystal_creek_01",
         "locationId": "crystal-creek",
@@ -891,8 +899,8 @@
         "id": "racers-roost",
         "kind": "house",
         "at": {
-          "x": 36.4,
-          "y": 12.5
+          "x": 35.91,
+          "y": 11.29
         },
         "spritePath": "/assets/world/houses/racers-roost.webp",
         "label": "Racer's Roost",

@@ -42,6 +42,14 @@ export const createMovementHandler = (context) => {
         }
         const path = buildTilePath(startPoint, targetPoint);
         if (path && path.length) {
+          const lastPoint = path[path.length - 1];
+          if (
+            lastPoint &&
+            Math.hypot(lastPoint.x - targetPoint.x, lastPoint.y - targetPoint.y) >
+              0.1
+          ) {
+            path.push({ x: targetPoint.x, y: targetPoint.y });
+          }
           actor.path = path;
           actor.pathIndex = 0;
           actor.pathTargetKey = targetKey;

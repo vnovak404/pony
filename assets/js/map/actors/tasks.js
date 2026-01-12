@@ -113,69 +113,7 @@ export const createTaskHelpers = (context) => {
     }
     const hasActiveTask = Boolean(actor.task);
     if (!hasActiveTask && !preserveGatheringTask) {
-      const canEat = foodSpots.length > 0 && now > actor.eatCooldownUntil;
-      const canDrink = drinkSpots.length > 0 && now > actor.drinkCooldownUntil;
-      const canFun = funSpots.length > 0 && now > actor.funCooldownUntil;
-      const canHeal = healthSpots.length > 0 && now > actor.vetCooldownUntil;
-      const candidates = [];
-      const healthLevel = Number.isFinite(actor.stats.health)
-        ? actor.stats.health
-        : 100;
-      if (canHeal && healthLevel <= healthThreshold) {
-        const target = pickHealthSpot(actor, position);
-        if (target) {
-          const healthNeed = Math.max(0, 100 - healthLevel) + 20;
-          candidates.push({
-            need: "health",
-            level: healthNeed,
-            task: { type: "vet", clinicId: target.id },
-          });
-        }
-      }
-      if (canEat && actor.stats.hunger >= eatThreshold) {
-        const target = pickFoodSpot(actor, position);
-        if (target) {
-          candidates.push({
-            need: "hunger",
-            level: actor.stats.hunger,
-            task: { type: "eat", foodId: target.id },
-          });
-        }
-      }
-      if (canDrink && actor.stats.thirst >= drinkThreshold) {
-        const target = pickDrinkSpot(actor, position);
-        if (target) {
-          candidates.push({
-            need: "thirst",
-            level: actor.stats.thirst,
-            task: { type: "drink", drinkId: target.id },
-          });
-        }
-      }
-      if (actor.stats.tiredness > 60 && actor.homeId && housesById.has(actor.homeId)) {
-        candidates.push({
-          need: "tired",
-          level: actor.stats.tiredness,
-          task: { type: "rest", houseId: actor.homeId },
-        });
-      }
-      const boredomThreshold = Number.isFinite(actor.funThreshold)
-        ? actor.funThreshold
-        : BOREDOM_THRESHOLD_DEFAULT;
-      if (canFun && actor.stats.boredom >= boredomThreshold) {
-        const target = pickFunSpot(actor, position);
-        if (target) {
-          candidates.push({
-            need: "boredom",
-            level: actor.stats.boredom,
-            task: { type: "fun", funId: target.id },
-          });
-        }
-      }
-      const chosenNeed = pickNeedCandidate(candidates);
-      if (chosenNeed) {
-        actor.task = chosenNeed.task;
-      } else if (isBuilder) {
+      if (isBuilder) {
         const target = findRepairTarget();
         if (target) {
           const repairTask = createRepairTask(target.id);
@@ -188,7 +126,73 @@ export const createTaskHelpers = (context) => {
             actor.task = repairTask;
           }
         }
-      } else if (actor.jobLocationId) {
+      }
+      if (!actor.task) {
+        const canEat = foodSpots.length > 0 && now > actor.eatCooldownUntil;
+        const canDrink = drinkSpots.length > 0 && now > actor.drinkCooldownUntil;
+        const canFun = funSpots.length > 0 && now > actor.funCooldownUntil;
+        const canHeal = healthSpots.length > 0 && now > actor.vetCooldownUntil;
+        const candidates = [];
+        const healthLevel = Number.isFinite(actor.stats.health)
+          ? actor.stats.health
+          : 100;
+        if (canHeal && healthLevel <= healthThreshold) {
+          const target = pickHealthSpot(actor, position);
+          if (target) {
+            const healthNeed = Math.max(0, 100 - healthLevel) + 20;
+            candidates.push({
+              need: "health",
+              level: healthNeed,
+              task: { type: "vet", clinicId: target.id },
+            });
+          }
+        }
+        if (canEat && actor.stats.hunger >= eatThreshold) {
+          const target = pickFoodSpot(actor, position);
+          if (target) {
+            candidates.push({
+              need: "hunger",
+              level: actor.stats.hunger,
+              task: { type: "eat", foodId: target.id },
+            });
+          }
+        }
+        if (canDrink && actor.stats.thirst >= drinkThreshold) {
+          const target = pickDrinkSpot(actor, position);
+          if (target) {
+            candidates.push({
+              need: "thirst",
+              level: actor.stats.thirst,
+              task: { type: "drink", drinkId: target.id },
+            });
+          }
+        }
+        if (actor.stats.tiredness > 60 && actor.homeId && housesById.has(actor.homeId)) {
+          candidates.push({
+            need: "tired",
+            level: actor.stats.tiredness,
+            task: { type: "rest", houseId: actor.homeId },
+          });
+        }
+        const boredomThreshold = Number.isFinite(actor.funThreshold)
+          ? actor.funThreshold
+          : BOREDOM_THRESHOLD_DEFAULT;
+        if (canFun && actor.stats.boredom >= boredomThreshold) {
+          const target = pickFunSpot(actor, position);
+          if (target) {
+            candidates.push({
+              need: "boredom",
+              level: actor.stats.boredom,
+              task: { type: "fun", funId: target.id },
+            });
+          }
+        }
+        const chosenNeed = pickNeedCandidate(candidates);
+        if (chosenNeed) {
+          actor.task = chosenNeed.task;
+        }
+      }
+      if (!actor.task && actor.jobLocationId) {
         const jobSpot = getSpotForLocationId(actor.jobLocationId);
         const inventory = jobSpot ? getSpotInventory(jobSpot) : null;
         const ratio =

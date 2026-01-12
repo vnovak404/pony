@@ -60,8 +60,7 @@ export const createSpotHelpers = (locationIndex) => {
       item &&
         (isFoodSpot(item) ||
           isDrinkSpot(item) ||
-          isFunSpot(item) ||
-          isSupplySource(item))
+          isFunSpot(item))
     );
   const isHealthSpot = (item) => {
     if (!item) return false;

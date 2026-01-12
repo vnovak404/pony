@@ -110,6 +110,7 @@ export const createActors = ({
       direction: savedDirection !== null ? savedDirection : Math.random() > 0.5 ? 1 : -1,
       facing: savedDirection !== null ? savedDirection : 1,
       position: null,
+      lastMoveAt: 0,
       path: null,
       pathIndex: 0,
       pathTargetKey: null,

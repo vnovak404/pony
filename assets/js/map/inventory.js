@@ -14,9 +14,12 @@ export const createInventoryState = ({ locationIndex, runtimeState }) => {
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
   const getInventoryConfig = (location) => {
     if (!location || typeof location !== "object") {
-      return { max: DEFAULT_INVENTORY_MAX, start: DEFAULT_INVENTORY_START };
+      return null;
     }
-    const inventory = location.inventory || {};
+    const inventory = location.inventory;
+    if (!inventory || typeof inventory !== "object") {
+      return null;
+    }
     const max = Number.isFinite(inventory.max) ? inventory.max : DEFAULT_INVENTORY_MAX;
     const start = Number.isFinite(inventory.start)
       ? inventory.start
@@ -27,6 +30,7 @@ export const createInventoryState = ({ locationIndex, runtimeState }) => {
     if (!key) return null;
     if (inventoryState.has(key)) return inventoryState.get(key);
     const config = getInventoryConfig(location);
+    if (!config) return null;
     const max = Math.max(1, Math.floor(config.max));
     const start = clamp(Math.floor(config.start), 0, max);
     const saved = runtimeInventory[key];

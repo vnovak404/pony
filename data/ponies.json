@@ -398,18 +398,25 @@
         "meta": "assets/ponies/tiny-horn/sheets/spritesheet.json"
       },
       "job": {
-        "title": "play coach",
-        "service": "hosts toy socials and playful pony games",
+        "title": "storytime helper",
+        "service": "hosts cozy reading circles and keeps the Sparkle Library tidy",
         "paid_in": "pony coins",
         "wage_range": {
           "min": 10,
           "max": 13
-        }
+        },
+        "locationId": "sparkle-library"
       },
       "house": {
         "id": "tiny-horns-tree-house",
         "name": "Tiny Horn's Tree House",
-        "palette": ["sunny yellow", "coral pink", "sky blue", "mint", "lavender"],
+        "palette": [
+          "sunny yellow",
+          "coral pink",
+          "sky blue",
+          "mint",
+          "lavender"
+        ],
         "prompt": "Colorful tree house with toy motifs, playful shapes, bunting, rope ladder, and bright trim."
       },
       "drives": {
@@ -956,13 +963,14 @@
       "personality": "strong and stern",
       "accessories": "sturdy construction helmet",
       "job": {
-        "title": "helper",
-        "service": "helps with friendly pony tasks",
+        "title": "master builder",
+        "service": "repairs homes and keeps the lumberyard organized",
         "paid_in": "pony coins",
         "wage_range": {
           "min": 12,
           "max": 16
-        }
+        },
+        "locationId": "lumberyard"
       },
       "stats": {
         "health": 92,
@@ -975,7 +983,13 @@
         "id": "house-taticorn",
         "name": "Taticorn's House",
         "shared": false,
-        "palette": ["warm cedar", "honey oak", "pine green", "gold", "cream"],
+        "palette": [
+          "warm cedar",
+          "honey oak",
+          "pine green",
+          "gold",
+          "cream"
+        ],
         "prompt": "Master builder's wooden architectural tour-de-force with intricate beams, layered gables, crafted balconies, carved trim, and a bold timber silhouette. No text, no signage, no labels."
       },
       "drives": {
@@ -1056,9 +1070,14 @@
       "personality": "protective and thoughtful",
       "vibe": "gorgeous, very feminine, smiling and happy",
       "job": {
-        "title": "helper",
-        "service": "helps with friendly pony tasks",
-        "paid_in": "kindness tokens"
+        "title": "clinic caretaker",
+        "service": "keeps the clinic stocked and cozy",
+        "paid_in": "kindness tokens",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        },
+        "locationId": "pony-clinic"
       },
       "stats": {
         "health": 92,

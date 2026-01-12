@@ -129,7 +129,17 @@ export const createNeedHelpers = ({
     if (!funSpots.length) return null;
     const availableSpots = funSpots.filter((spot) => isSpotStocked(spot));
     if (!availableSpots.length) return null;
-    const scored = availableSpots
+    const applyFunChance = (spots) => {
+      const filtered = spots.filter((spot) => {
+        const chance = Number.isFinite(spot.funChance) ? spot.funChance : 1;
+        if (chance >= 1) return true;
+        if (chance <= 0) return false;
+        return Math.random() <= chance;
+      });
+      return filtered.length ? filtered : spots;
+    };
+    const eligibleSpots = applyFunChance(availableSpots);
+    const scored = eligibleSpots
       .map((spot) => {
         const accessPoint = getFunSpotAccessPoint(spot);
         const score = Math.hypot(

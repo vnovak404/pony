@@ -3,7 +3,11 @@
     {
       "id": "sunrise-bakery",
       "name": "Sunrise Bakery",
-      "tags": ["food", "town", "cozy"],
+      "tags": [
+        "food",
+        "town",
+        "cozy"
+      ],
       "inventory": {
         "max": 14,
         "start": 11
@@ -12,7 +16,11 @@
     {
       "id": "pony-restaurant",
       "name": "Golden Spoon Restaurant",
-      "tags": ["food", "town", "cozy"],
+      "tags": [
+        "food",
+        "town",
+        "cozy"
+      ],
       "inventory": {
         "max": 16,
         "start": 12
@@ -21,7 +29,11 @@
     {
       "id": "picnic-grove",
       "name": "Sunny Picnic Grove",
-      "tags": ["food", "outskirts", "picnic"],
+      "tags": [
+        "food",
+        "outskirts",
+        "picnic"
+      ],
       "inventory": {
         "max": 12,
         "start": 9
@@ -30,61 +42,114 @@
     {
       "id": "sparkle-library",
       "name": "Sparkle Library",
-      "tags": ["books", "quiet", "town"]
+      "tags": [
+        "books",
+        "quiet",
+        "town"
+      ],
+      "inventory": {
+        "max": 12,
+        "start": 9
+      }
     },
     {
       "id": "windmill-farm",
       "name": "Pumpkin & Carrot Farm",
-      "tags": ["farm", "harvest", "outskirts", "supply"]
+      "tags": [
+        "farm",
+        "harvest",
+        "outskirts",
+        "supply"
+      ]
     },
     {
       "id": "honeybee-field",
       "name": "Honeybee Field",
-      "tags": ["farm", "meadow", "outskirts", "supply"]
+      "tags": [
+        "farm",
+        "meadow",
+        "outskirts",
+        "supply"
+      ]
     },
     {
       "id": "cow-pasture",
       "name": "Cow Pasture",
-      "tags": ["farm", "pasture", "outskirts", "supply"]
+      "tags": [
+        "farm",
+        "pasture",
+        "outskirts",
+        "supply"
+      ]
     },
     {
       "id": "lemon-orchard",
       "name": "Lemon Orchard",
-      "tags": ["farm", "orchard", "outskirts", "supply"]
+      "tags": [
+        "farm",
+        "orchard",
+        "outskirts",
+        "supply"
+      ]
     },
     {
       "id": "sugar-cane-field",
       "name": "Sugar Cane Field",
-      "tags": ["farm", "outskirts", "supply"]
+      "tags": [
+        "farm",
+        "outskirts",
+        "supply"
+      ]
     },
     {
       "id": "rainbow-bridge",
       "name": "Rainbow Bridge",
-      "tags": ["landmark", "sky", "colorful"]
+      "tags": [
+        "landmark",
+        "sky",
+        "colorful"
+      ]
     },
     {
       "id": "firefly-meadow",
       "name": "Firefly Meadow",
-      "tags": ["nature", "night", "glow"]
+      "tags": [
+        "nature",
+        "night",
+        "glow"
+      ]
     },
     {
       "id": "crystal-creek",
       "name": "Crystal Creek",
-      "tags": ["water", "calm", "nature", "supply"]
+      "tags": [
+        "water",
+        "calm",
+        "nature",
+        "supply"
+      ]
     },
     {
       "id": "starlight-observatory",
       "name": "Starlight Observatory",
-      "tags": ["science", "sky", "night"]
+      "tags": [
+        "science",
+        "sky",
+        "night"
+      ],
+      "inventory": {
+        "max": 12,
+        "start": 9
+      }
     },
     {
       "id": "market-square",
       "name": "Market Square",
-      "tags": ["supply", "storage", "town"],
-      "inventory": {
-        "max": 20,
-        "start": 16
-      },
+      "tags": [
+        "supply",
+        "storage",
+        "town"
+      ],
       "ingredients": {
         "produce": {
           "max": 40,
@@ -115,11 +180,11 @@
     {
       "id": "lumberyard",
       "name": "Lumberyard",
-      "tags": ["supply", "repair", "outskirts"],
-      "inventory": {
-        "max": 16,
-        "start": 10
-      },
+      "tags": [
+        "supply",
+        "repair",
+        "outskirts"
+      ],
       "ingredients": {
         "lumber": {
           "max": 30,
@@ -130,12 +195,25 @@
     {
       "id": "pony-clinic",
       "name": "Pony Clinic",
-      "tags": ["care", "town", "helpful"]
+      "tags": [
+        "care",
+        "town",
+        "helpful"
+      ],
+      "inventory": {
+        "max": 12,
+        "start": 9
+      }
     },
     {
       "id": "lemonade-bar",
       "name": "Lemonade Bar",
-      "tags": ["snacks", "drink", "town", "cheerful"],
+      "tags": [
+        "snacks",
+        "drink",
+        "town",
+        "cheerful"
+      ],
       "inventory": {
         "max": 14,
         "start": 10
@@ -144,7 +222,11 @@
     {
       "id": "milk-honey-well",
       "name": "Milk & Honey Well",
-      "tags": ["drink", "town", "cozy"],
+      "tags": [
+        "drink",
+        "town",
+        "cozy"
+      ],
       "inventory": {
         "max": 14,
         "start": 10
@@ -153,12 +235,22 @@
     {
       "id": "moonlit-inn",
       "name": "Moonlit Inn",
-      "tags": ["rest", "town", "cozy"]
+      "tags": [
+        "rest",
+        "town",
+        "cozy"
+      ]
     },
     {
       "id": "whispering-forest",
       "name": "Whispering Forest",
-      "tags": ["nature", "shade", "outskirts", "recreation", "lumber"],
+      "tags": [
+        "nature",
+        "shade",
+        "outskirts",
+        "recreation",
+        "lumber"
+      ],
       "inventory": {
         "max": 10,
         "start": 8
@@ -167,7 +259,12 @@
     {
       "id": "silver-lake",
       "name": "Silver Lake",
-      "tags": ["water", "calm", "outskirts", "recreation"],
+      "tags": [
+        "water",
+        "calm",
+        "outskirts",
+        "recreation"
+      ],
       "inventory": {
         "max": 10,
         "start": 8
@@ -176,7 +273,11 @@
     {
       "id": "songbird-pavilion",
       "name": "Songbird Pavilion",
-      "tags": ["music", "park", "community"],
+      "tags": [
+        "music",
+        "park",
+        "community"
+      ],
       "inventory": {
         "max": 12,
         "start": 9
@@ -185,7 +286,11 @@
     {
       "id": "pony-race-track",
       "name": "Ponyville Race Track",
-      "tags": ["recreation", "sport", "outskirts"],
+      "tags": [
+        "recreation",
+        "sport",
+        "outskirts"
+      ],
       "inventory": {
         "max": 12,
         "start": 9

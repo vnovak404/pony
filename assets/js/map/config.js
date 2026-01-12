@@ -49,6 +49,7 @@ export const MAP_CONFIG = {
   REPAIR_DURATION_MIN: 10000,
   REPAIR_DURATION_MAX: 15000,
   MANUAL_SPEED_MULTIPLIER: 1.8,
+  ACTOR_STUCK_TIMEOUT: 8000,
   STATE_SAVE_INTERVAL: 60000,
 };
 
@@ -110,6 +111,60 @@ export const INGREDIENT_ICON_MAP = {
   honey: "assets/ui/icons/ingredient-honey.webp",
   milk: "assets/ui/icons/ingredient-milk.webp",
   lumber: "assets/ui/icons/ingredient-lumber.webp",
+};
+
+export const LOCATION_SERVICE_ICONS = {
+  "sunrise-bakery": {
+    label: "Bakery treats",
+    icon: "assets/ui/icons/venue-bakery.webp",
+  },
+  "pony-restaurant": {
+    label: "Pony dinner plate",
+    icon: "assets/ui/icons/venue-restaurant.webp",
+  },
+  "picnic-grove": {
+    label: "Picnic basket",
+    icon: "assets/ui/icons/venue-picnic.webp",
+  },
+  "lemonade-bar": {
+    label: "Lemonade",
+    icon: "assets/ui/icons/venue-lemonade.webp",
+  },
+  "milk-honey-well": {
+    label: "Milk & honey",
+    icon: "assets/ui/icons/venue-milk-honey.webp",
+  },
+};
+
+export const LOCATION_UPKEEP_ICONS = {
+  "pony-race-track": {
+    label: "Prizes",
+    icon: "assets/ui/icons/upkeep-prizes.webp",
+  },
+  "songbird-pavilion": {
+    label: "Song sheets",
+    icon: "assets/ui/icons/upkeep-song-sheets.webp",
+  },
+  "silver-lake": {
+    label: "Towels",
+    icon: "assets/ui/icons/upkeep-towels.webp",
+  },
+  "whispering-forest": {
+    label: "Flower crowns",
+    icon: "assets/ui/icons/upkeep-flower-crowns.webp",
+  },
+  "sparkle-library": {
+    label: "Story books",
+    icon: "assets/ui/icons/upkeep-story-books.webp",
+  },
+  "starlight-observatory": {
+    label: "Star charts",
+    icon: "assets/ui/icons/upkeep-star-charts.webp",
+  },
+  "pony-clinic": {
+    label: "Bandage kits",
+    icon: "assets/ui/icons/upkeep-bandage-kits.webp",
+  },
 };
 
 export const INGREDIENT_SUPPLY_TYPES = {

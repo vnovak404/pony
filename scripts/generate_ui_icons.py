@@ -32,6 +32,18 @@ ICON_PROMPTS = {
     "ingredient-milk": "A small milk bottle with a white splash.",
     "ingredient-lumber": "Two wooden planks tied with twine.",
     "magic-wand": "A sparkling magic wand with a golden star tip and pastel ribbon.",
+    "venue-bakery": "A warm basket of fresh bread and a cute cupcake.",
+    "venue-restaurant": "A pretty pony dinner plate with a fork and colorful food.",
+    "venue-picnic": "A picnic basket with a folded blanket and a few treats.",
+    "venue-lemonade": "A tall lemonade cup with straw, lemon slice, and ice.",
+    "venue-milk-honey": "A cozy cup of milk with a honey drizzle and tiny sparkles.",
+    "upkeep-towels": "A neatly folded stack of fluffy towels with a ribbon.",
+    "upkeep-song-sheets": "A stack of song sheets with a tiny musical note.",
+    "upkeep-prizes": "A small trophy with a colorful ribbon and confetti.",
+    "upkeep-flower-crowns": "A bundle of flower crowns with soft pastel flowers.",
+    "upkeep-story-books": "A stack of storybooks with a ribbon bookmark.",
+    "upkeep-star-charts": "A rolled star chart with a tiny constellation sparkle.",
+    "upkeep-bandage-kits": "A small first-aid kit with a heart patch and bandage roll.",
 }
 
 

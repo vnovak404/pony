@@ -31,6 +31,7 @@ export const createActorUpdater = (context) => {
     THIRST_RATE,
     BOREDOM_RATE,
     HEALTH_DECAY_RATE,
+    ACTOR_STUCK_TIMEOUT,
   } = context;
 
   const updateActor = (actor, delta, now) => {
@@ -46,6 +47,8 @@ export const createActorUpdater = (context) => {
     const healing = actor.vetUntil > now;
     const working = actor.workUntil > now;
     const repairing = actor.repairUntil > now;
+    const inAction =
+      sleeping || eating || drinking || playing || healing || working || repairing;
 
     if (!sleeping && actor.sleepSpotOwner) {
       if (actor.sleepSpotOwner.kind === "inn") {
@@ -225,6 +228,30 @@ export const createActorUpdater = (context) => {
       const dx = x - previousPosition.x;
       if (Math.abs(dx) > 0.5) {
         actor.facing = dx >= 0 ? 1 : -1;
+      }
+    }
+    const moved = previousPosition
+      ? Math.hypot(x - previousPosition.x, y - previousPosition.y) > 0.5
+      : true;
+    if (moved || !actor.lastMoveAt) {
+      actor.lastMoveAt = now;
+    }
+    const stuckTimeout = Number.isFinite(ACTOR_STUCK_TIMEOUT)
+      ? ACTOR_STUCK_TIMEOUT
+      : 8000;
+    if (!inAction && actor.task && actor.lastMoveAt) {
+      const stuckFor = now - actor.lastMoveAt;
+      if (stuckFor > stuckTimeout) {
+        const preserveTask = Boolean(actor.task.manual || actor.task.urgent);
+        actor.path = null;
+        actor.pathIndex = 0;
+        actor.pathTargetKey = null;
+        actor.pathBlockedUntil = 0;
+        snapActorToNearestSegment(actor, { x, y });
+        if (!preserveTask) {
+          actor.task = null;
+        }
+        actor.lastMoveAt = now;
       }
     }
 

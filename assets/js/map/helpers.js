@@ -90,6 +90,24 @@ const renderIngredientList = (ingredients, iconMap) => {
   return { html: htmlParts.join(""), text: textParts.join(", ") };
 };
 
+const renderServiceIcons = (services) => {
+  if (!services || !services.length) return null;
+  const htmlParts = [];
+  const textParts = [];
+  services.forEach((service) => {
+    if (!service || !service.icon || !service.label) return;
+    const label = String(service.label);
+    htmlParts.push(
+      `<span class="map-tooltip-icon-chip"><img class="map-tooltip-icon" src="${service.icon}" alt="${escapeHtml(
+        label
+      )}"></span>`
+    );
+    textParts.push(label);
+  });
+  if (!htmlParts.length) return null;
+  return { html: htmlParts.join(""), text: textParts.join(", ") };
+};
+
 const renderRecipe = (recipe, iconMap) => {
   if (!recipe) return null;
   const required = recipe.required || {};
@@ -124,7 +142,6 @@ export const createTooltipLabel = ({
   formatHouseStatus,
   getSpotInventory,
   getSpotIngredients,
-  getSupplyTypesForSpot,
   isFoodSpot,
   isDrinkSpot,
   isFunSpot,
@@ -134,10 +151,14 @@ export const createTooltipLabel = ({
   producerOutputs,
   recipesByLocation,
   recipesByType,
+  locationServiceIcons,
+  locationUpkeepIcons,
 }) => {
   const outputMap = producerOutputs || {};
   const recipeByLocation = recipesByLocation || {};
   const recipeByType = recipesByType || {};
+  const serviceIcons = locationServiceIcons || {};
+  const upkeepIcons = locationUpkeepIcons || {};
   return (hit) => {
     const baseLabel = hit.label || "";
     const lines = [];
@@ -177,13 +198,13 @@ export const createTooltipLabel = ({
       hit.item &&
       (isFoodSpot(hit.item) ||
         isDrinkSpot(hit.item) ||
-        isFunSpot(hit.item) ||
-        supplySource)
+        isFunSpot(hit.item))
     ) {
       const inventory = getSpotInventory(hit.item);
       if (inventory) {
+        const stockLabel = isFunSpot(hit.item) ? "Upkeep" : "Stock";
         addLine(
-          "Stock",
+          stockLabel,
           `${inventory.current}/${inventory.max}`,
           `${inventory.current}/${inventory.max}`
         );
@@ -207,6 +228,43 @@ export const createTooltipLabel = ({
       if (outputs.length) {
         const render = renderIngredientList(outputs, ingredientIconMap);
         addIconLine("Produces", render);
+      }
+    }
+
+    if (
+      hit.item &&
+      !supplySource &&
+      !supplyProducer &&
+      (isFoodSpot(hit.item) || isDrinkSpot(hit.item))
+    ) {
+      const serviceEntry =
+        hit.item.locationId && serviceIcons[hit.item.locationId]
+          ? serviceIcons[hit.item.locationId]
+          : null;
+      const services = Array.isArray(serviceEntry)
+        ? serviceEntry
+        : serviceEntry
+          ? [serviceEntry]
+          : [];
+      const render = renderServiceIcons(services);
+      if (render) {
+        addIconLine("Serves", render);
+      }
+    }
+
+    if (hit.item) {
+      const upkeepEntry =
+        hit.item.locationId && upkeepIcons[hit.item.locationId]
+          ? upkeepIcons[hit.item.locationId]
+          : null;
+      const items = Array.isArray(upkeepEntry)
+        ? upkeepEntry
+        : upkeepEntry
+          ? [upkeepEntry]
+          : [];
+      const render = renderServiceIcons(items);
+      if (render) {
+        addIconLine("Upkeep", render);
       }
     }
 

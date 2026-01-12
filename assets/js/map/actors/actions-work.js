@@ -58,7 +58,7 @@ export const createWorkActions = (context) => {
       : null;
     const targetInventory = targetSpot ? getSpotInventory(targetSpot) : null;
     const sourceInventory = sourceSpot ? getSpotInventory(sourceSpot) : null;
-    if (!targetSpot || !sourceSpot || !targetInventory || !sourceInventory) {
+    if (!targetSpot || !sourceSpot || !targetInventory) {
       actor.task = null;
       return false;
     }
@@ -80,14 +80,16 @@ export const createWorkActions = (context) => {
     if (distToWork >= workRadius || now <= actor.workCooldownUntil) return false;
     if (actor.task.phase === "pickup") {
       const restockNeed = Math.max(0, targetInventory.max - targetInventory.current);
-      const desiredAmount = Math.min(
-        restockNeed,
-        WORK_RESTOCK_MIN +
-          Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1))
-      );
+      if (restockNeed <= 0) {
+        actor.task = null;
+        return false;
+      }
+      const desiredAmount = restockNeed;
       const available = getSupplyAvailable
         ? getSupplyAvailable(sourceSpot, targetSpot, actor.task.supplyType)
-        : sourceInventory.current;
+        : sourceInventory
+          ? sourceInventory.current
+          : 0;
       const cappedAvailable = Number.isFinite(available)
         ? available
         : available === Infinity
@@ -313,11 +315,7 @@ export const createWorkActions = (context) => {
     const workRadius = mapData.meta.tileSize * WORK_RADIUS_TILES;
     if (distToWork >= workRadius || now <= actor.workCooldownUntil) return false;
     const restockNeed = Math.max(0, inventory.max - inventory.current);
-    const restockAmount = Math.min(
-      restockNeed,
-      WORK_RESTOCK_MIN +
-        Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1))
-    );
+    const restockAmount = restockNeed;
     const restocked = restockSpotInventory(spot, restockAmount);
     if (restocked) {
       const perItemDuration =
