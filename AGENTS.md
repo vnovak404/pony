@@ -62,4 +62,5 @@ Do not commit secrets. Store local configuration in `.env` files and add them to
 - Prefer small, single-purpose modules. Frontend logic is intentionally split across many files under `assets/js/`. Keep files under 500-600 lines and split them up if they get bigger than that.
 - Before editing frontend JavaScript, read `docs/js-modules.md` and keep it updated with module/function changes.
 - Before editing Python scripts, read `docs/python-scripts.md` and keep it updated with module/function changes.
+- When running Python scripts from the repo, use the local virtual environment interpreter (e.g. `.venv/bin/python`) to ensure required libraries are available.
 - When providing the after-action-report, first provide it normally, then on a new line preface with ">>> For a 7 year old >>>" and provide a concise version summarized for a girl with the intellectual level of a 9-10 year old.

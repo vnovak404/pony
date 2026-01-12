@@ -31,6 +31,7 @@ ICON_PROMPTS = {
     "ingredient-honey": "A honey jar with a golden drip.",
     "ingredient-milk": "A small milk bottle with a white splash.",
     "ingredient-lumber": "Two wooden planks tied with twine.",
+    "magic-wand": "A sparkling magic wand with a golden star tip and pastel ribbon.",
 }
 
 
