@@ -6,7 +6,8 @@ These diagrams describe how supplies move between the new production sites, stor
 
 ```mermaid
 graph TD
-  Farm[Pumpkin & Carrot Farm] --> Market[Market Square]
+  Farm[Pumpkin & Carrot Farm] --> Produce[Produce Stock (Market Square)]
+  Produce --> Market[Market Square]
   Market --> Bakery[Sunrise Bakery]
   Market --> Restaurant[Golden Spoon Restaurant]
   Market --> Picnic[Sunny Picnic Grove]
@@ -16,20 +17,26 @@ graph TD
 
 ```mermaid
 graph TD
-  Water[Water Tower] --> Lemonade[Lemonade Bar]
-  LemonOrchard[Lemon Orchard / Cow Pasture] --> Lemonade
-  Sugar[Sugar Cane Field] --> Lemonade
-  Honey[Honeybee Field] --> Lemonade
+  Creek[Crystal Creek] --> Market[Market Square Ingredients]
+  LemonOrchard[Lemon Orchard] --> Market
+  Sugar[Sugar Cane Field] --> Market
+  Honey[Honeybee Field] --> Market
+  Market --> Lemonade[Lemonade Bar]
+  Market --> MilkHoney[Milk & Honey Well]
 ```
 
-Note: Lemonade uses sugar or honey as the sweetener.
+Notes:
+- Lemonade uses sugar or honey as the sweetener.
+- Crystal Creek refills the water ingredient for the market.
+- Market Square is the drink ingredient hub and drink supply source (replacing the water tower).
 
 ## Milk & Honey Fountain Flow
 
 ```mermaid
 graph TD
-  Milk[Cow Pasture] --> MilkHoney[Milk & Honey Well]
-  Honey[Honeybee Field] --> MilkHoney
+  Milk[Cow Pasture] --> Market[Market Square Ingredients]
+  Honey[Honeybee Field] --> Market
+  Market --> MilkHoney[Milk & Honey Well]
 ```
 
 ## Repair Supply Flow

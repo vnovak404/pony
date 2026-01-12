@@ -45,7 +45,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": false
+      "label_always_on": false,
+      "knowledge": {
+        "home": {
+          "id": "starlight-manor",
+          "name": "Starlight Manor"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Sky Sprinter",
@@ -87,7 +139,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": false
+      "label_always_on": false,
+      "knowledge": {
+        "home": {
+          "id": "sunrise-loft",
+          "name": "Sunrise Loft"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Sunny Pippin",
@@ -103,8 +207,8 @@
         "meta": "assets/ponies/sunny-pippin/sheets/spritesheet.json"
       },
       "job": {
-        "title": "home builder",
-        "service": "builds and renovates pony houses, plus keeps the Golden Spoon market stocked",
+        "title": "treasure scout",
+        "service": "tracks shiny finds and keeps the Golden Spoon market stocked",
         "paid_in": "pony coins",
         "wage_range": {
           "min": 12,
@@ -129,7 +233,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": false
+      "label_always_on": false,
+      "knowledge": {
+        "home": {
+          "id": "sunrise-loft",
+          "name": "Sunrise Loft"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Moonbeam",
@@ -140,14 +296,14 @@
       "accent_color": "twilight purple",
       "talent": "star catching",
       "personality": "calm and dreamy",
-  "sprites": {
-    "sheet": "assets/ponies/moonbeam/sheets/spritesheet.webp",
-    "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
-  },
-  "sprite_flip_actions": [
-    "trot"
-  ],
-  "job": {
+      "sprites": {
+        "sheet": "assets/ponies/moonbeam/sheets/spritesheet.webp",
+        "meta": "assets/ponies/moonbeam/sheets/spritesheet.json"
+      },
+      "sprite_flip_actions": [
+        "trot"
+      ],
+      "job": {
         "title": "stargazer",
         "service": "tracks wishes and tends the Milk & Honey Well",
         "paid_in": "pony coins",
@@ -174,24 +330,76 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": false
+      "label_always_on": false,
+      "knowledge": {
+        "home": {
+          "id": "starlight-manor",
+          "name": "Starlight Manor"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Tiny Horn",
-      "slug": "raging-torrent",
+      "slug": "tiny-horn",
       "species": "unicorn",
       "body_color": "midnight green",
       "mane_color": "envy green",
       "accent_color": "emerald",
       "talent": "entertaining and clowning",
-      "personality": "stubborn and quarrelsome",
+      "personality": "playful, super-social, toy-loving, and happy",
       "sprites": {
-        "sheet": "assets/ponies/raging-torrent/sheets/spritesheet.webp",
-        "meta": "assets/ponies/raging-torrent/sheets/spritesheet.json"
+        "sheet": "assets/ponies/tiny-horn/sheets/spritesheet.webp",
+        "meta": "assets/ponies/tiny-horn/sheets/spritesheet.json"
       },
       "job": {
-        "title": "storm trainer",
-        "service": "teaches strong-water safety",
+        "title": "play coach",
+        "service": "hosts toy socials and playful pony games",
         "paid_in": "pony coins",
         "wage_range": {
           "min": 10,
@@ -199,8 +407,10 @@
         }
       },
       "house": {
-        "id": "torrent-lodge",
-        "name": "Torrent Lodge"
+        "id": "tiny-horns-tree-house",
+        "name": "Tiny Horn's Tree House",
+        "palette": ["sunny yellow", "coral pink", "sky blue", "mint", "lavender"],
+        "prompt": "Colorful tree house with toy motifs, playful shapes, bunting, rope ladder, and bright trim."
       },
       "drives": {
         "eat": {
@@ -214,11 +424,63 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": true
+      "label_always_on": true,
+      "knowledge": {
+        "home": {
+          "id": "tiny-horns-tree-house",
+          "name": "Tiny Horn's Tree House"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Catohorn",
-      "slug": "blue-wonder",
+      "slug": "catohorn",
       "species": "unicorn",
       "body_color": "ocean blue",
       "mane_color": "reddish blue",
@@ -226,8 +488,8 @@
       "talent": "casting magic",
       "personality": "mysterious",
       "sprites": {
-        "sheet": "assets/ponies/blue-wonder/sheets/spritesheet.webp",
-        "meta": "assets/ponies/blue-wonder/sheets/spritesheet.json"
+        "sheet": "assets/ponies/catohorn/sheets/spritesheet.webp",
+        "meta": "assets/ponies/catohorn/sheets/spritesheet.json"
       },
       "job": {
         "title": "arcane helper",
@@ -255,7 +517,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": true
+      "label_always_on": true,
+      "knowledge": {
+        "home": {
+          "id": "mystic-tower",
+          "name": "Mystic Tower"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Stellacorn",
@@ -296,7 +610,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": true
+      "label_always_on": true,
+      "knowledge": {
+        "home": {
+          "id": "rescue-cottage",
+          "name": "Rescue Cottage"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Gleam Treasure",
@@ -338,7 +704,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": false
+      "label_always_on": false,
+      "knowledge": {
+        "home": {
+          "id": "racers-roost",
+          "name": "Racer's Roost"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Pixie",
@@ -379,7 +797,59 @@
         "boredom": 24,
         "tiredness": 35
       },
-      "label_always_on": false
+      "label_always_on": false,
+      "knowledge": {
+        "home": {
+          "id": "acrobat-atelier",
+          "name": "Acrobat Atelier"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Maria",
@@ -421,7 +891,59 @@
         "tiredness": 35
       },
       "label_always_on": false,
-      "sprite_flip": false
+      "sprite_flip": false,
+      "knowledge": {
+        "home": {
+          "id": "kindness-cottage",
+          "name": "Kindness Cottage"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
     },
     {
       "name": "Taticorn",
@@ -452,7 +974,9 @@
       "house": {
         "id": "house-taticorn",
         "name": "Taticorn's House",
-        "shared": false
+        "shared": false,
+        "palette": ["warm cedar", "honey oak", "pine green", "gold", "cream"],
+        "prompt": "Master builder's wooden architectural tour-de-force with intricate beams, layered gables, crafted balconies, carved trim, and a bold timber silhouette. No text, no signage, no labels."
       },
       "drives": {
         "eat": {
@@ -467,6 +991,100 @@
       "sprites": {
         "sheet": "assets/ponies/taticorn/sheets/spritesheet.webp",
         "meta": "assets/ponies/taticorn/sheets/spritesheet.json"
+      },
+      "knowledge": {
+        "home": {
+          "id": "house-taticorn",
+          "name": "Taticorn's House"
+        },
+        "homesBySlug": {
+          "golden-violet": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "sky-sprinter": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "sunny-pippin": {
+            "id": "sunrise-loft",
+            "name": "Sunrise Loft"
+          },
+          "moonbeam": {
+            "id": "starlight-manor",
+            "name": "Starlight Manor"
+          },
+          "tiny-horn": {
+            "id": "tiny-horns-tree-house",
+            "name": "Tiny Horn's Tree House"
+          },
+          "catohorn": {
+            "id": "mystic-tower",
+            "name": "Mystic Tower"
+          },
+          "stellacorn": {
+            "id": "rescue-cottage",
+            "name": "Rescue Cottage"
+          },
+          "gleam-treasure": {
+            "id": "racers-roost",
+            "name": "Racer's Roost"
+          },
+          "pixie": {
+            "id": "acrobat-atelier",
+            "name": "Acrobat Atelier"
+          },
+          "maria": {
+            "id": "kindness-cottage",
+            "name": "Kindness Cottage"
+          },
+          "taticorn": {
+            "id": "house-taticorn",
+            "name": "Taticorn's House"
+          }
+        }
+      }
+    },
+    {
+      "name": "Nessie Star",
+      "slug": "nessie-star",
+      "species": "pony",
+      "body_color": "sunny yellow",
+      "mane_color": "sunshine yellow",
+      "accent_color": "gold",
+      "talent": "Star Gazing",
+      "personality": "protective and thoughtful",
+      "vibe": "gorgeous, very feminine, smiling and happy",
+      "job": {
+        "title": "helper",
+        "service": "helps with friendly pony tasks",
+        "paid_in": "kindness tokens"
+      },
+      "stats": {
+        "health": 92,
+        "hunger": 28,
+        "thirst": 20,
+        "boredom": 24,
+        "tiredness": 35
+      },
+      "house": {
+        "id": "house-nessie-star",
+        "name": "Nessie Star's House",
+        "shared": false
+      },
+      "drives": {
+        "eat": {
+          "threshold": 60,
+          "preference": "picnic"
+        },
+        "drink": {
+          "threshold": 55,
+          "preference": "lemonade"
+        }
+      },
+      "sprites": {
+        "sheet": "assets/ponies/nessie-star/sheets/spritesheet.webp",
+        "meta": "assets/ponies/nessie-star/sheets/spritesheet.json"
       }
     }
   ]

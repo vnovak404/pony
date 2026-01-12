@@ -21,6 +21,8 @@ export const createWorkActions = (context) => {
     getSupplyAvailable,
     consumeSupplyFromSource,
     getIngredientEntry,
+    INGREDIENT_WORK_DURATION_MULTIPLIERS,
+    INGREDIENT_RESTOCK_MULTIPLIERS,
     foodSpotById,
     drinkSpotById,
     funSpotById,
@@ -30,12 +32,21 @@ export const createWorkActions = (context) => {
     WORK_RADIUS_TILES,
     WORK_DURATION_PER_ITEM_MIN,
     WORK_DURATION_PER_ITEM_MAX,
+    WORK_ACTION_DURATION_MAX,
     WORK_COOLDOWN_MIN,
     WORK_COOLDOWN_MAX,
     WORK_RESTOCK_MIN,
     WORK_RESTOCK_MAX,
+    REPAIR_DURATION_MIN,
+    REPAIR_DURATION_MAX,
     restockIngredient,
   } = context;
+
+  const maxWorkDuration = Number.isFinite(WORK_ACTION_DURATION_MAX)
+    ? WORK_ACTION_DURATION_MAX
+    : null;
+  const clampWorkDuration = (value) =>
+    maxWorkDuration ? Math.min(maxWorkDuration, value) : value;
 
   const handleRestockTask = (actor, now, position) => {
     if (!actor.task || actor.task.type !== "restock") return false;
@@ -99,7 +110,7 @@ export const createWorkActions = (context) => {
       const perItemDuration =
         WORK_DURATION_PER_ITEM_MIN +
         Math.random() * (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
-      const workDuration = perItemDuration * carryAmount * 0.6;
+      const workDuration = clampWorkDuration(perItemDuration * carryAmount * 0.6);
       actor.workUntil = now + workDuration;
       actor.workCooldownUntil = actor.workUntil;
       actor.workTargetId = actor.task.sourceLocationId;
@@ -121,8 +132,9 @@ export const createWorkActions = (context) => {
       if (restocked) {
         const perItemDuration =
           WORK_DURATION_PER_ITEM_MIN +
-          Math.random() * (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
-        const workDuration = perItemDuration * restockAmount;
+          Math.random() *
+            (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
+        const workDuration = clampWorkDuration(perItemDuration * restockAmount);
         actor.workUntil = now + workDuration;
         actor.workCooldownUntil =
           actor.workUntil +
@@ -158,6 +170,9 @@ export const createWorkActions = (context) => {
     const workRadius = mapData.meta.tileSize * WORK_RADIUS_TILES;
     if (distToWork >= workRadius || now <= actor.workCooldownUntil) return false;
     let totalRestocked = 0;
+    let totalDurationWeight = 0;
+    const durationMultipliers = INGREDIENT_WORK_DURATION_MULTIPLIERS || {};
+    const restockMultipliers = INGREDIENT_RESTOCK_MULTIPLIERS || {};
     const ingredients = Array.isArray(actor.task.ingredients)
       ? actor.task.ingredients
       : getProducerIngredients
@@ -177,21 +192,32 @@ export const createWorkActions = (context) => {
       if (!destinationSpot || !entry || !restockIngredient) return;
       const restockNeed = Math.max(0, entry.max - entry.current);
       if (restockNeed <= 0) return;
-      const restockAmount = Math.min(
-        restockNeed,
+      const baseAmount =
         WORK_RESTOCK_MIN +
-          Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1))
+        Math.floor(Math.random() * (WORK_RESTOCK_MAX - WORK_RESTOCK_MIN + 1));
+      const amountMultiplier = Number.isFinite(restockMultipliers[ingredient])
+        ? restockMultipliers[ingredient]
+        : 1;
+      const restockAmount = Math.max(
+        1,
+        Math.min(restockNeed, Math.round(baseAmount * amountMultiplier))
       );
       const added = restockIngredient(destinationSpot, ingredient, restockAmount);
       if (added > 0) {
         totalRestocked += added;
+        const durationMultiplier = Number.isFinite(durationMultipliers[ingredient])
+          ? durationMultipliers[ingredient]
+          : 1;
+        totalDurationWeight += added * durationMultiplier;
       }
     });
     if (totalRestocked > 0) {
       const perItemDuration =
         WORK_DURATION_PER_ITEM_MIN +
         Math.random() * (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
-      const workDuration = perItemDuration * totalRestocked;
+      const workDuration = clampWorkDuration(
+        perItemDuration * Math.max(1, totalDurationWeight)
+      );
       actor.workUntil = now + workDuration;
       actor.workCooldownUntil =
         actor.workUntil +
@@ -248,7 +274,7 @@ export const createWorkActions = (context) => {
     const perItemDuration =
       WORK_DURATION_PER_ITEM_MIN +
       Math.random() * (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
-    const workDuration = perItemDuration * 0.6;
+    const workDuration = clampWorkDuration(perItemDuration * 0.6);
     actor.workUntil = now + workDuration;
     actor.workCooldownUntil = actor.workUntil;
     actor.workTargetId = actor.task.sourceLocationId;
@@ -297,7 +323,7 @@ export const createWorkActions = (context) => {
       const perItemDuration =
         WORK_DURATION_PER_ITEM_MIN +
         Math.random() * (WORK_DURATION_PER_ITEM_MAX - WORK_DURATION_PER_ITEM_MIN);
-      const workDuration = perItemDuration * restockAmount;
+      const workDuration = clampWorkDuration(perItemDuration * restockAmount);
       actor.workUntil = now + workDuration;
       actor.workCooldownUntil =
         actor.workUntil +
@@ -331,7 +357,9 @@ export const createWorkActions = (context) => {
     const distToHome = Math.hypot(position.x - homeX, position.y - homeY);
     const repairRadius = mapData.meta.tileSize * 0.6;
     if (distToHome >= repairRadius) return false;
-    const repairTime = 30000 + Math.random() * 20000;
+    const minRepair = Number.isFinite(REPAIR_DURATION_MIN) ? REPAIR_DURATION_MIN : 30000;
+    const maxRepair = Number.isFinite(REPAIR_DURATION_MAX) ? REPAIR_DURATION_MAX : 50000;
+    const repairTime = minRepair + Math.random() * Math.max(0, maxRepair - minRepair);
     state.status = "repairing";
     state.repairingUntil = now + repairTime;
     state.repairingBy = actor;

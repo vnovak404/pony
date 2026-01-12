@@ -24,6 +24,13 @@ ICON_PROMPTS = {
     "tired": "A sleepy crescent moon resting on a tiny pillow.",
     "boredom": "A colorful pinwheel toy with a short ribbon.",
     "repair": "A tiny pony-safe hammer with a friendly horseshoe detail.",
+    "ingredient-produce": "A small basket with a pumpkin, carrot, and apple.",
+    "ingredient-water": "A clear water droplet with a tiny sparkle.",
+    "ingredient-lemon": "A bright lemon slice with a leaf.",
+    "ingredient-sugar": "A sugar cube with a few sparkly crystals.",
+    "ingredient-honey": "A honey jar with a golden drip.",
+    "ingredient-milk": "A small milk bottle with a white splash.",
+    "ingredient-lumber": "Two wooden planks tied with twine.",
 }
 
 

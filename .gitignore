@@ -31,6 +31,10 @@ assets/ponies/*
 !assets/ponies/*.webp
 !assets/ponies/*/
 assets/ponies/*/*
+assets/ponies/**/frames/
+assets/ponies/**/frames/**
+assets/ponies/**/frames_dense/
+assets/ponies/**/frames_dense/**
 !assets/ponies/*/sheets/
 assets/ponies/*/sheets/*
 !assets/ponies/*/sheets/spritesheet.webp

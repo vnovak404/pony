@@ -21,6 +21,8 @@ export const createTaskHelpers = (context) => {
     healthSpots,
     spotByLocationId,
     getSupplyTypesForSpot,
+    getIngredientEntry,
+    pickSupplyProducer,
     getFoodTargetPoint,
     getDrinkTargetPoint,
     getFunTargetPoint,
@@ -36,7 +38,11 @@ export const createTaskHelpers = (context) => {
     WORK_RESTOCK_THRESHOLD,
     HOUSE_REPAIR_THRESHOLD,
     SUPPLY_SOURCE_BY_TYPE,
+    SUPPLY_TYPE_FOOD,
+    SUPPLY_TYPE_DRINK,
     SUPPLY_TYPE_REPAIR,
+    INGREDIENT_DESTINATIONS,
+    INGREDIENT_SUPPLY_TYPES,
   } = context;
 
   const getSpotForLocationId = (locationId) => {
@@ -162,6 +168,22 @@ export const createTaskHelpers = (context) => {
       return;
     }
     const position = getActorPosition(actor);
+    const createSupplyTaskForIngredient = (ingredient, options = {}) => {
+      if (!ingredient || !pickSupplyProducer) return null;
+      const supplyType =
+        (INGREDIENT_SUPPLY_TYPES && INGREDIENT_SUPPLY_TYPES[ingredient]) || null;
+      if (!supplyType) return null;
+      const producer = pickSupplyProducer(supplyType, actor, position, ingredient);
+      if (!producer || !producer.locationId) return null;
+      return {
+        type: "supply",
+        locationId: producer.locationId,
+        supplyTypes: getSupplyTypesForSpot(producer),
+        ingredients: [ingredient],
+        ingredient,
+        manual: Boolean(options.manual),
+      };
+    };
     if (command === "eat") {
       const target = pickFoodSpot(actor, position);
       if (target) {
@@ -236,6 +258,61 @@ export const createTaskHelpers = (context) => {
       } else if (mapStatus) {
         mapStatus.textContent = "No houses need repair.";
       }
+      return;
+    }
+    if (command === "market") {
+      const ponySlug = (actor.sprite?.pony?.slug || "").toLowerCase();
+      const isBuilder = ponySlug === "taticorn";
+      if (isBuilder) {
+        const task = createSupplyTaskForIngredient("lumber", { manual: true });
+        if (task) {
+          actor.task = task;
+          actor.workCooldownUntil = 0;
+        } else if (mapStatus) {
+          mapStatus.textContent = "No lumber supply route is available.";
+        }
+        return;
+      }
+      const marketLocationId =
+        SUPPLY_SOURCE_BY_TYPE[SUPPLY_TYPE_FOOD] ||
+        SUPPLY_SOURCE_BY_TYPE[SUPPLY_TYPE_DRINK];
+      const marketSpot = marketLocationId
+        ? getSpotForLocationId(marketLocationId)
+        : null;
+      if (!marketSpot) {
+        if (mapStatus) {
+          mapStatus.textContent = "Market supplies are not configured.";
+        }
+        return;
+      }
+      const marketNeeds = Object.entries(INGREDIENT_DESTINATIONS || {})
+        .filter(([, destinationId]) => destinationId === marketLocationId)
+        .map(([ingredient]) => {
+          const entry = getIngredientEntry
+            ? getIngredientEntry(marketSpot, ingredient)
+            : null;
+          if (!entry || entry.max <= 0) return null;
+          const ratio = entry.current / entry.max;
+          return { ingredient, ratio };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.ratio - b.ratio);
+      const nextNeed = marketNeeds[0] || null;
+      if (!nextNeed || nextNeed.ratio >= 1) {
+        if (mapStatus) {
+          mapStatus.textContent = "Market supplies are full.";
+        }
+        return;
+      }
+      const task = createSupplyTaskForIngredient(nextNeed.ingredient, { manual: true });
+      if (!task) {
+        if (mapStatus) {
+          mapStatus.textContent = "No producer can supply the market right now.";
+        }
+        return;
+      }
+      actor.task = task;
+      actor.workCooldownUntil = 0;
       return;
     }
     if (command === "fun") {

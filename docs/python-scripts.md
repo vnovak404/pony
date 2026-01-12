@@ -40,7 +40,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 
 ## `scripts/generate_pony_sprites.py`
 
-- Purpose: generate per-action sprite frames for each pony.
+- Purpose: generate per-action sprite frames for each pony (idle first when editing from a portrait).
 - Uses: `scripts/sprites/prompting.py`, `scripts/sprites/images_api.py`, `scripts/sprites/qc.py`.
 - Environment: `OPENAI_API_KEY` (via `images_api.ensure_api_key()`).
 - CLI:
@@ -52,7 +52,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--max-retries` per-frame retry cap (default 5).
   - `--size` frame size override (default from `data/pony_actions.json`).
   - `--source-image` edit from a source image (single pony only).
-  - `--use-portrait` use existing portrait as the source image.
+  - `--use-portrait` use existing portrait as the source image for idle, then edit other actions from idle.
   - `--data` pony JSON path.
   - `--actions-data` actions JSON path.
   - `--auto-flip` auto-flip frames to face right.
@@ -218,6 +218,9 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `build_house_prompt(house)` — crafts a prompt from residents, colors, jobs.
   - `collect_houses(ponies, only_houses, only_ponies)` — builds house data from ponies.
   - `parse_args()` / `main()` — CLI entrypoint.
+- Data notes:
+  - `house.palette` (optional) — override palette colors for the house prompt.
+  - `house.prompt` (optional) — extra prompt text appended to the house prompt.
 - Example usage:
   - `python3 scripts/generate_pony_houses.py`
   - `python3 scripts/generate_pony_houses.py --pony golden-violet`
@@ -291,6 +294,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `scripts/pony_server/io.py` — `load_data`, `save_data`, `load_json_body`.
   - `scripts/pony_server/pony.py` — `build_pony`, `assign_house`, `ensure_house_on_map`, `ensure_output_dir`, `ensure_pony_asset_dirs`.
   - `scripts/pony_server/generators.py` — `run_generator`, `run_sprite_generator`, `run_spritesheet_packer`, `run_interpolator`, `run_house_generator`, `run_house_state_generator`, `run_post_create_tasks`, `launch_async`.
+    - Auto sprite pipeline now skips interpolation and packs from `frames/` only.
   - `scripts/pony_server/handler.py` — `PonyHandler` endpoints.
   - `scripts/pony_server/app.py` — `parse_args()` / `main()`.
 - Example usage:

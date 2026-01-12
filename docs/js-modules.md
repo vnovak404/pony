@@ -81,6 +81,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/map/core.js`
 
 - `initMap(mapData, ponies, locations, runtimeState)` — orchestrates map bootstrap (scaling, indices, assets, actors, render loop, runtime saves).
+  - Defers pony spritesheet loading so the map renders before ponies stream in.
 
 ## `assets/js/map/config.js`
 
@@ -88,7 +89,11 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `SUPPLY_TYPE_FOOD`, `SUPPLY_TYPE_DRINK`, `SUPPLY_TYPE_REPAIR` — supply identifiers.
 - `SUPPLY_SOURCE_BY_TYPE` — location id mapping for supply sources.
 - `SUPPLY_RECIPES_BY_TYPE`, `SUPPLY_RECIPES_BY_LOCATION` — ingredient recipes for restocking.
-- `PRODUCER_INGREDIENT_OUTPUTS`, `INGREDIENT_DESTINATIONS`, `UNLIMITED_INGREDIENTS` — ingredient flow config.
+- `PRODUCER_INGREDIENT_OUTPUTS`, `INGREDIENT_WORK_DURATION_MULTIPLIERS`, `INGREDIENT_RESTOCK_MULTIPLIERS`, `INGREDIENT_ICON_MAP`, `INGREDIENT_SUPPLY_TYPES`, `INGREDIENT_DESTINATIONS`, `UNLIMITED_INGREDIENTS` — ingredient flow config.
+
+## `assets/js/map/decor.js`
+
+- `createDecorPlan({ mapData, objects, roadSegments, getStructureLabel })` — randomizes decor placement away from roads/structures and generates signpost objects near roads.
 
 ## `assets/js/map/locations.js`
 
@@ -129,6 +134,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - `createTaskHelpers({...})` — task selection utilities and manual commands.
   - returns `getSpotForLocationId`, `getSupplySourceForType`, `getRestockSupplyType`, `createRestockTask`, `createRepairTask`, `getTaskTargetPoint`, `getActorPosition`, `assignManualTask`.
+  - `assignManualTask` supports a `market` command to trigger a market supply run.
 
 ## `assets/js/map/assets.js`
 
@@ -151,13 +157,14 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - `createRuntimeSaver({...})` — persists runtime state.
   - returns `saveRuntimeState`, `start`.
+  - saves both `inventory` and `ingredients` snapshots.
 
 ## `assets/js/map/helpers.js`
 
 - `createSpotOffset(mapData)` — returns `getSpotOffset(spot, key)`.
 - `structureScale` — scale map for structure rendering.
 - `createDragState()` — initializes drag state.
-- `createTooltipLabel({...})` — builds tooltip label formatter.
+- `createTooltipLabel({...})` — builds tooltip label formatter with ingredient icons for markets, producers, and recipe inputs.
 - `createMapScale({...})` — manages canvas resize and returns `getScale()`.
 
 ## `assets/js/map/pathfinding.js`
@@ -251,6 +258,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - `bindMapUI({...})` — wires pointer events, tooltips, drag/drop saving, and command menu actions.
   - Map persistence posts are gated by `HAS_API` and use `apiUrl(...)`.
+  - Supports a `magic` command that applies the global reset helper when provided.
 - Internal helpers:
   - `hideTooltip()` — hides tooltip and resets its position.
   - `getCanvasPoint(event)` — maps pointer to canvas coordinates.

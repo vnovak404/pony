@@ -73,8 +73,12 @@ export const createCommandMenu = ({
     }
     if (task && task.type === "supply") {
       const spot = getSpotForLocationId(task.locationId);
+      const ingredient = task.ingredient
+        ? String(task.ingredient).replace(/[-_]+/g, " ")
+        : "";
+      const ingredientLabel = ingredient ? ` ${ingredient}` : "";
       return spot
-        ? `Heading: Harvesting at ${getStructureLabel(spot)}`
+        ? `Heading: Gathering${ingredientLabel} at ${getStructureLabel(spot)}`
         : "Heading: Gathering supplies";
     }
     if (task && task.type === "work") {

@@ -91,6 +91,10 @@
     "lake_01": {
       "prompt": "Calm pony lake, smooth water oval, lily pads, small stone bridge, reed clusters, subtle pony motif, no text.",
       "base": "scenery"
+    },
+    "crystal_creek_01": {
+      "prompt": "Crystal creek with a clear winding stream, sparkly stones, tiny wooden footbridge, reeds, gentle banks, pony-friendly style, no text.",
+      "base": "scenery"
     }
   },
   "decor": {

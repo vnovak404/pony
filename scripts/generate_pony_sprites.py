@@ -96,6 +96,22 @@ def build_frame_name(action_id, index, frame_count):
     return get_action_frame_name(action_id, index, frame_count)
 
 
+def resolve_portrait_path(pony_id):
+    base_path = ROOT / DEFAULT_OUTPUT_ROOT / pony_id
+    for ext in (".webp", ".png", ".jpg", ".jpeg"):
+        candidate = base_path.with_suffix(ext)
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def find_action(action_list, action_id):
+    for action in action_list:
+        if action.get("id") == action_id:
+            return action
+    return None
+
+
 def select_actions(action_list, selected):
     if not selected:
         return action_list
@@ -193,6 +209,7 @@ def main():
     pony_data = load_json(args.data)
     action_data = load_json(args.actions_data)
 
+    all_actions = action_data.get("actions", [])
     ponies = pony_data.get("ponies", [])
     if args.pony:
         ponies = [pony for pony in ponies if pony.get("slug") == args.pony]
@@ -205,11 +222,12 @@ def main():
         print("The --source-image option only supports a single pony.")
         return 1
 
-    actions = action_data.get("actions", [])
-    actions = select_actions(actions, args.actions)
+    actions = select_actions(all_actions, args.actions)
     if not actions:
         print("No matching actions found.")
         return 1
+
+    idle_action = find_action(all_actions, "idle")
 
     frame_size = args.size or action_data.get("sprite", {}).get("frame_size", 512)
 
@@ -217,6 +235,7 @@ def main():
         images_api.ensure_api_key()
         qc.ensure_pillow()
 
+    results = {"generated": 0, "skipped": 0, "failed": 0, "dry-run": 0}
     tasks = []
     for pony in ponies:
         pony_id = pony.get("slug")
@@ -226,13 +245,65 @@ def main():
         pony_payload["frame_size"] = frame_size
         source_image = None
         if args.source_image:
-            source_image = Path(args.source_image)
+            candidate = Path(args.source_image)
+            if candidate.exists():
+                source_image = candidate
+            else:
+                log(pony_id, f"Source image missing: {candidate}.")
         elif args.use_portrait:
-            source_image = ROOT / DEFAULT_OUTPUT_ROOT / f"{pony_id}.png"
+            candidate = resolve_portrait_path(pony_id)
+            if candidate:
+                source_image = candidate
+            else:
+                log(pony_id, "Portrait image missing; generating without edit source.")
 
         frame_dir = ROOT / DEFAULT_OUTPUT_ROOT / pony_id / "frames"
         frame_dir.mkdir(parents=True, exist_ok=True)
+        source_for_actions = source_image
+        handle_idle = bool(source_image and idle_action)
+        if handle_idle:
+            idle_frame_count = int(idle_action.get("frames", 1))
+            idle_frame_name = build_frame_name(
+                idle_action["id"], 0, idle_frame_count
+            )
+            idle_source = frame_dir / f"{idle_frame_name}.png"
+            needs_idle_source = any(
+                action.get("id") != "idle" for action in actions
+            )
+            includes_idle = any(action.get("id") == "idle" for action in actions)
+            if needs_idle_source or includes_idle:
+                for frame_index in range(idle_frame_count):
+                    frame_name = build_frame_name(
+                        idle_action["id"], frame_index, idle_frame_count
+                    )
+                    out_path = frame_dir / f"{frame_name}.png"
+                    outcome = generate_frame(
+                        {
+                            "pony": pony_payload,
+                            "action": idle_action,
+                            "frame_index": frame_index,
+                            "frame_count": idle_frame_count,
+                            "out_path": out_path,
+                            "size": frame_size,
+                            "dry_run": args.dry_run,
+                            "force": args.force,
+                            "max_retries": args.max_retries,
+                            "auto_flip": args.auto_flip,
+                            "prefix": f"{pony_id}/idle/{frame_index + 1}",
+                            "source_image": source_image,
+                        }
+                    )
+                    results[outcome] = results.get(outcome, 0) + 1
+            if idle_source.exists():
+                source_for_actions = idle_source
+            elif needs_idle_source:
+                log(
+                    pony_id,
+                    "Idle source missing; using base image for edit prompts.",
+                )
         for action in actions:
+            if handle_idle and action.get("id") == "idle":
+                continue
             frame_count = int(action.get("frames", 1))
             for frame_index in range(frame_count):
                 frame_name = build_frame_name(action["id"], frame_index, frame_count)
@@ -250,15 +321,16 @@ def main():
                         "max_retries": args.max_retries,
                         "auto_flip": args.auto_flip,
                         "prefix": f"{pony_id}/{action['id']}/{frame_index + 1}",
-                        "source_image": source_image,
+                        "source_image": source_for_actions,
                     }
                 )
 
     if not tasks:
-        print("No frames to generate.")
-        return 0
+        print("Sprite generation complete.")
+        for key, value in results.items():
+            print(f"{key}: {value}")
+        return 1 if results.get("failed") else 0
 
-    results = {"generated": 0, "skipped": 0, "failed": 0, "dry-run": 0}
     with ThreadPoolExecutor(max_workers=args.jobs) as executor:
         futures = [executor.submit(generate_frame, task) for task in tasks]
         for future in as_completed(futures):

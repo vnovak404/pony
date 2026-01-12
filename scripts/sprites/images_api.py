@@ -205,6 +205,17 @@ def _encode_multipart(fields, files):
     return boundary, bytes(body)
 
 
+def _guess_mime_type(path):
+    suffix = Path(path).suffix.lower()
+    if suffix == ".png":
+        return "image/png"
+    if suffix == ".webp":
+        return "image/webp"
+    if suffix in {".jpg", ".jpeg"}:
+        return "image/jpeg"
+    return "application/octet-stream"
+
+
 def _request_edit(fields, files, api_key):
     boundary, body = _encode_multipart(fields, files)
     request = urllib.request.Request(
@@ -286,6 +297,8 @@ def generate_png_from_image(prompt, size, out_path, image_path):
     image_path = Path(image_path)
     if not image_path.exists():
         raise RuntimeError(f"Source image not found: {image_path}")
+    if not is_gpt_image_model(model) and image_path.suffix.lower() != ".png":
+        raise RuntimeError("Non-GPT image models require PNG source images for edits.")
 
     fields = {"model": model, "prompt": prompt, "n": "1"}
     if size_value:
@@ -296,7 +309,8 @@ def generate_png_from_image(prompt, size, out_path, image_path):
     else:
         fields["response_format"] = "b64_json"
 
-    files = [("image", image_path.name, "image/png", image_path.read_bytes())]
+    mime_type = _guess_mime_type(image_path)
+    files = [("image", image_path.name, mime_type, image_path.read_bytes())]
 
     data, request_id = _request_edit(fields, files, api_key)
     response_id = data.get("id")

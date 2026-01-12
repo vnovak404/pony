@@ -20,6 +20,7 @@ export const bindMapUI = ({
   showCommandMenu,
   hideCommandMenu,
   assignManualTask,
+  applyMagicWand,
   setLastPointer,
   dragState,
 }) => {
@@ -32,6 +33,13 @@ export const bindMapUI = ({
       if (!button) return;
       event.preventDefault();
       const command = button.dataset.command;
+      if (command === "magic") {
+        if (applyMagicWand) {
+          applyMagicWand();
+        }
+        hideCommandMenu();
+        return;
+      }
       const commandTarget = getCommandTarget();
       if (commandTarget) {
         assignManualTask(commandTarget, command);
@@ -90,7 +98,13 @@ export const bindMapUI = ({
     if (!cardRect) return;
     const localX = clientX - cardRect.left;
     const localY = clientY - cardRect.top;
-    mapTooltip.textContent = label;
+    if (label && typeof label === "object") {
+      mapTooltip.innerHTML = label.html || "";
+      mapTooltip.setAttribute("aria-label", label.text || "");
+    } else {
+      mapTooltip.textContent = label || "";
+      mapTooltip.setAttribute("aria-label", label || "");
+    }
     mapTooltip.classList.add("is-visible");
     mapTooltip.setAttribute("aria-hidden", "false");
     const tooltipWidth = mapTooltip.offsetWidth;
@@ -124,7 +138,7 @@ export const bindMapUI = ({
   const handleDragStart = (event) => {
     const point = getCanvasPoint(event);
     const hit = getHit(point);
-    if (!hit || !hit.item) return;
+    if (!hit || !hit.item || hit.item.draggable === false) return;
     event.preventDefault();
     dragState.active = true;
     dragState.item = hit.item;

@@ -241,16 +241,10 @@ def launch_async(target, *args):
 def run_post_create_tasks(slug, generate_house_variants=False):
     try:
         run_sprite_generator(slug, {"use_portrait": True})
-        interpolation_ok = True
-        try:
-            run_interpolator(slug, {})
-        except Exception as exc:
-            interpolation_ok = False
-            print(f"Interpolation failed for {slug}: {exc}", file=sys.stderr)
-        if interpolation_ok:
-            run_spritesheet_packer(slug, {})
-        else:
-            run_spritesheet_packer(slug, {"frames_subdir": "frames", "prefer_dense": False})
+        run_spritesheet_packer(
+            slug,
+            {"frames_subdir": "frames", "fallback_subdir": "frames", "prefer_dense": False},
+        )
     except Exception as exc:
         print(f"Sprite pipeline failed for {slug}: {exc}", file=sys.stderr)
     try:

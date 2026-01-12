@@ -253,12 +253,12 @@ export const createActorDrawer = (context) => {
         textSecondary: "#fff2b8",
         box: "rgba(44, 32, 10, 0.75)",
       },
-      "blue-wonder": {
+      catohorn: {
         textPrimary: "#9fd6ff",
         textSecondary: "#cde9ff",
         box: "rgba(12, 24, 40, 0.75)",
       },
-      "raging-torrent": {
+      "tiny-horn": {
         textPrimary: "#b7f59a",
         textSecondary: "#dcffd1",
         box: "rgba(16, 36, 18, 0.75)",

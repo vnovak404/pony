@@ -179,6 +179,21 @@
                   <img src="assets/ui/icons/repair.webp" alt="" />
                 </picture>
               </button>
+              <button
+                class="btn ghost small pony-command-btn"
+                type="button"
+                data-command="market"
+                aria-label="Market supplies"
+                title="Market supplies"
+              >
+                <picture>
+                  <source
+                    srcset="assets/ui/icons/ingredient-produce.webp"
+                    type="image/webp"
+                  />
+                  <img src="assets/ui/icons/ingredient-produce.webp" alt="" />
+                </picture>
+              </button>
               <button class="btn ghost small" type="button" data-command="clear">Clear</button>
               <button class="btn ghost small" type="button" data-command="close">
                 Close
@@ -189,6 +204,17 @@
           <div id="map-tooltip" class="map-tooltip" aria-hidden="true"></div>
           <div id="pony-quickbar" class="pony-quickbar" aria-label="Pony shortcuts">
             <div class="pony-quickbar-list" data-pony-quickbar-list></div>
+            <div class="pony-quickbar-actions">
+              <button
+                class="pony-quickbar-action"
+                type="button"
+                data-quickbar-action="magic"
+                aria-label="Magic wand"
+                title="Magic wand"
+              >
+                <img src="assets/ui/icons/magic-wand.svg" alt="" />
+              </button>
+            </div>
           </div>
           <p id="map-status" class="map-status">Loading map...</p>
         </div>

@@ -9,10 +9,16 @@ import { bindMapUI } from "./ui.js";
 import {
   MAP_CONFIG,
   SUPPLY_SOURCE_BY_TYPE,
+  SUPPLY_TYPE_FOOD,
+  SUPPLY_TYPE_DRINK,
   SUPPLY_TYPE_REPAIR,
   SUPPLY_RECIPES_BY_LOCATION,
   SUPPLY_RECIPES_BY_TYPE,
   PRODUCER_INGREDIENT_OUTPUTS,
+  INGREDIENT_WORK_DURATION_MULTIPLIERS,
+  INGREDIENT_RESTOCK_MULTIPLIERS,
+  INGREDIENT_ICON_MAP,
+  INGREDIENT_SUPPLY_TYPES,
   INGREDIENT_DESTINATIONS,
   UNLIMITED_INGREDIENTS,
 } from "./config.js";
@@ -24,6 +30,8 @@ import { createHouseState } from "./houses.js";
 import { createAccessPoints } from "./access.js";
 import { createNeedHelpers } from "./needs.js";
 import { createTaskHelpers } from "./tasks.js";
+import { createDecorPlan } from "./decor.js";
+import { createSupplyHelpers } from "./actors/supply.js";
 import {
   loadDecorSprites,
   loadPonySprites,
@@ -85,12 +93,15 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     WORK_RADIUS_TILES,
     WORK_DURATION_PER_ITEM_MIN,
     WORK_DURATION_PER_ITEM_MAX,
+    WORK_ACTION_DURATION_MAX,
     WORK_COOLDOWN_MIN,
     WORK_COOLDOWN_MAX,
     WORK_RESTOCK_MIN,
     WORK_RESTOCK_MAX,
     CRITICAL_HEALTH_LEVEL,
     CRITICAL_NEED_LEVEL,
+    REPAIR_DURATION_MIN,
+    REPAIR_DURATION_MAX,
     MANUAL_SPEED_MULTIPLIER,
     STATE_SAVE_INTERVAL,
   } = MAP_CONFIG;
@@ -143,6 +154,16 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
 
   const roadNetwork = createRoadNetwork({ mapData, roads, mapWidth, mapHeight });
 
+  const { decorItems, signpostObjects } = createDecorPlan({
+    mapData,
+    objects,
+    roadSegments: roadNetwork.roadSegments,
+    getStructureLabel,
+  });
+  const renderObjects = signpostObjects.length
+    ? [...objects, ...signpostObjects]
+    : objects;
+
   const houseState = createHouseState({
     mapData,
     objects,
@@ -176,6 +197,34 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     isInnObject,
     computeAccessPoint: roadNetwork.computeAccessPoint,
     updateLakeState: vfxState.updateLakeState,
+  });
+
+  const getSpotForLocationId = (locationId) => {
+    if (!locationId) return null;
+    return spotByLocationId.get(locationId) || null;
+  };
+  const getSupplySourceForType = (type) => {
+    const locationId = SUPPLY_SOURCE_BY_TYPE[type];
+    return locationId ? getSpotForLocationId(locationId) : null;
+  };
+  const supplyHelpers = createSupplyHelpers({
+    supplyProducers,
+    getSupplyTypesForSpot: spotHelpers.getSupplyTypesForSpot,
+    getSupplySpotAccessPoint: accessPoints.getSupplySpotAccessPoint,
+    getSupplySourceForType,
+    getSpotForLocationId,
+    getSpotInventory,
+    getIngredientEntry,
+    consumeSpotInventory,
+    consumeIngredients,
+    WORK_RESTOCK_THRESHOLD,
+    isFoodSpot: spotHelpers.isFoodSpot,
+    isDrinkSpot: spotHelpers.isDrinkSpot,
+    SUPPLY_RECIPES_BY_LOCATION,
+    SUPPLY_RECIPES_BY_TYPE,
+    PRODUCER_INGREDIENT_OUTPUTS,
+    INGREDIENT_DESTINATIONS,
+    UNLIMITED_INGREDIENTS,
   });
 
   const needHelpers = createNeedHelpers({
@@ -214,6 +263,8 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     healthSpots,
     spotByLocationId,
     getSupplyTypesForSpot: spotHelpers.getSupplyTypesForSpot,
+    getIngredientEntry,
+    pickSupplyProducer: supplyHelpers.pickSupplyProducer,
     getFoodTargetPoint: accessPoints.getFoodTargetPoint,
     getDrinkTargetPoint: accessPoints.getDrinkTargetPoint,
     getFunTargetPoint: accessPoints.getFunTargetPoint,
@@ -229,7 +280,11 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     WORK_RESTOCK_THRESHOLD,
     HOUSE_REPAIR_THRESHOLD,
     SUPPLY_SOURCE_BY_TYPE,
+    SUPPLY_TYPE_FOOD,
+    SUPPLY_TYPE_DRINK,
     SUPPLY_TYPE_REPAIR,
+    INGREDIENT_DESTINATIONS,
+    INGREDIENT_SUPPLY_TYPES,
     pickFoodSpot: needHelpers.pickFoodSpot,
     pickDrinkSpot: needHelpers.pickDrinkSpot,
     pickFunSpot: needHelpers.pickFunSpot,
@@ -245,53 +300,14 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     });
   }
 
-  const structureSprites = await loadStructureSprites({
-    objects,
-    loadImageWithFallback,
-  });
+  const [structureSprites, decorSprites, statusIcons] = await Promise.all([
+    loadStructureSprites({ objects: renderObjects, loadImageWithFallback }),
+    loadDecorSprites({ decorItems, loadImageWithFallback }),
+    loadStatusIcons({ loadImageWithFallback }),
+  ]);
 
-  const decorItems = (mapData.layers.decor && mapData.layers.decor.items) || [];
-  const decorSprites = await loadDecorSprites({ decorItems, loadImageWithFallback });
-
-  const statusIcons = await loadStatusIcons({ loadImageWithFallback });
-  const sprites = await loadPonySprites({
-    ponies,
-    loadImageWithFallback,
-    loadJson,
-  });
-
-  const activeSprites = sprites.filter(Boolean);
-  if (!activeSprites.length) {
-    mapStatus.textContent = "No spritesheets found. Pack sprites to animate.";
-  } else {
-    const missingCount = ponies.length - activeSprites.length;
-    if (activeSprites.length > MAX_ACTORS) {
-      mapStatus.textContent = `Showing ${MAX_ACTORS} of ${activeSprites.length} ponies.`;
-    } else if (missingCount > 0) {
-      mapStatus.textContent = `${missingCount} ponies missing spritesheets.`;
-    } else {
-      mapStatus.textContent = "Ponyville is live.";
-    }
-  }
-
-  const { actors } = createActors({
-    sprites: activeSprites,
-    roadSegments: roadNetwork.roadSegments,
-    mapWidth,
-    runtimeState,
-    maxActors: MAX_ACTORS,
-    eatThresholdDefault: EAT_THRESHOLD_DEFAULT,
-    drinkThresholdDefault: DRINK_THRESHOLD_DEFAULT,
-    funThresholdDefault: BOREDOM_THRESHOLD_DEFAULT,
-    healthThresholdDefault: HEALTH_THRESHOLD_DEFAULT,
-  });
+  const actors = [];
   const actorBySlug = new Map();
-  actors.forEach((actor) => {
-    const slug = actor.sprite?.pony?.slug;
-    if (slug) {
-      actorBySlug.set(slug, actor);
-    }
-  });
   const commandMenu = createCommandMenu({
     ponyMap,
     actors,
@@ -310,6 +326,117 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
   commandMenu.bindPonyQuickbar();
 
   let lastPointer = null;
+  const applyMagicWand = () => {
+    inventoryState.forEach((entry) => {
+      if (!entry) return;
+      entry.current = entry.max;
+    });
+    ingredientState.forEach((entry) => {
+      if (!entry) return;
+      entry.current = entry.max;
+    });
+    houseState.houseStates.forEach((state) => {
+      if (!state) return;
+      state.condition = 1;
+      state.status = "ok";
+      state.repairingUntil = 0;
+      state.repairingBy = null;
+    });
+    actors.forEach((actor) => {
+      if (!actor || !actor.stats) return;
+      actor.stats.health = 100;
+      actor.stats.hunger = 0;
+      actor.stats.thirst = 0;
+      actor.stats.boredom = 0;
+      actor.stats.tiredness = 0;
+      actor.task = null;
+      actor.pendingRepairId = null;
+      actor.path = null;
+      actor.pathIndex = 0;
+      actor.pathTargetKey = null;
+      actor.pathBlockedUntil = 0;
+      actor.sleepUntil = 0;
+      actor.sleepSpotIndex = null;
+      actor.sleepSpotOwner = null;
+      actor.restTarget = null;
+      actor.workUntil = 0;
+      actor.workTargetId = null;
+      actor.repairUntil = 0;
+      actor.repairTargetId = null;
+      actor.eatUntil = 0;
+      actor.eatTargetId = null;
+      actor.drinkUntil = 0;
+      actor.drinkTargetId = null;
+      actor.funUntil = 0;
+      actor.funTargetId = null;
+      actor.vetUntil = 0;
+      actor.vetTargetId = null;
+      actor.workCooldownUntil = 0;
+      actor.eatCooldownUntil = 0;
+      actor.drinkCooldownUntil = 0;
+      actor.funCooldownUntil = 0;
+      actor.vetCooldownUntil = 0;
+      actor.homeCooldownUntil = 0;
+      actor.innCooldownUntil = 0;
+    });
+    if (mapStatus) {
+      mapStatus.textContent = "Magic wand: everything is restored.";
+    }
+  };
+  const quickbar = document.getElementById("pony-quickbar");
+  const magicButton = quickbar
+    ? quickbar.querySelector('[data-quickbar-action="magic"]')
+    : null;
+  if (magicButton) {
+    magicButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      applyMagicWand();
+    });
+  }
+
+  const loadPonyActors = async () => {
+    if (mapStatus) {
+      mapStatus.textContent = "Loading ponies...";
+    }
+    const sprites = await loadPonySprites({
+      ponies,
+      loadImageWithFallback,
+      loadJson,
+    });
+    const activeSprites = sprites.filter(Boolean);
+    if (!activeSprites.length) {
+      mapStatus.textContent = "No spritesheets found. Pack sprites to animate.";
+    } else {
+      const missingCount = ponies.length - activeSprites.length;
+      if (activeSprites.length > MAX_ACTORS) {
+        mapStatus.textContent = `Showing ${MAX_ACTORS} of ${activeSprites.length} ponies.`;
+      } else if (missingCount > 0) {
+        mapStatus.textContent = `${missingCount} ponies missing spritesheets.`;
+      } else {
+        mapStatus.textContent = "Ponyville is live.";
+      }
+    }
+    const { actors: newActors } = createActors({
+      sprites: activeSprites,
+      roadSegments: roadNetwork.roadSegments,
+      mapWidth,
+      runtimeState,
+      maxActors: MAX_ACTORS,
+      eatThresholdDefault: EAT_THRESHOLD_DEFAULT,
+      drinkThresholdDefault: DRINK_THRESHOLD_DEFAULT,
+      funThresholdDefault: BOREDOM_THRESHOLD_DEFAULT,
+      healthThresholdDefault: HEALTH_THRESHOLD_DEFAULT,
+    });
+    actors.splice(0, actors.length, ...newActors);
+    actorBySlug.clear();
+    actors.forEach((actor) => {
+      const slug = actor.sprite?.pony?.slug;
+      if (slug) {
+        actorBySlug.set(slug, actor);
+      }
+    });
+    commandMenu.renderPonyQuickbar();
+  };
 
   const { drawActors } = createActorRenderer({
     ctx,
@@ -385,6 +512,10 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     SUPPLY_RECIPES_BY_LOCATION,
     SUPPLY_RECIPES_BY_TYPE,
     PRODUCER_INGREDIENT_OUTPUTS,
+    INGREDIENT_WORK_DURATION_MULTIPLIERS,
+    INGREDIENT_RESTOCK_MULTIPLIERS,
+    INGREDIENT_ICON_MAP,
+    INGREDIENT_SUPPLY_TYPES,
     INGREDIENT_DESTINATIONS,
     UNLIMITED_INGREDIENTS,
     HUNGER_RATE,
@@ -408,6 +539,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     WORK_RADIUS_TILES,
     WORK_DURATION_PER_ITEM_MIN,
     WORK_DURATION_PER_ITEM_MAX,
+    WORK_ACTION_DURATION_MAX,
     WORK_COOLDOWN_MIN,
     WORK_COOLDOWN_MAX,
     WORK_RESTOCK_MIN,
@@ -423,6 +555,8 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     VET_DURATION_MAX,
     VET_COOLDOWN_MIN,
     VET_COOLDOWN_MAX,
+    REPAIR_DURATION_MIN,
+    REPAIR_DURATION_MAX,
     MANUAL_SPEED_MULTIPLIER,
   });
 
@@ -435,7 +569,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     roadSegments: roadNetwork.roadSegments,
     decorItems,
     decorSprites,
-    objects,
+    objects: renderObjects,
     structureSprites,
     structureScale,
     houseStates: houseState.houseStates,
@@ -450,15 +584,82 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     lastCommandStatsUpdateRef: commandMenu.lastCommandStatsUpdate,
   });
 
+  let lastSupplyLog = 0;
+  const SUPPLY_LOG_INTERVAL = 30000;
+  const logSupplyStatus = (now) => {
+    if (!HAS_API) return;
+    if (now - lastSupplyLog < SUPPLY_LOG_INTERVAL) return;
+    lastSupplyLog = now;
+    const timeLabel = new Date().toLocaleTimeString();
+    const taskCounts = {
+      supply: 0,
+      restock: 0,
+      repair: 0,
+      work: 0,
+    };
+    const supplyByIngredient = {};
+    const restockByType = {};
+    actors.forEach((actor) => {
+      const task = actor.task;
+      if (!task) return;
+      if (task.type === "supply") {
+        taskCounts.supply += 1;
+        const ingredient = task.ingredient || "mixed";
+        supplyByIngredient[ingredient] =
+          (supplyByIngredient[ingredient] || 0) + 1;
+      }
+      if (task.type === "restock") {
+        taskCounts.restock += 1;
+        const type = task.supplyType || "unknown";
+        restockByType[type] = (restockByType[type] || 0) + 1;
+      }
+      if (task.type === "repair") {
+        taskCounts.repair += 1;
+      }
+      if (task.type === "work") {
+        taskCounts.work += 1;
+      }
+    });
+    console.groupCollapsed(`[Supply Metrics ${timeLabel}]`);
+    console.log("Active tasks", {
+      ...taskCounts,
+      supplyByIngredient,
+      restockByType,
+    });
+    if (supplySources.length) {
+      console.log("Supply sources");
+      supplySources.forEach((spot) => {
+        const label = getStructureLabel(spot);
+        const inventory = getSpotInventory(spot);
+        const ingredients = getSpotIngredients(spot);
+        const ingredientSummary = ingredients.length
+          ? ingredients
+              .map(
+                (entry) => `${entry.ingredient}:${entry.current}/${entry.max}`
+              )
+              .join(", ")
+          : "none";
+        console.log(
+          `${label} (${spot.locationId || spot.id}) stock ${inventory?.current ?? 0}/${
+            inventory?.max ?? 0
+          } | ingredients ${ingredientSummary}`
+        );
+      });
+    }
+    console.groupEnd();
+  };
+
   let lastTime = performance.now();
   const draw = (now) => {
     const delta = now - lastTime;
     lastTime = now;
     renderer.drawFrame(delta, now);
+    logSupplyStatus(now);
     requestAnimationFrame(draw);
   };
 
   requestAnimationFrame(draw);
+  void loadPonyActors();
 
   const runtimeSaver = createRuntimeSaver({
     HAS_API,
@@ -475,10 +676,16 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     houseStates: houseState.houseStates,
     formatHouseStatus: houseState.formatHouseStatus,
     getSpotInventory,
+    getSpotIngredients,
     isFoodSpot: spotHelpers.isFoodSpot,
     isDrinkSpot: spotHelpers.isDrinkSpot,
     isFunSpot: spotHelpers.isFunSpot,
     isSupplySource: spotHelpers.isSupplySource,
+    isSupplyProducer: spotHelpers.isSupplyProducer,
+    ingredientIconMap: INGREDIENT_ICON_MAP,
+    producerOutputs: PRODUCER_INGREDIENT_OUTPUTS,
+    recipesByLocation: SUPPLY_RECIPES_BY_LOCATION,
+    recipesByType: SUPPLY_RECIPES_BY_TYPE,
   });
 
   const dragState = createDragState();
@@ -501,6 +708,7 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     showCommandMenu: commandMenu.showCommandMenu,
     hideCommandMenu: commandMenu.hideCommandMenu,
     assignManualTask: taskHelpers.assignManualTask,
+    applyMagicWand,
     setLastPointer: (point) => {
       lastPointer = point;
     },

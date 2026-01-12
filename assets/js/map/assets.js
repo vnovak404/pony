@@ -66,9 +66,7 @@ export const loadStatusIcons = async ({ loadImageWithFallback }) => {
   await Promise.all(
     Object.entries(statusIconPaths).map(async ([key, path]) => {
       try {
-        statusIcons[key] = await loadImageWithFallback(path, {
-          cacheBust: Date.now(),
-        });
+        statusIcons[key] = await loadImageWithFallback(path);
       } catch (error) {
         statusIcons[key] = null;
       }
@@ -84,9 +82,8 @@ export const loadPonySprites = async ({ ponies, loadImageWithFallback, loadJson 
         return null;
       }
       try {
-        const cacheBust = Date.now();
         const metaPath = pony.sprites.meta;
-        const meta = await loadJson(`${metaPath}?v=${cacheBust}`);
+        const meta = await loadJson(metaPath);
         const basePath = metaPath.slice(0, metaPath.lastIndexOf("/") + 1);
         const metaImage = meta.meta && meta.meta.image ? meta.meta.image : "";
         const sheetPath = pony.sprites.sheet
@@ -99,7 +96,7 @@ export const loadPonySprites = async ({ ponies, loadImageWithFallback, loadJson 
         if (!sheetPath) {
           return null;
         }
-        const sheet = await loadImageWithFallback(sheetPath, { cacheBust });
+        const sheet = await loadImageWithFallback(sheetPath);
         if (!sheet) {
           return null;
         }

@@ -32,8 +32,9 @@ export const MAP_CONFIG = {
   FUN_COOLDOWN_MIN: 7000,
   FUN_COOLDOWN_MAX: 10000,
   WORK_RADIUS_TILES: 0.6,
-  WORK_DURATION_PER_ITEM_MIN: 9000,
-  WORK_DURATION_PER_ITEM_MAX: 11000,
+  WORK_DURATION_PER_ITEM_MIN: 800,
+  WORK_DURATION_PER_ITEM_MAX: 1200,
+  WORK_ACTION_DURATION_MAX: 5000,
   WORK_COOLDOWN_MIN: 15000,
   WORK_COOLDOWN_MAX: 25000,
   WORK_RESTOCK_MIN: 2,
@@ -45,6 +46,8 @@ export const MAP_CONFIG = {
   HEALTH_THRESHOLD_DEFAULT: 78,
   CRITICAL_HEALTH_LEVEL: 40,
   CRITICAL_NEED_LEVEL: 100,
+  REPAIR_DURATION_MIN: 10000,
+  REPAIR_DURATION_MAX: 15000,
   MANUAL_SPEED_MULTIPLIER: 1.8,
   STATE_SAVE_INTERVAL: 60000,
 };
@@ -55,7 +58,7 @@ export const SUPPLY_TYPE_REPAIR = "repair";
 
 export const SUPPLY_SOURCE_BY_TYPE = {
   [SUPPLY_TYPE_FOOD]: "market-square",
-  [SUPPLY_TYPE_DRINK]: "water-tower",
+  [SUPPLY_TYPE_DRINK]: "market-square",
   [SUPPLY_TYPE_REPAIR]: "lumberyard",
 };
 
@@ -84,19 +87,49 @@ export const SUPPLY_RECIPES_BY_LOCATION = {
 export const PRODUCER_INGREDIENT_OUTPUTS = {
   "windmill-farm": ["produce"],
   "honeybee-field": ["honey"],
-  "cow-pasture": ["milk", "lemon"],
+  "cow-pasture": ["milk"],
+  "lemon-orchard": ["lemon"],
+  "crystal-creek": ["water"],
   "sugar-cane-field": ["sugar"],
   "whispering-forest": ["lumber"],
 };
 
+export const INGREDIENT_WORK_DURATION_MULTIPLIERS = {
+  water: 0.4,
+};
+
+export const INGREDIENT_RESTOCK_MULTIPLIERS = {
+  water: 2,
+};
+
+export const INGREDIENT_ICON_MAP = {
+  produce: "assets/ui/icons/ingredient-produce.webp",
+  water: "assets/ui/icons/ingredient-water.webp",
+  lemon: "assets/ui/icons/ingredient-lemon.webp",
+  sugar: "assets/ui/icons/ingredient-sugar.webp",
+  honey: "assets/ui/icons/ingredient-honey.webp",
+  milk: "assets/ui/icons/ingredient-milk.webp",
+  lumber: "assets/ui/icons/ingredient-lumber.webp",
+};
+
+export const INGREDIENT_SUPPLY_TYPES = {
+  produce: SUPPLY_TYPE_FOOD,
+  water: SUPPLY_TYPE_DRINK,
+  lemon: SUPPLY_TYPE_DRINK,
+  sugar: SUPPLY_TYPE_DRINK,
+  honey: SUPPLY_TYPE_DRINK,
+  milk: SUPPLY_TYPE_DRINK,
+  lumber: SUPPLY_TYPE_REPAIR,
+};
+
 export const INGREDIENT_DESTINATIONS = {
   produce: "market-square",
-  water: "water-tower",
-  lemon: "water-tower",
-  sugar: "water-tower",
-  honey: "water-tower",
-  milk: "water-tower",
+  water: "market-square",
+  lemon: "market-square",
+  sugar: "market-square",
+  honey: "market-square",
+  milk: "market-square",
   lumber: "lumberyard",
 };
 
-export const UNLIMITED_INGREDIENTS = ["water"];
+export const UNLIMITED_INGREDIENTS = [];

@@ -29,6 +29,7 @@ export const createTaskHelpers = (context) => {
     pickSupplyProducer,
     getSupplyAvailable,
     getIngredientDestination,
+    INGREDIENT_SUPPLY_TYPES,
     getProducerIngredients,
     WORK_RESTOCK_THRESHOLD,
     BOREDOM_THRESHOLD_DEFAULT,
@@ -39,6 +40,41 @@ export const createTaskHelpers = (context) => {
 
   const updateActorTask = (actor, position, now) => {
     if (!actor) return;
+    const startSupplyRun = (ingredient, pendingRepairId = null) => {
+      if (!ingredient || !pickSupplyProducer) return false;
+      const supplyType =
+        (INGREDIENT_SUPPLY_TYPES && INGREDIENT_SUPPLY_TYPES[ingredient]) || null;
+      if (!supplyType) return false;
+      const producer = pickSupplyProducer(supplyType, actor, position, ingredient);
+      if (!producer || !producer.locationId) return false;
+      actor.task = {
+        type: "supply",
+        locationId: producer.locationId,
+        supplyTypes: getSupplyTypesForSpot(producer),
+        ingredients: [ingredient],
+        ingredient,
+      };
+      actor.pendingRepairId = pendingRepairId || null;
+      return true;
+    };
+    const hasRepairSupplies = (task) => {
+      if (!task || task.type !== "repair" || !task.sourceLocationId) return true;
+      const sourceSpot = getSpotForLocationId(task.sourceLocationId);
+      const available =
+        sourceSpot && getSupplyAvailable
+          ? getSupplyAvailable(sourceSpot, null, "repair")
+          : 0;
+      if (available === Infinity) return true;
+      return Number.isFinite(available) ? available > 0 : false;
+    };
+    const isGatheringTask = (task) =>
+      Boolean(
+        task &&
+          (task.type === "supply" ||
+            (task.type === "restock" && task.phase === "pickup") ||
+            (task.type === "repair" && task.phase === "pickup"))
+      );
+    const preserveGatheringTask = isGatheringTask(actor.task);
     const ponySlug = (actor.sprite?.pony?.slug || "").toLowerCase();
     const isBuilder = ponySlug === "taticorn";
     const eatThreshold = Number.isFinite(actor.eatThreshold)
@@ -52,14 +88,31 @@ export const createTaskHelpers = (context) => {
       : HEALTH_THRESHOLD_DEFAULT;
     const hasManualTask = actor.task && actor.task.manual;
     const hasUrgentTask = actor.task && actor.task.urgent;
-    if (!hasManualTask && !hasUrgentTask) {
+    if (!preserveGatheringTask && !hasManualTask && !hasUrgentTask) {
       const urgentTask = getCriticalNeedTask(actor, position);
       if (urgentTask) {
         actor.task = urgentTask;
       }
     }
+    if (!actor.task && actor.pendingRepairId && !hasManualTask && !hasUrgentTask) {
+      const pendingHouse = housesById.get(actor.pendingRepairId);
+      if (!pendingHouse) {
+        actor.pendingRepairId = null;
+      } else {
+        const repairTask = createRepairTask(actor.pendingRepairId);
+        if (repairTask && !hasRepairSupplies(repairTask)) {
+          const startedSupply = startSupplyRun("lumber", actor.pendingRepairId);
+          if (!startedSupply) {
+            actor.pendingRepairId = null;
+          }
+        } else if (repairTask) {
+          actor.task = repairTask;
+          actor.pendingRepairId = null;
+        }
+      }
+    }
     const hasActiveTask = Boolean(actor.task);
-    if (!hasActiveTask) {
+    if (!hasActiveTask && !preserveGatheringTask) {
       const canEat = foodSpots.length > 0 && now > actor.eatCooldownUntil;
       const canDrink = drinkSpots.length > 0 && now > actor.drinkCooldownUntil;
       const canFun = funSpots.length > 0 && now > actor.funCooldownUntil;
@@ -125,7 +178,15 @@ export const createTaskHelpers = (context) => {
       } else if (isBuilder) {
         const target = findRepairTarget();
         if (target) {
-          actor.task = createRepairTask(target.id);
+          const repairTask = createRepairTask(target.id);
+          if (repairTask && !hasRepairSupplies(repairTask)) {
+            const startedSupply = startSupplyRun("lumber", target.id);
+            if (!startedSupply) {
+              actor.task = repairTask;
+            }
+          } else if (repairTask) {
+            actor.task = repairTask;
+          }
         }
       } else if (actor.jobLocationId) {
         const jobSpot = getSpotForLocationId(actor.jobLocationId);
@@ -155,7 +216,10 @@ export const createTaskHelpers = (context) => {
               ? getSpotForLocationId(destinationId)
               : null;
             const types = destinationSpot ? getSupplyTypesForSpot(destinationSpot) : [];
-            supplyType = types[0] || null;
+            supplyType =
+              (INGREDIENT_SUPPLY_TYPES && INGREDIENT_SUPPLY_TYPES[ingredient]) ||
+              types[0] ||
+              null;
           }
           const producer = supplyType
             ? pickSupplyProducer(supplyType, actor, position, ingredient)
@@ -257,7 +321,14 @@ export const createTaskHelpers = (context) => {
       const hasSupply =
         Number.isFinite(available) ? available > 0 : available === Infinity;
       if (!sourceSpot || !hasSupply) {
-        actor.task = null;
+        if (isBuilder && actor.task.houseId) {
+          const startedSupply = startSupplyRun("lumber", actor.task.houseId);
+          if (!startedSupply) {
+            actor.task = null;
+          }
+        } else {
+          actor.task = null;
+        }
       }
     }
     if (actor.task && actor.task.type === "work") {

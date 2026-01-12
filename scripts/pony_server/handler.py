@@ -326,7 +326,7 @@ class PonyHandler(SimpleHTTPRequestHandler):
             )
             return
 
-        generate_variants = bool(is_new_house) and pony.get("species") == "unicorn"
+        generate_variants = True
         launch_async(run_post_create_tasks, pony["slug"], generate_variants)
 
         image_path = f"{self.output_dir}/{pony['slug']}.webp"

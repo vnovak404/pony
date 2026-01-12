@@ -44,8 +44,13 @@
     },
     {
       "id": "cow-pasture",
-      "name": "Cow Pasture & Lemon Orchard",
+      "name": "Cow Pasture",
       "tags": ["farm", "pasture", "outskirts", "supply"]
+    },
+    {
+      "id": "lemon-orchard",
+      "name": "Lemon Orchard",
+      "tags": ["farm", "orchard", "outskirts", "supply"]
     },
     {
       "id": "sugar-cane-field",
@@ -65,7 +70,7 @@
     {
       "id": "crystal-creek",
       "name": "Crystal Creek",
-      "tags": ["water", "calm", "nature"]
+      "tags": ["water", "calm", "nature", "supply"]
     },
     {
       "id": "starlight-observatory",
@@ -84,21 +89,10 @@
         "produce": {
           "max": 40,
           "start": 24
-        }
-      }
-    },
-    {
-      "id": "water-tower",
-      "name": "Water Tower",
-      "tags": ["supply", "water", "town"],
-      "inventory": {
-        "max": 18,
-        "start": 12
-      },
-      "ingredients": {
+        },
         "water": {
           "max": 60,
-          "start": 60
+          "start": 24
         },
         "lemon": {
           "max": 30,

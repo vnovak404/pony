@@ -15,7 +15,8 @@ DEFAULT_OUTPUT_DIR = ROOT / "assets" / "world" / "houses"
 STYLE_BIBLE = (
     "Storybook pony village house sprite, front view, centered, clean silhouette. "
     "Pony-friendly scale with wide doors, rounded steps, and cozy windows. "
-    "Transparent background, no ground, no text, no border, no scenery."
+    "Transparent background, no ground, no text, no lettering, no signs, no labels, "
+    "no border, no scenery."
 )
 
 
@@ -30,12 +31,26 @@ def sanitize(value):
     return str(value).strip()
 
 
+def normalize_list(value):
+    if not value:
+        return []
+    if isinstance(value, list):
+        return [sanitize(item) for item in value if sanitize(item)]
+    return [sanitize(item) for item in str(value).split(",") if sanitize(item)]
+
+
+def unique_in_order(items):
+    return list(dict.fromkeys(item for item in items if item))
+
+
 def build_house_prompt(house):
     residents = ", ".join(house["residents"])
-    colors = ", ".join(sorted(set(house["colors"])))
+    palette = house.get("palette_overrides") or house["colors"]
+    colors = ", ".join(sorted(set(palette))) if palette else "soft pastels"
     vibes = ", ".join(sorted(set(house["vibes"])))
     talents = ", ".join(sorted(set(house["talents"])))
     jobs = ", ".join(sorted(set(house["jobs"])))
+    extra_prompts = " ".join(unique_in_order(house.get("prompt_overrides", [])))
 
     details = []
     if house.get("shared") or len(house["residents"]) > 1:
@@ -48,9 +63,11 @@ def build_house_prompt(house):
         details.append(f"Touches inspired by jobs like {jobs}.")
     if vibes:
         details.append(f"Vibe: {vibes}.")
+    if extra_prompts:
+        details.append(extra_prompts)
 
     return (
-        f"House name: {house['name']}. Residents: {residents}. "
+        f"Home for residents: {residents}. "
         f"Palette: {colors}. "
         + " ".join(details)
         + " "
@@ -81,13 +98,21 @@ def collect_houses(ponies, only_houses=None, only_ponies=None):
                 "name": house_name or house_id.replace("-", " ").title(),
                 "residents": [],
                 "colors": [],
+                "palette_overrides": [],
                 "vibes": [],
                 "talents": [],
                 "jobs": [],
+                "prompt_overrides": [],
                 "shared": bool(house.get("shared")),
             },
         )
         entry["residents"].append(pony.get("name", house_id))
+        palette_override = normalize_list(house.get("palette"))
+        if palette_override:
+            entry["palette_overrides"].extend(palette_override)
+        prompt_override = sanitize(house.get("prompt"))
+        if prompt_override:
+            entry["prompt_overrides"].append(prompt_override)
         for color_key in ("body_color", "mane_color", "accent_color"):
             color = sanitize(pony.get(color_key))
             if color:
