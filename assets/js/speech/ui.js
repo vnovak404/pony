@@ -54,6 +54,7 @@ export const initSpeechUI = () => {
   let awaitingUserFinal = false;
   let queuedPonyFinal = "";
   let queuedPonyTimer = null;
+  let spaceActive = false;
 
   const renderTranscript = () => {
     const lines = transcriptLog.slice();
@@ -204,6 +205,12 @@ export const initSpeechUI = () => {
     },
     onReply: (payload) => {
       if (!payload) return;
+      if (payload.reset) {
+        pendingPony = "";
+        clearQueuedPony();
+        renderTranscript();
+        return;
+      }
       const text = (payload.text || "").trim();
       const isFinal = Boolean(payload.final);
       if (isFinal) {
@@ -238,6 +245,39 @@ export const initSpeechUI = () => {
     toggleButton.textContent = isListening ? "Stop Listening" : "Start Listening";
   };
 
+  const isEditableTarget = (target) => {
+    if (!target) return false;
+    if (target.isContentEditable) return true;
+    const tag = target.tagName;
+    if (!tag) return false;
+    const upper = tag.toUpperCase();
+    return upper === "INPUT" || upper === "TEXTAREA" || upper === "SELECT";
+  };
+
+  const startListening = async () => {
+    if (isListening) return;
+    try {
+      const ponySlug = ponySelect?.value || activePonySlug || "";
+      await client.start({ ponySlug });
+      isListening = true;
+      pendingUser = "";
+      pendingPony = "";
+      awaitingUserFinal = false;
+      clearQueuedPony();
+      renderTranscript();
+    } catch (error) {
+      if (statusEl) statusEl.textContent = "Microphone denied or helper offline.";
+    }
+    updateToggleState();
+  };
+
+  const stopListening = async () => {
+    if (!isListening) return;
+    await client.stop({ close: false });
+    isListening = false;
+    updateToggleState();
+  };
+
   const checkHealth = async () => {
     try {
       const data = await requestJson(`${helperHttp}/health`);
@@ -253,23 +293,10 @@ export const initSpeechUI = () => {
 
   toggleButton.addEventListener("click", async () => {
     if (!isListening) {
-      try {
-        const ponySlug = ponySelect?.value || activePonySlug || "";
-        await client.start({ ponySlug });
-        isListening = true;
-        pendingUser = "";
-        pendingPony = "";
-        awaitingUserFinal = false;
-        clearQueuedPony();
-        renderTranscript();
-      } catch (error) {
-        if (statusEl) statusEl.textContent = "Microphone denied or helper offline.";
-      }
-    } else {
-      await client.stop({ close: true });
-      isListening = false;
+      await startListening();
+      return;
     }
-    updateToggleState();
+    await stopListening();
   });
 
   if (clearButton) {
@@ -346,8 +373,32 @@ export const initSpeechUI = () => {
     ponySelect.addEventListener("change", () => {
       activePonySlug = ponySelect.value;
       updateAvatar(activePonySlug);
+      if (isListening) {
+        client.start({ ponySlug: activePonySlug });
+      }
     });
   }
+
+  const isSpaceKey = (event) =>
+    event.code === "Space" || event.key === " " || event.key === "Spacebar";
+
+  document.addEventListener("keydown", (event) => {
+    if (event.repeat) return;
+    if (!isSpaceKey(event)) return;
+    if (isEditableTarget(event.target)) return;
+    event.preventDefault();
+    spaceActive = true;
+    startListening();
+  });
+
+  document.addEventListener("keyup", (event) => {
+    if (!spaceActive) return;
+    if (!isSpaceKey(event)) return;
+    if (isEditableTarget(event.target)) return;
+    event.preventDefault();
+    spaceActive = false;
+    stopListening();
+  });
 
   updateToggleState();
   checkHealth();

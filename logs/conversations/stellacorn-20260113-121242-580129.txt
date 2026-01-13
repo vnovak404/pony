@@ -1,0 +1,4 @@
+[2026-01-13 12:12:42] session_start mode=pipeline pony=Stellacorn slug=stellacorn stt=whisper-1 llm_fast=gpt-5-mini-2025-08-07 llm_smart=gpt-5-nano-2025-08-07 tts=tts-1 voice=alloy sample_rate=24000
+[2026-01-13 12:12:48] utterance_stop bytes=204800 chunks=50 capture_ms=4288
+[2026-01-13 12:12:49] stt_done ms=1138 chars=22
+Stella: Hey, what's your name?

@@ -28,6 +28,23 @@ export const floatTo16BitPCM = (buffer) => {
   return output;
 };
 
+export const resampleBuffer = (buffer, inputRate, outputRate) => {
+  if (!buffer || inputRate === outputRate) return buffer;
+  const ratio = inputRate / outputRate;
+  const newLength = Math.round(buffer.length / ratio);
+  const result = new Float32Array(newLength);
+  for (let i = 0; i < newLength; i += 1) {
+    const position = i * ratio;
+    const leftIndex = Math.floor(position);
+    const rightIndex = Math.min(leftIndex + 1, buffer.length - 1);
+    const frac = position - leftIndex;
+    const left = buffer[leftIndex] || 0;
+    const right = buffer[rightIndex] || 0;
+    result[i] = left + (right - left) * frac;
+  }
+  return result;
+};
+
 export const encodePCM16 = (pcm16) => {
   const bytes = new Uint8Array(pcm16.buffer);
   let binary = "";
@@ -90,20 +107,38 @@ export class PcmStreamPlayer {
   constructor(sampleRate = 24000) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.context = new AudioContext({ sampleRate });
-    this.sampleRate = this.context.sampleRate;
+    this.sampleRate = sampleRate;
+    this.outputSampleRate = this.context.sampleRate;
     this.nextTime = this.context.currentTime;
+    this.sources = new Set();
   }
 
   enqueue(pcm16) {
     if (!pcm16 || !pcm16.length) return;
-    const buffer = this.context.createBuffer(1, pcm16.length, this.sampleRate);
-    const channel = buffer.getChannelData(0);
+    let floats = new Float32Array(pcm16.length);
     for (let i = 0; i < pcm16.length; i += 1) {
-      channel[i] = pcm16[i] / 0x8000;
+      floats[i] = pcm16[i] / 0x8000;
     }
+    if (this.outputSampleRate !== this.sampleRate) {
+      floats = resampleBuffer(
+        floats,
+        this.sampleRate,
+        this.outputSampleRate
+      );
+    }
+    const buffer = this.context.createBuffer(
+      1,
+      floats.length,
+      this.outputSampleRate
+    );
+    buffer.getChannelData(0).set(floats);
     const source = this.context.createBufferSource();
     source.buffer = buffer;
     source.connect(this.context.destination);
+    this.sources.add(source);
+    source.onended = () => {
+      this.sources.delete(source);
+    };
     if (this.nextTime < this.context.currentTime) {
       this.nextTime = this.context.currentTime + 0.02;
     }
@@ -112,6 +147,19 @@ export class PcmStreamPlayer {
   }
 
   reset() {
+    this.sources.forEach((source) => {
+      try {
+        source.stop(0);
+      } catch (error) {
+        // ignore
+      }
+      try {
+        source.disconnect();
+      } catch (error) {
+        // ignore
+      }
+    });
+    this.sources.clear();
     this.nextTime = this.context.currentTime;
   }
 

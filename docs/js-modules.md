@@ -86,12 +86,12 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/speech/client.js`
 
 - `SpeechClient` — websocket bridge for realtime speech; handles mic capture, audio streaming, transcripts, and audio playback.
-  - Emits `onTranscript({ text, final })` and `onReply({ text, final })` for UI consumers.
+  - Emits `onTranscript({ text, final })` and `onReply({ text, final, reset })` for UI consumers.
   - Emits `onAudioActivity(active)` when audio response chunks start/end.
 
 ## `assets/js/speech/ui.js`
 
-- `initSpeechUI()` — wires the speech UI, loads pony selector, starts/stops listening, updates pronunciation/actions, maintains a combined transcript log, updates the active pony avatar, and toggles the pronunciation helper panel.
+- `initSpeechUI()` — wires the speech UI, loads pony selector, starts/stops listening (buttons + spacebar push-to-talk), updates pronunciation/actions, maintains a combined transcript log, updates the active pony avatar, and toggles the pronunciation helper panel.
 
 ## `assets/js/map.js`
 

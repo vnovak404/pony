@@ -20,7 +20,7 @@ DEFAULT_ALLOWED_ORIGINS = [
     "http://localhost:8000",
 ]
 
-DEFAULT_FAST_MODEL = os.getenv("OPENAI_FAST_MODEL", "gpt-5-mini-2025-08-07")
+DEFAULT_FAST_MODEL = os.getenv("OPENAI_FAST_MODEL", "gpt-5-nano-2025-08-07")
 DEFAULT_SMART_MODEL = os.getenv("OPENAI_SMART_MODEL", "gpt-5-nano-2025-08-07")
 DEFAULT_STT_MODEL = os.getenv("OPENAI_STT_MODEL", "whisper-1")
 DEFAULT_TTS_MODEL = os.getenv("OPENAI_TTS_MODEL", "tts-1")
@@ -42,6 +42,12 @@ DEFAULT_REALTIME_IDLE_TIMEOUT = int(os.getenv("OPENAI_REALTIME_IDLE_TIMEOUT", "1
 DEFAULT_REALTIME_MAX_SESSION = int(os.getenv("OPENAI_REALTIME_MAX_SESSION", "900"))
 DEFAULT_REALTIME_SILENCE_DURATION_MS = int(
     os.getenv("OPENAI_REALTIME_SILENCE_DURATION_MS", "2500")
+)
+DEFAULT_SPEECH_MODE = os.getenv("SPEECH_MODE", "pipeline")
+DEFAULT_SPEECH_FORCE_FALLBACK = os.getenv("SPEECH_FORCE_FALLBACK", "0")
+DEFAULT_SPEECH_HISTORY_TURNS = int(os.getenv("SPEECH_HISTORY_TURNS", "4"))
+DEFAULT_SPEECH_MAX_OUTPUT_TOKENS = int(
+    os.getenv("SPEECH_MAX_OUTPUT_TOKENS", "3000")
 )
 
 
@@ -74,3 +80,12 @@ class SpeechConfig:
     realtime_max_session: int = DEFAULT_REALTIME_MAX_SESSION
     realtime_silence_duration_ms: int = DEFAULT_REALTIME_SILENCE_DURATION_MS
     fallback_to_smart: bool = True
+    speech_mode: str = DEFAULT_SPEECH_MODE
+    force_fallback: bool = DEFAULT_SPEECH_FORCE_FALLBACK.strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    speech_history_turns: int = DEFAULT_SPEECH_HISTORY_TURNS
+    speech_max_output_tokens: int = DEFAULT_SPEECH_MAX_OUTPUT_TOKENS

@@ -534,6 +534,11 @@ def _backstory_max_tokens(word_target):
     return min(3000, target)
 
 
+def _summary_max_tokens(word_target):
+    target = max(200, word_target * 2)
+    return min(400, target)
+
+
 def _violates_family_rules(slug, text):
     if slug in FAMILY_CHILDREN or slug in {"taticorn", "nessie-star"}:
         return False
@@ -578,6 +583,71 @@ def generate_backstory(
             )
         return backstory
     return None
+
+
+def _build_summary_prompt(backstory):
+    return (
+        "Summarize the following Ponyville backstory in about 100 words "
+        "(90-110 words). Keep names and places. Warm, child-friendly tone. "
+        "End with a complete sentence. Return plain text only.\n\n"
+        f"Backstory:\n{backstory}"
+    )
+
+
+def generate_backstory_summary(backstory, api_key, model, word_target, dry_run):
+    if not backstory:
+        return ""
+    prompt = _build_summary_prompt(backstory)
+    if dry_run:
+        print(prompt)
+        return None
+    messages = [
+        {"role": "system", "content": "Return only plain text."},
+        {"role": "user", "content": prompt},
+    ]
+    response = chat_response(
+        messages,
+        model=model,
+        api_key=api_key,
+        max_tokens=_summary_max_tokens(word_target),
+        temperature=0.4,
+    )
+    content = _extract_chat_text(response)
+    summary = content.strip()
+    return summary
+
+
+def _summary_targets(selected, slugs, backstories):
+    available = set(backstories.get("backstories", {}).keys())
+    if selected:
+        return [slug for slug in selected if slug in available]
+    return [slug for slug in slugs if slug in available]
+
+
+def generate_summaries(
+    target_slugs, backstories, lore, api_key, model, dry_run, refresh=False
+):
+    total = len(target_slugs)
+    if total:
+        print(f"Generating summaries: {total}", flush=True)
+    for index, slug in enumerate(target_slugs, start=1):
+        backstory = backstories.get("backstories", {}).get(slug, "")
+        if not backstory:
+            continue
+        entry = lore["ponies"].setdefault(slug, {})
+        if entry.get("backstorySummary") and not refresh:
+            continue
+        _progress("Summary", index, total, slug)
+        summary = generate_backstory_summary(
+            backstory,
+            api_key=api_key,
+            model=model,
+            word_target=100,
+            dry_run=dry_run,
+        )
+        if summary:
+            entry["backstorySummary"] = summary
+            save_json(args.lore, lore)
 
 
 def _build_opinions_prompt(pony, others, family_notes):
@@ -671,6 +741,16 @@ def main():
     )
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--seed-only", action="store_true")
+    parser.add_argument(
+        "--refresh-summaries",
+        action="store_true",
+        help="Regenerate backstory summaries even if they already exist.",
+    )
+    parser.add_argument(
+        "--summaries-only",
+        action="store_true",
+        help="Only generate backstory summaries (no backstories/opinions).",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -713,6 +793,21 @@ def main():
         for slug in slugs
         if slug not in backstories.get("backstories", {})
     ]
+
+    if args.summaries_only:
+        api_key = ensure_api_key(args.env_file) if not args.dry_run else None
+        targets = _summary_targets(selected, slugs, backstories)
+        generate_summaries(
+            targets,
+            backstories,
+            lore,
+            api_key=api_key,
+            model=args.model,
+            dry_run=args.dry_run,
+            refresh=args.refresh_summaries,
+        )
+        save_json(args.lore, lore)
+        return 0
 
     if not args.skip_backstories:
         total = len(target_slugs)
@@ -774,8 +869,30 @@ def main():
             if backstory:
                 backstories.setdefault("backstories", {})[slug] = backstory
                 lore["ponies"].setdefault(slug, {})["backstoryRef"] = slug
+                summary = generate_backstory_summary(
+                    backstory,
+                    api_key=api_key,
+                    model=args.model,
+                    word_target=100,
+                    dry_run=args.dry_run,
+                )
+                if summary:
+                    lore["ponies"].setdefault(slug, {})["backstorySummary"] = summary
                 save_json(args.lore, lore)
                 save_json(args.backstories, backstories)
+
+    if args.refresh_summaries:
+        targets = _summary_targets(selected, slugs, backstories)
+        generate_summaries(
+            targets,
+            backstories,
+            lore,
+            api_key=api_key,
+            model=args.model,
+            dry_run=args.dry_run,
+            refresh=True,
+        )
+        save_json(args.lore, lore)
 
     if args.update_opinions:
         source_slugs = slugs if args.opinions_scope == "all" else selected

@@ -1,0 +1,22 @@
+[2026-01-13 13:23:45] session_start mode=pipeline pony=Stellacorn slug=stellacorn stt=whisper-1 llm_fast=gpt-5-nano-2025-08-07 llm_smart=gpt-5-nano-2025-08-07 tts=tts-1 voice=alloy sample_rate=24000 force_fallback=False history_turns=4
+[2026-01-13 13:23:51] utterance_stop bytes=217088 chunks=53 capture_ms=4576
+[2026-01-13 13:23:52] stt_done ms=1218 chars=22
+Stella: Hey, what's your name?
+[2026-01-13 13:23:54] llm_done ms=1197 attempts=1 chars=97
+[2026-01-13 13:23:54] llm_attempt model=gpt-5-nano-2025-08-07 violations=none error= text=Hi there! I’m Stellacorn. I live at Rescue Cottage and I rescue animals in the Whispering Forest.
+Stellacorn: Hi there! I’m Stellacorn. I live at Rescue Cottage and I rescue animals in the Whispering Forest.
+[2026-01-13 13:23:54] history_len messages=3
+[2026-01-13 13:23:55] tts_done ms=1624 bytes=280200 duration_ms=5837 rate=24000
+[2026-01-13 13:23:55] tts_stream chunks=18 chunk_bytes=16000
+[2026-01-13 13:23:55] utterance_done ms=4074
+[2026-01-13 13:24:02] session_resume pony=Stellacorn slug=stellacorn
+[2026-01-13 13:24:07] utterance_stop bytes=229376 chunks=56 capture_ms=4781
+[2026-01-13 13:24:08] stt_done ms=886 chars=58
+Stella: What's your favorite place to go for a drink in Ponyville?
+[2026-01-13 13:24:11] llm_done ms=3313 attempts=1 chars=126
+[2026-01-13 13:24:11] llm_attempt model=gpt-5-nano-2025-08-07 violations=none error= text=I like the Milk & Honey Well for a warm drink. It feels cozy there. If I’m with friends, the Lemonade Bar is fun and cheerful.
+Stellacorn: I like the Milk & Honey Well for a warm drink. It feels cozy there. If I’m with friends, the Lemonade Bar is fun and cheerful.
+[2026-01-13 13:24:11] history_len messages=5
+[2026-01-13 13:24:13] tts_done ms=1866 bytes=358800 duration_ms=7475 rate=24000
+[2026-01-13 13:24:13] tts_stream chunks=23 chunk_bytes=16000
+[2026-01-13 13:24:13] utterance_done ms=6102

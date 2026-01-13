@@ -1,0 +1,28 @@
+[2026-01-13 13:01:59] session_start mode=pipeline pony=Stellacorn slug=stellacorn stt=whisper-1 llm_fast=gpt-5-mini-2025-08-07 llm_smart=gpt-5-nano-2025-08-07 tts=tts-1 voice=alloy sample_rate=24000 force_fallback=False history_turns=4
+[2026-01-13 13:02:05] utterance_stop bytes=208896 chunks=51 capture_ms=4339
+[2026-01-13 13:02:07] stt_done ms=2173 chars=22
+Stella: Hey, what's your name?
+[2026-01-13 13:02:10] session_resume pony=Stellacorn slug=stellacorn
+[2026-01-13 13:02:10] cancel reason=barge-in
+[2026-01-13 13:02:18] utterance_stop bytes=389120 chunks=95 capture_ms=8137
+[2026-01-13 13:02:19] stt_done ms=964 chars=22
+Stella: Hey, what's your name?
+[2026-01-13 13:02:30] llm_fallback ms=11319 attempts=4
+[2026-01-13 13:02:30] llm_attempt model=gpt-5-mini-2025-08-07 violations=empty error=empty_response keys=background,billing,completed_at,created_at,error,frequency_penalty,id,incomplete_details,instruct... text=
+[2026-01-13 13:02:30] llm_attempt model= violations=empty error=fast model failed: OpenAI request failed: 400 Bad Request
+{
+  "error": {
+    "message": "Invalid value: 'input_text'.... text=
+[2026-01-13 13:02:30] llm_attempt model= violations=empty error=fast model failed: OpenAI request failed: 400 Bad Request
+{
+  "error": {
+    "message": "Invalid value: 'input_text'.... text=
+[2026-01-13 13:02:30] llm_attempt model= violations=empty error=fast model failed: OpenAI request failed: 400 Bad Request
+{
+  "error": {
+    "message": "Invalid value: 'input_text'.... text=
+Stellacorn: Hi! I'm Stellacorn from Ponyville. How are you today?
+[2026-01-13 13:02:30] history_len messages=4
+[2026-01-13 13:02:31] tts_done ms=954 bytes=144600 duration_ms=3012 rate=24000
+[2026-01-13 13:02:31] tts_stream chunks=10 chunk_bytes=16000
+[2026-01-13 13:02:31] utterance_done ms=13258

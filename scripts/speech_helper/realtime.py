@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import re
 import threading
 import time
@@ -15,8 +16,35 @@ from .pronunciation import load_pronunciation_guide
 
 ROOT = Path(__file__).resolve().parents[2]
 LOG_ROOT = ROOT / "logs" / "conversations"
-MALE_VOICES = ["ballad", "echo", "onyx", "ash"]
-FEMALE_VOICES = ["coral", "fable", "shimmer"]
+ALLOWED_VOICES = [
+    "alloy",
+    "ash",
+    "ballad",
+    "coral",
+    "echo",
+    "sage",
+    "shimmer",
+    "verse",
+    "marin",
+    "cedar",
+]
+MALE_VOICES = ["ash", "ballad", "echo", "cedar", "sage", "verse"]
+FEMALE_VOICES = ["coral", "shimmer", "marin", "alloy"]
+BANNED_REPLY_PHRASES = [
+    "virtual assistant",
+    "ai helper",
+    "ai assistant",
+    "i'm here to help",
+    "i am here to help",
+    "what can i do for you",
+    "how can i help",
+    "call me whatever",
+    "call me anything",
+    "don't have a personal name",
+    "do not have a personal name",
+    "don't have a name",
+    "do not have a name",
+]
 
 ACTION_TOOL = {
     "type": "function",
@@ -113,8 +141,14 @@ def start_realtime_server(config):
         reply_streamed = False
         reply_finalized = False
         response_in_flight = False
+        reply_source = None
         last_audio_at = None
         session_started_at = None
+        session_ready = False
+        buffered_audio = False
+        active_response_id = None
+        ready_timeout_task = None
+        pending_response_task = None
 
         async def send_status(status):
             try:
@@ -122,11 +156,41 @@ def start_realtime_server(config):
             except Exception:
                 return
 
+        async def schedule_ready_timeout():
+            nonlocal ready_timeout_task
+            if ready_timeout_task:
+                ready_timeout_task.cancel()
+            ready_timeout_task = asyncio.create_task(ready_timeout())
+
+        async def ready_timeout():
+            nonlocal session_ready, ready_timeout_task
+            await asyncio.sleep(1.0)
+            if session_ready:
+                return
+            session_ready = True
+            await send_status("ready")
+            await ws.send(json.dumps({"type": "ready"}))
+            ready_timeout_task = None
+
+        async def schedule_speech_fallback():
+            nonlocal pending_response_task
+            if pending_response_task:
+                pending_response_task.cancel()
+            pending_response_task = asyncio.create_task(speech_fallback())
+
+        async def speech_fallback():
+            nonlocal pending_response_task
+            await asyncio.sleep(0.35)
+            pending_response_task = None
+            if not buffered_audio:
+                return
+            await request_response()
+
         async def set_active_pony(slug, context=None):
-            nonlocal log_path, active_pony_slug, active_pony_name
+            nonlocal log_path, active_pony_slug, active_pony_name, session_ready
             safe_slug = _safe_slug(slug)
             if context is None:
-                context = build_session_context(config)
+                context = build_session_context(config, safe_slug)
             pony_entry = (
                 context.get("ponyLore", {}).get(safe_slug, {}) if safe_slug else {}
             )
@@ -134,23 +198,41 @@ def start_realtime_server(config):
             active_pony_name = pony_entry.get("name") or slug or "Pony"
             log_path = _init_log_path(active_pony_slug)
             if openai_ws:
-                await _send_session_update(
+                session_ready = False
+                backstory = _load_backstory(config, active_pony_slug)
+                summary = _ensure_summary(pony_entry, backstory)
+                payload = await _send_session_update(
                     openai_ws,
                     config,
                     context=context,
                     active_pony=pony_entry or {"name": active_pony_name},
+                    backstory_summary=summary,
                 )
+                _append_log_block(log_path, _format_session_log(payload))
+                await schedule_ready_timeout()
 
         async def close_openai():
             nonlocal openai_ws, openai_task, response_requested, close_after_response
             nonlocal last_audio_at, session_started_at, reply_finalized
-            nonlocal response_in_flight
+            nonlocal response_in_flight, reply_source, session_ready
+            nonlocal buffered_audio, active_response_id, ready_timeout_task
+            nonlocal pending_response_task
             response_requested = False
             close_after_response = False
             reply_finalized = False
             response_in_flight = False
+            reply_source = None
             last_audio_at = None
             session_started_at = None
+            session_ready = False
+            buffered_audio = False
+            active_response_id = None
+            if ready_timeout_task:
+                ready_timeout_task.cancel()
+                ready_timeout_task = None
+            if pending_response_task:
+                pending_response_task.cancel()
+                pending_response_task = None
             if openai_task and openai_task is not asyncio.current_task():
                 openai_task.cancel()
             if openai_ws:
@@ -161,38 +243,69 @@ def start_realtime_server(config):
             openai_ws = None
             openai_task = None
 
-        async def request_response():
+        async def request_response(commit=False):
             nonlocal response_requested, reply_buffer, reply_streamed, reply_finalized
-            nonlocal response_in_flight
-            if not openai_ws or response_requested or response_in_flight:
+            nonlocal response_in_flight, reply_source, buffered_audio
+            if (
+                not openai_ws
+                or not session_ready
+                or response_requested
+                or response_in_flight
+            ):
                 return
             response_requested = True
             response_in_flight = True
             reply_buffer = ""
             reply_streamed = False
             reply_finalized = False
-            await openai_ws.send(json.dumps({"type": "input_audio_buffer.commit"}))
+            reply_source = None
+            if commit and buffered_audio:
+                await openai_ws.send(json.dumps({"type": "input_audio_buffer.commit"}))
+                buffered_audio = False
             await openai_ws.send(json.dumps({"type": "response.create"}))
 
         async def start_openai(pony_slug):
             nonlocal openai_ws, openai_task, close_after_response, response_requested
             nonlocal last_audio_at, session_started_at, reply_finalized
+            nonlocal session_ready, buffered_audio, active_response_id
+            nonlocal ready_timeout_task, pending_response_task
             await close_openai()
-            openai_ws = await _openai_connect_once(websockets, url, headers)
+            try:
+                openai_ws = await _openai_connect_once(websockets, url, headers)
+            except Exception as exc:
+                await send_status("error")
+                await ws.send(json.dumps({"type": "error", "error": str(exc)}))
+                return
             close_after_response = False
             response_requested = False
             reply_finalized = False
             tool_calls.clear()
             session_started_at = time.monotonic()
             last_audio_at = session_started_at
-            await send_status("ready")
-            context = build_session_context(config)
+            session_ready = False
+            buffered_audio = False
+            active_response_id = None
+            if ready_timeout_task:
+                ready_timeout_task.cancel()
+                ready_timeout_task = None
+            if pending_response_task:
+                pending_response_task.cancel()
+                pending_response_task = None
+            await send_status("connecting")
+            context = build_session_context(config, pony_slug)
             await set_active_pony(pony_slug, context=context)
-            await openai_ws.send(json.dumps({"type": "input_audio_buffer.clear"}))
+            try:
+                await openai_ws.send(json.dumps({"type": "input_audio_buffer.clear"}))
+            except Exception as exc:
+                await ws.send(json.dumps({"type": "error", "error": str(exc)}))
+                await close_openai()
+                return
             openai_task = asyncio.create_task(forward_openai())
 
         async def forward_client():
-            nonlocal close_after_response, last_audio_at
+            nonlocal close_after_response, last_audio_at, reply_buffer
+            nonlocal reply_streamed, reply_finalized, response_in_flight, response_requested
+            nonlocal reply_source, buffered_audio
             async for message in ws:
                 try:
                     payload = json.loads(message)
@@ -202,12 +315,28 @@ def start_realtime_server(config):
                 if msg_type == "start":
                     pony_slug = payload.get("ponySlug") or ""
                     await start_openai(pony_slug)
+                elif msg_type == "switch":
+                    pony_slug = payload.get("ponySlug") or ""
+                    if openai_ws:
+                        await _cancel_response(openai_ws)
+                        await openai_ws.send(
+                            json.dumps({"type": "input_audio_buffer.clear"})
+                        )
+                        buffered_audio = False
+                    reply_buffer = ""
+                    reply_streamed = False
+                    reply_finalized = False
+                    response_in_flight = False
+                    response_requested = False
+                    reply_source = None
+                    await set_active_pony(pony_slug)
                 elif msg_type == "audio":
-                    if not openai_ws:
+                    if not openai_ws or not session_ready:
                         continue
                     audio = payload.get("audio")
                     if audio:
                         last_audio_at = time.monotonic()
+                        buffered_audio = True
                         await openai_ws.send(
                             json.dumps(
                                 {"type": "input_audio_buffer.append", "audio": audio}
@@ -215,24 +344,67 @@ def start_realtime_server(config):
                         )
                 elif msg_type == "stop":
                     close_after_response = True
-                    await request_response()
+                    await request_response(commit=True)
                 elif msg_type == "clear":
                     if openai_ws:
                         await openai_ws.send(
                             json.dumps({"type": "input_audio_buffer.clear"})
                         )
+                        buffered_audio = False
 
         async def forward_openai():
             nonlocal log_path, active_pony_slug, active_pony_name, close_after_response
             nonlocal reply_buffer, reply_streamed, reply_finalized
+            nonlocal response_in_flight, response_requested, reply_source
+            nonlocal session_ready, buffered_audio, active_response_id
+            nonlocal ready_timeout_task, pending_response_task
             async for message in openai_ws:
                 event = _safe_json(message)
                 if not event:
                     continue
                 event_type = event.get("type")
+                response_id = _extract_response_id(event)
+                if event_type == "session.updated":
+                    session_ready = True
+                    await send_status("ready")
+                    await ws.send(json.dumps({"type": "ready"}))
+                    if ready_timeout_task:
+                        ready_timeout_task.cancel()
+                        ready_timeout_task = None
+                    continue
+                if event_type == "session.created":
+                    session_ready = True
+                    await send_status("ready")
+                    await ws.send(json.dumps({"type": "ready"}))
+                    if ready_timeout_task:
+                        ready_timeout_task.cancel()
+                        ready_timeout_task = None
+                    continue
+                if event_type == "response.created":
+                    if response_id:
+                        active_response_id = response_id
+                    continue
                 if event_type == "input_audio_buffer.speech_stopped":
+                    await schedule_speech_fallback()
+                    continue
+                if event_type == "input_audio_buffer.committed":
+                    buffered_audio = False
+                    if pending_response_task:
+                        pending_response_task.cancel()
+                        pending_response_task = None
                     await request_response()
+                    continue
                 elif event_type and event_type.endswith("audio.delta"):
+                    if not _accept_response_id(response_id, active_response_id):
+                        if _debug_enabled():
+                            print(
+                                "Drop audio delta (response_id mismatch)",
+                                response_id,
+                                active_response_id,
+                            )
+                        continue
+                    if response_id and not active_response_id:
+                        active_response_id = response_id
                     await ws.send(
                         json.dumps({"type": "audio", "audio": event.get("delta", "")})
                     )
@@ -243,11 +415,52 @@ def start_realtime_server(config):
                         break
                 reply_payload = _extract_reply_payload(event)
                 if reply_payload:
+                    payload_response_id = reply_payload.get("response_id")
+                    if not _accept_response_id(payload_response_id, active_response_id):
+                        if _debug_enabled():
+                            print(
+                                "Drop reply payload (response_id mismatch)",
+                                payload_response_id,
+                                active_response_id,
+                            )
+                        continue
+                    if payload_response_id and not active_response_id:
+                        active_response_id = payload_response_id
+                    source = reply_payload.get("source")
+                    if reply_source and source and reply_source != source:
+                        continue
+                    if source and not reply_source:
+                        reply_source = source
                     delta = reply_payload.get("delta")
                     text = reply_payload.get("text")
                     is_final = reply_payload.get("final")
                     if delta:
                         reply_buffer += delta
+                        if _has_banned_phrase(reply_buffer):
+                            await _cancel_response(openai_ws)
+                            await ws.send(json.dumps({"type": "reply_reset"}))
+                            await ws.send(json.dumps({"type": "audio_reset"}))
+                            reply_buffer = ""
+                            reply_streamed = False
+                            reply_finalized = True
+                            response_in_flight = False
+                            response_requested = False
+                            reply_source = None
+                            active_response_id = None
+                            fallback = _fallback_reply(active_pony_name)
+                            if fallback:
+                                await ws.send(
+                                    json.dumps({"type": "reply", "text": fallback})
+                                )
+                                await ws.send(json.dumps({"type": "reply_done"}))
+                                append_action(
+                                    config.actions_path,
+                                    f"Pony replied: {fallback}",
+                                )
+                                if not log_path:
+                                    log_path = _init_log_path(active_pony_slug)
+                                _append_log(log_path, f"{active_pony_name}: {fallback}")
+                            continue
                         reply_streamed = True
                         await ws.send(json.dumps({"type": "reply", "delta": delta}))
                     if is_final:
@@ -257,6 +470,8 @@ def start_realtime_server(config):
                             continue
                         reply_finalized = True
                         response_in_flight = False
+                        response_requested = False
+                        reply_source = None
                         if text and not reply_buffer:
                             reply_buffer = text
                         final_text = (reply_buffer or text or "").strip()
@@ -264,6 +479,11 @@ def start_realtime_server(config):
                         streamed = reply_streamed
                         reply_streamed = False
                         if final_text and not _is_garbage_reply(final_text):
+                            if _has_banned_phrase(final_text):
+                                await _cancel_response(openai_ws)
+                                await ws.send(json.dumps({"type": "reply_reset"}))
+                                await ws.send(json.dumps({"type": "audio_reset"}))
+                                final_text = _fallback_reply(active_pony_name)
                             if not streamed:
                                 await ws.send(
                                     json.dumps({"type": "reply", "text": final_text})
@@ -334,11 +554,18 @@ def start_realtime_server(config):
                                 openai_ws, tool_call.get("call_id"), backstory
                             )
                 elif event_type == "error":
+                    error_detail = event.get("message")
+                    if not error_detail and isinstance(event.get("error"), dict):
+                        error_detail = event.get("error", {}).get("message")
                     await ws.send(
-                        json.dumps({"type": "error", "error": event.get("message")})
+                        json.dumps({"type": "error", "error": error_detail})
                     )
                 elif event_type and event_type.endswith("response.done"):
-                    response_in_flight = False
+                    if not response_id or response_id == active_response_id:
+                        active_response_id = None
+                        response_in_flight = False
+                        response_requested = False
+                        reply_source = None
 
         async def watchdog():
             nonlocal last_audio_at, session_started_at
@@ -403,12 +630,17 @@ async def _openai_connect_once(websockets, url, headers):
         return await websockets.connect(url, additional_headers=headers)
 
 
-async def _send_session_update(ws, config, context=None, active_pony=None):
+async def _send_session_update(
+    ws, config, context=None, active_pony=None, backstory_summary=None
+):
     if context is None:
         context = build_session_context(config)
     guide = load_pronunciation_guide(config.pronunciation_guide_path)
     instructions = build_system_prompt(
-        context, guide.get("entries", {}), active_pony=active_pony
+        context,
+        guide.get("entries", {}),
+        active_pony=active_pony,
+        backstory_summary=backstory_summary,
     )
     voice = _resolve_voice(active_pony, config)
     instructions += (
@@ -435,6 +667,7 @@ async def _send_session_update(ws, config, context=None, active_pony=None):
         },
     }
     await ws.send(json.dumps(payload))
+    return payload
 
 
 def _safe_slug(value):
@@ -459,6 +692,16 @@ def _append_log(path, line):
     try:
         with open(path, "a", encoding="utf-8") as handle:
             handle.write(line.strip() + "\n")
+    except OSError:
+        return
+
+
+def _append_log_block(path, block):
+    if not path or not block:
+        return
+    try:
+        with open(path, "a", encoding="utf-8") as handle:
+            handle.write(block.rstrip() + "\n")
     except OSError:
         return
 
@@ -529,10 +772,18 @@ def _resolve_voice(active_pony, config):
             "stellacorn": "female",
         }.get(slug)
     if gender == "male":
-        return _pick_voice(MALE_VOICES, slug) or config.realtime_voice
+        return _sanitize_voice(_pick_voice(MALE_VOICES, slug), config)
     if gender == "female":
-        return _pick_voice(FEMALE_VOICES, slug) or config.realtime_voice
-    return config.realtime_voice
+        return _sanitize_voice(_pick_voice(FEMALE_VOICES, slug), config)
+    return _sanitize_voice(config.realtime_voice, config)
+
+
+def _sanitize_voice(voice, config):
+    if voice in ALLOWED_VOICES:
+        return voice
+    if config.realtime_voice in ALLOWED_VOICES:
+        return config.realtime_voice
+    return "coral"
 
 
 def _is_garbage_reply(text):
@@ -569,7 +820,60 @@ def _build_turn_detection(config):
     silence_ms = max(0, config.realtime_silence_duration_ms)
     if silence_ms:
         payload["silence_duration_ms"] = silence_ms
+    payload["create_response"] = False
     return payload
+
+
+def _has_banned_phrase(text):
+    if not text:
+        return False
+    lowered = text.lower()
+    return any(phrase in lowered for phrase in BANNED_REPLY_PHRASES)
+
+
+async def _cancel_response(ws):
+    try:
+        await ws.send(json.dumps({"type": "response.cancel"}))
+    except Exception:
+        return
+
+
+def _fallback_reply(name):
+    safe_name = name or "a pony"
+    if safe_name.lower() == "pony":
+        safe_name = "a pony"
+    return f"Hi! I'm {safe_name} from Ponyville. How are you today?"
+
+
+def _format_session_log(payload):
+    if not isinstance(payload, dict):
+        return ""
+    session = payload.get("session", {})
+    lines = [
+        "--- Session context start ---",
+        "instructions:",
+        session.get("instructions", ""),
+        f"voice: {session.get('voice', '')}",
+        f"input_audio_format: {session.get('input_audio_format', '')}",
+        f"output_audio_format: {session.get('output_audio_format', '')}",
+        f"input_audio_transcription: {json.dumps(session.get('input_audio_transcription', {}), ensure_ascii=True)}",
+        f"turn_detection: {json.dumps(session.get('turn_detection', {}), ensure_ascii=True)}",
+        "--- Session context end ---",
+    ]
+    return "\n".join(line for line in lines if line is not None)
+
+
+def _summarize_backstory(text, target_words=100):
+    if not text:
+        return ""
+    cleaned = " ".join(str(text).split())
+    words = cleaned.split(" ")
+    if len(words) <= target_words:
+        return cleaned
+    trimmed = words[:target_words]
+    if trimmed and not re.search(r"[.!?]$", trimmed[-1]):
+        trimmed[-1] = f"{trimmed[-1]}..."
+    return " ".join(trimmed)
 
 
 def _extract_transcript_payload(event):
@@ -598,11 +902,14 @@ def _extract_reply_payload(event):
     event_type = str(event.get("type") or "").lower()
     if "input_audio_transcription" in event_type:
         return None
-    if not any(
-        key in event_type
-        for key in ("output_text", "audio_transcript", "text.delta", "text.done")
-    ):
+    source = None
+    if "output_text" in event_type:
+        source = "text"
+    elif "audio_transcript" in event_type:
+        source = "audio"
+    else:
         return None
+    response_id = _extract_response_id(event)
     text = event.get("text") or event.get("transcript")
     delta = event.get("delta")
     item = event.get("item")
@@ -618,7 +925,59 @@ def _extract_reply_payload(event):
         delta = ""
     if not text and not delta:
         return None
-    return {"text": text or "", "delta": delta or "", "final": is_final}
+    return {
+        "text": text or "",
+        "delta": delta or "",
+        "final": is_final,
+        "source": source,
+        "response_id": response_id,
+    }
+
+
+def _extract_response_id(event):
+    if not isinstance(event, dict):
+        return None
+    response_id = event.get("response_id")
+    if response_id:
+        return response_id
+    response = event.get("response")
+    if isinstance(response, dict):
+        response_id = response.get("id")
+        if response_id:
+            return response_id
+    item = event.get("item")
+    if isinstance(item, dict):
+        response_id = item.get("response_id")
+        if response_id:
+            return response_id
+    return None
+
+
+def _accept_response_id(response_id, active_response_id):
+    if active_response_id:
+        if not response_id:
+            return True
+        return response_id == active_response_id
+    return True
+
+
+def _debug_enabled():
+    return os.getenv("OPENAI_REALTIME_DEBUG", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _ensure_summary(pony_entry, backstory):
+    summary = ""
+    if isinstance(pony_entry, dict):
+        summary = pony_entry.get("backstorySummary") or ""
+    summary = summary.strip()
+    if summary:
+        return _summarize_backstory(summary)
+    return _summarize_backstory(backstory)
 
 
 def _maybe_extract_tool_call(event, tool_calls):

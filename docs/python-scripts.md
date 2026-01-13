@@ -165,6 +165,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Environment: `OPENAI_API_KEY` (from env or `.env`).
 - Optional env: `OPENAI_LORE_MODEL` to override the default lore model.
 - Output: prints per-pony progress updates during generation.
+- Notes: writes ~100-word backstory summaries into `data/pony_lore.json`.
 - Reads:
   - `data/ponies.json` (pony roster).
   - `data/pony_lore.json` (lore + opinions output).
@@ -182,6 +183,8 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--seed` set RNG seed for arc selection.
   - `--only` comma-separated slugs to generate.
   - `--skip-backstories` skip backstory generation.
+  - `--summaries-only` only generate 100-word backstory summaries.
+  - `--refresh-summaries` regenerate summaries even if present.
   - `--update-opinions` generate opinions via the API.
   - `--opinions-scope` `all` or `selected` (when used with `--only`).
   - `--force` overwrite existing backstories.
@@ -198,6 +201,10 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Purpose: run the local BYOK speech helper for realtime speech (S2S) plus pronunciation handling.
 - Environment: `OPENAI_API_KEY` (from env or `.env`).
 - Optional env:
+  - `SPEECH_MODE` (`realtime` or `pipeline`, default `pipeline`).
+  - `SPEECH_FORCE_FALLBACK` (`1` or `0`, default `0`) to bypass LLM and use the fallback reply.
+  - `SPEECH_HISTORY_TURNS` (default `4`) to keep the last N user/pony turns in the LLM context.
+  - `SPEECH_MAX_OUTPUT_TOKENS` (default `3000`) to cap LLM output length in pipeline mode.
   - `OPENAI_REALTIME_MODEL` (default `gpt-4o-realtime-preview`).
   - `OPENAI_REALTIME_VOICE` (default `coral`).
   - `OPENAI_REALTIME_TRANSCRIPTION_MODEL` (default `whisper-1`).
@@ -206,7 +213,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `OPENAI_REALTIME_IDLE_TIMEOUT` (default `120` seconds; 0 disables).
   - `OPENAI_REALTIME_MAX_SESSION` (default `900` seconds; 0 disables).
   - `OPENAI_REALTIME_SILENCE_DURATION_MS` (default `2500`; 0 disables).
-  - `OPENAI_FAST_MODEL`, `OPENAI_SMART_MODEL` (fallback models for non-realtime endpoints).
+  - `OPENAI_FAST_MODEL`, `OPENAI_SMART_MODEL` (defaults to `gpt-5-nano-2025-08-07`).
 - Reads:
   - `data/pony_lore.json` (pony lore + opinions).
   - `data/pony_backstories.json` (long-form backstories served via tool calls; not embedded in prompt context).
@@ -225,7 +232,11 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `POST /pronunciation-guide` - update pronunciation entries.
   - `POST /actions` - append a recent action.
 - WebSocket:
-  - `ws://<host>:<ws-port>` - realtime speech bridge for audio/text streaming.
+  - `ws://<host>:<ws-port>` - speech bridge for audio/text streaming (pipeline or realtime).
+- Pipeline mode:
+  - `SPEECH_MODE=pipeline` switches the WS bridge to STT → LLM → QA/FILTER/RETRY → TTS.
+  - Audio is synthesized via `tts-1` with `response_format=pcm` and streamed as base64 PCM16 chunks.
+  - Logs include a brief response-shape hint when the LLM returns empty text.
 - Dependency: install `websockets` (`pip install websockets`) for realtime mode.
 - CLI:
   - `--host`, `--port` server bind (default `127.0.0.1:8091`).
@@ -241,10 +252,12 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--realtime-idle-timeout` idle seconds before closing a realtime session.
   - `--realtime-max-session` max seconds before forcing a realtime reconnect.
   - `--realtime-silence-duration-ms` server VAD silence duration (ms) before ending a turn.
+  - `--speech-mode` set `realtime` or `pipeline`.
   - `--no-fallback-smart` disable smart-model fallback.
 - Example usage:
   - `.venv/bin/python scripts/speech_helper.py`
   - `.venv/bin/python scripts/speech_helper.py --allow-null-origin`
+  - The realtime prompt includes a ~100-word backstory summary for the active pony.
 
 ## `scripts/interpolate_pony_sprites.py`
 

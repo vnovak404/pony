@@ -28,8 +28,10 @@ from .config import (
     DEFAULT_REALTIME_SILENCE_DURATION_MS,
     SpeechConfig,
     DEFAULT_REALTIME_URL,
+    DEFAULT_SPEECH_MODE,
 )
 from .handler import SpeechHandler
+from .pipeline import start_pipeline_server
 from .realtime import start_realtime_server
 
 
@@ -94,6 +96,11 @@ def parse_args():
         help="Silence duration (ms) before server VAD ends a turn.",
     )
     parser.add_argument(
+        "--speech-mode",
+        default=DEFAULT_SPEECH_MODE,
+        help="Speech mode: realtime or pipeline.",
+    )
+    parser.add_argument(
         "--no-fallback-smart",
         action="store_true",
         help="Disable fallback to the smart model on failure.",
@@ -137,6 +144,7 @@ def main():
         realtime_max_session=args.realtime_max_session,
         realtime_silence_duration_ms=args.realtime_silence_duration_ms,
         fallback_to_smart=not args.no_fallback_smart,
+        speech_mode=args.speech_mode,
     )
 
     handler = lambda *handler_args, **handler_kwargs: SpeechHandler(  # noqa: E731
@@ -145,7 +153,11 @@ def main():
         **handler_kwargs,
     )
 
-    realtime_thread = start_realtime_server(config)
+    speech_mode = (config.speech_mode or "").strip().lower()
+    if speech_mode == "pipeline":
+        realtime_thread = start_pipeline_server(config)
+    else:
+        realtime_thread = start_realtime_server(config)
 
     with ThreadingHTTPServer((config.host, config.port), handler) as server:
         print(f"Speech helper running at http://{config.host}:{config.port}")

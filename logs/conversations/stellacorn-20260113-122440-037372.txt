@@ -1,0 +1,20 @@
+[2026-01-13 12:24:40] session_start mode=pipeline pony=Stellacorn slug=stellacorn stt=whisper-1 llm_fast=gpt-5-mini-2025-08-07 llm_smart=gpt-5-nano-2025-08-07 tts=tts-1 voice=alloy sample_rate=24000
+[2026-01-13 12:24:47] utterance_stop bytes=208896 chunks=51 capture_ms=5111
+[2026-01-13 12:24:48] stt_done ms=1515 chars=26
+Stella: If you have any questions.
+[2026-01-13 12:25:00] llm_fallback ms=12123
+Stellacorn: Hi! I'm Stellacorn from Ponyville. How are you today?
+[2026-01-13 12:25:00] history_len messages=3
+[2026-01-13 12:25:02] tts_done ms=1283 bytes=151800 duration_ms=3162 rate=24000
+[2026-01-13 12:25:02] tts_stream chunks=10 chunk_bytes=16000
+[2026-01-13 12:25:02] utterance_done ms=14942
+[2026-01-13 12:25:14] session_resume pony=Stellacorn slug=stellacorn
+[2026-01-13 12:25:19] utterance_stop bytes=208896 chunks=51 capture_ms=4355
+[2026-01-13 12:25:21] stt_done ms=2208 chars=40
+Stella: What's your favorite place in Ponyville?
+[2026-01-13 12:25:31] llm_fallback ms=10674
+Stellacorn: Hi! I'm Stellacorn from Ponyville. How are you today?
+[2026-01-13 12:25:31] history_len messages=5
+[2026-01-13 12:25:32] tts_done ms=990 bytes=150600 duration_ms=3137 rate=24000
+[2026-01-13 12:25:32] tts_stream chunks=10 chunk_bytes=16000
+[2026-01-13 12:25:32] utterance_done ms=13895

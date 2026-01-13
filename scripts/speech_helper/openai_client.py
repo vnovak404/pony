@@ -147,14 +147,33 @@ def _uses_max_completion_tokens(model):
     return model.startswith("gpt-5")
 
 
+def _coerce_text_content(content):
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict):
+                text = item.get("text")
+                if text:
+                    parts.append(str(text))
+            elif isinstance(item, str):
+                parts.append(item)
+        if parts:
+            return "\n".join(parts)
+    if isinstance(content, dict):
+        text = content.get("text")
+        if text:
+            return str(text)
+    return str(content or "")
+
+
 def _messages_to_responses_input(messages):
     input_messages = []
     for message in messages:
-        content = message.get("content", "")
+        content = _coerce_text_content(message.get("content", ""))
         input_messages.append(
             {
                 "role": message.get("role", "user"),
-                "content": [{"type": "input_text", "text": str(content)}],
+                "content": content,
             }
         )
     return input_messages
@@ -166,6 +185,7 @@ def responses_create(messages, *, model, api_key, max_output_tokens=220):
         "input": _messages_to_responses_input(messages),
         "max_output_tokens": max_output_tokens,
         "text": {"format": {"type": "text"}},
+        "reasoning": {"effort": "low"},
     }
     return _request_json(RESPONSES_URL, payload, api_key)
 
