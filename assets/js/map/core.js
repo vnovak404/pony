@@ -496,4 +496,32 @@ export const initMap = async (mapData, ponies, locations, runtimeState) => {
     },
     dragState,
   });
+
+  const handleSpeechCommand = (event) => {
+    const detail = event?.detail || {};
+    const command = detail.command;
+    if (!command) return;
+    const ingredient = detail.ingredient || null;
+    const slug = (detail.ponySlug || "").toLowerCase().replace(/\s+/g, "-");
+    let actor = slug ? actorBySlug.get(slug) : null;
+    if (!actor) {
+      actor = commandMenu.getCommandTarget() || actors[0];
+    }
+    if (!actor) {
+      if (mapStatus) {
+        mapStatus.textContent = "No pony available for that action.";
+      }
+      return;
+    }
+    if (ingredient) {
+      taskHelpers.assignManualTask(actor, { command, ingredient });
+    } else {
+      taskHelpers.assignManualTask(actor, command);
+    }
+    if (mapStatus && slug) {
+      mapStatus.textContent = `Sent ${actor.sprite?.pony?.name || "pony"} to ${command}.`;
+    }
+  };
+
+  document.addEventListener("pony-speech-command", handleSpeechCommand);
 };

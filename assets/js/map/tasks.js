@@ -158,8 +158,21 @@ export const createTaskHelpers = (context) => {
     };
   };
 
-  const assignManualTask = (actor, command) => {
+  const assignManualTask = (actor, commandInput) => {
     if (!actor) return;
+    let command =
+      typeof commandInput === "string" ? commandInput : commandInput?.command;
+    const ingredient =
+      typeof commandInput === "string" ? null : commandInput?.ingredient;
+    const aliases = {
+      sleep: "rest",
+      clinic: "vet",
+      restock: "resupply",
+    };
+    if (command && aliases[command]) {
+      command = aliases[command];
+    }
+    if (!command) return;
     if (command === "close") {
       return;
     }
@@ -313,6 +326,46 @@ export const createTaskHelpers = (context) => {
       }
       actor.task = task;
       actor.workCooldownUntil = 0;
+      return;
+    }
+    if (command === "resupply") {
+      const jobLocationId = actor.jobLocationId;
+      if (!jobLocationId) {
+        if (mapStatus) {
+          mapStatus.textContent = "This pony doesn't have a job assignment.";
+        }
+        return;
+      }
+      const jobSpot = getSpotForLocationId(jobLocationId);
+      if (!jobSpot) {
+        if (mapStatus) {
+          mapStatus.textContent = "No job spot found for this pony.";
+        }
+        return;
+      }
+      const restockTask = createRestockTask(jobSpot, { manual: true });
+      if (restockTask) {
+        actor.task = restockTask;
+        actor.workCooldownUntil = 0;
+      } else if (mapStatus) {
+        mapStatus.textContent = "No restock task available right now.";
+      }
+      return;
+    }
+    if (command === "gather") {
+      if (!ingredient) {
+        if (mapStatus) {
+          mapStatus.textContent = "Pick an ingredient to gather.";
+        }
+        return;
+      }
+      const task = createSupplyTaskForIngredient(ingredient, { manual: true });
+      if (task) {
+        actor.task = task;
+        actor.workCooldownUntil = 0;
+      } else if (mapStatus) {
+        mapStatus.textContent = `No route to gather ${ingredient} right now.`;
+      }
       return;
     }
     if (command === "fun") {

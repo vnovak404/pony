@@ -16,6 +16,7 @@
         <div class="logo">Pony Parade</div>
         <div class="nav-links">
           <a href="#ponies">Meet the Ponies</a>
+          <a href="#speech">Talk</a>
           <a href="#adventures">Adventures</a>
           <a href="#creators">Create</a>
         </div>
@@ -217,6 +218,61 @@
             </div>
           </div>
           <p id="map-status" class="map-status">Loading map...</p>
+        </div>
+      </section>
+
+      <section id="speech" class="section speech">
+        <div class="section-title">
+          <h2>Talk to the Ponies</h2>
+          <p>Ask a question and hear a pony reply (local helper required).</p>
+        </div>
+        <div class="speech-card">
+          <div class="speech-controls">
+            <label class="speech-select" for="speech-pony-select">
+              <span>Talk to</span>
+              <select id="speech-pony-select"></select>
+            </label>
+            <button class="btn primary" type="button" id="speech-toggle">Start Listening</button>
+            <button class="btn ghost" type="button" id="speech-clear">Clear</button>
+            <div class="speech-indicator" id="speech-pony-indicator" aria-live="polite">
+              <span class="speech-indicator-dot" aria-hidden="true"></span>
+              <span class="speech-indicator-text">Pony quiet</span>
+            </div>
+            <span class="speech-status" id="speech-status">Helper offline.</span>
+          </div>
+          <div class="speech-panels">
+            <div class="speech-panel">
+              <div class="speech-panel-header">
+                <h3>Transcript</h3>
+                <div class="speech-pony-avatar">
+                  <img id="speech-pony-avatar" alt="" />
+                </div>
+              </div>
+              <div class="speech-box" id="speech-transcript" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="speech-pronunciation">
+            <button class="speech-pronunciation-toggle" type="button" id="speech-pronounce-toggle" aria-expanded="true">
+              <span>Pronunciation helper</span>
+              <span class="speech-pronunciation-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="speech-pronunciation-body" id="speech-pronounce-body">
+              <p class="speech-hint">
+                Teach the helper how to say special names (Twylite → Twy-light).
+              </p>
+              <div class="speech-pronunciation-controls">
+                <input id="speech-pronounce-token" type="text" placeholder="Token" />
+                <input id="speech-pronounce-normalized" type="text" placeholder="Normalized" />
+                <button class="btn ghost small" type="button" id="speech-pronounce-save">
+                  Save
+                </button>
+                <button class="btn ghost small" type="button" id="speech-pronounce-delete">
+                  Delete
+                </button>
+              </div>
+              <p class="speech-guide-status" id="speech-guide-status"></p>
+            </div>
+          </div>
         </div>
       </section>
 

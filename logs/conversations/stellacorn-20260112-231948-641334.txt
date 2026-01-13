@@ -1,0 +1,2 @@
+Stellacorn: <edit><path>src/cjsxElement.ts</path><start_line>217</start_line><end_line>218</end_line></edit>
+<edit><path>src/cjsxElement.ts</path><start_line>259</start_line><end_line>259</end_line></edit>

@@ -38,6 +38,19 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `python3 scripts/generate_pony_images.py --target-size 512`
   - `python3 scripts/generate_pony_images.py --dry-run`
 
+## `scripts/pony_server.py`
+
+- Purpose: serve the Pony Parade site and local API endpoints for pony creation and map edits.
+- CLI:
+  - `--host`, `--port` server bind (default `127.0.0.1:8000`).
+  - `--data` path to `data/ponies.json`.
+  - `--output-dir` output folder for generated portraits.
+  - `--env-file` `.env` path for `OPENAI_API_KEY`.
+  - `--map` path to the Ponyville map JSON.
+  - `--state` path for runtime state persistence.
+- Behavior:
+  - On pony creation, runs sprite generation, spritesheet packing, house assets, and pony lore generation.
+
 ## `scripts/generate_pony_sprites.py`
 
 - Purpose: generate per-action sprite frames for each pony (idle first when editing from a portrait).
@@ -138,13 +151,100 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--method` compression method 0-6 (default 6).
   - `--force` overwrite existing `.webp`.
   - `--include-frames` include pony frame directories.
-  - `--prune-source` delete source images after conversion.
-  - `--dry-run` print planned conversions.
+- `--prune-source` delete source images after conversion.
+- `--dry-run` print planned conversions.
 - Example usage:
   - `python3 scripts/convert_assets_webp.py --dry-run`
   - `python3 scripts/convert_assets_webp.py --quality 82`
   - `python3 scripts/convert_assets_webp.py --lossless --include-frames`
   - `python3 scripts/convert_assets_webp.py --prune-source`
+
+## `scripts/generate_pony_lore.py`
+
+- Purpose: generate pony backstories and relationship opinions using the OpenAI API.
+- Environment: `OPENAI_API_KEY` (from env or `.env`).
+- Optional env: `OPENAI_LORE_MODEL` to override the default lore model.
+- Output: prints per-pony progress updates during generation.
+- Reads:
+  - `data/ponies.json` (pony roster).
+  - `data/pony_lore.json` (lore + opinions output).
+  - `data/pony_backstories.json` (backstory output).
+  - `data/lore_arcs.json` (arc bundles/slots used to vary backstory beats).
+- CLI:
+  - `--data`, `--lore`, `--backstories` data paths.
+  - `--arcs` arc JSON path (default `data/lore_arcs.json`).
+  - `--env-file` path to `.env` with `OPENAI_API_KEY`.
+  - `--model` OpenAI model for generation.
+  - `--word-target` target word count for backstories (default 900).
+  - `--max-retries` regeneration attempts if family rules are violated.
+  - `--arc-variants` number of candidate arc tuples to store (default 1).
+  - `--refresh-arcs` regenerate arc tuples even if already stored.
+  - `--seed` set RNG seed for arc selection.
+  - `--only` comma-separated slugs to generate.
+  - `--skip-backstories` skip backstory generation.
+  - `--update-opinions` generate opinions via the API.
+  - `--opinions-scope` `all` or `selected` (when used with `--only`).
+  - `--force` overwrite existing backstories.
+  - `--seed-only` only seed lore entries/opinion matrix (no API calls).
+  - `--dry-run` print prompts only.
+- Example usage:
+  - `.venv/bin/python scripts/generate_pony_lore.py --seed-only`
+  - `.venv/bin/python scripts/generate_pony_lore.py --update-opinions`
+  - `.venv/bin/python scripts/generate_pony_lore.py --only moonbeam --word-target 900`
+  - `.venv/bin/python scripts/generate_pony_lore.py --arc-variants 2 --refresh-arcs`
+
+## `scripts/speech_helper.py`
+
+- Purpose: run the local BYOK speech helper for realtime speech (S2S) plus pronunciation handling.
+- Environment: `OPENAI_API_KEY` (from env or `.env`).
+- Optional env:
+  - `OPENAI_REALTIME_MODEL` (default `gpt-4o-realtime-preview`).
+  - `OPENAI_REALTIME_VOICE` (default `coral`).
+  - `OPENAI_REALTIME_TRANSCRIPTION_MODEL` (default `whisper-1`).
+  - `OPENAI_REALTIME_INPUT_FORMAT` (default `pcm16`).
+  - `OPENAI_REALTIME_OUTPUT_FORMAT` (default `pcm16`).
+  - `OPENAI_REALTIME_IDLE_TIMEOUT` (default `120` seconds; 0 disables).
+  - `OPENAI_REALTIME_MAX_SESSION` (default `900` seconds; 0 disables).
+  - `OPENAI_REALTIME_SILENCE_DURATION_MS` (default `2500`; 0 disables).
+  - `OPENAI_FAST_MODEL`, `OPENAI_SMART_MODEL` (fallback models for non-realtime endpoints).
+- Reads:
+  - `data/pony_lore.json` (pony lore + opinions).
+  - `data/pony_backstories.json` (long-form backstories served via tool calls; not embedded in prompt context).
+  - `assets/world/maps/ponyville.json` (structure + house layout).
+  - `data/world_locations.json` (location summary).
+  - `data/_generated/speech_recent_actions.json` (recent actions).
+  - `data/_generated/pronunciation_guide.json` (pronunciation entries).
+- Writes:
+  - `logs/conversations/<pony-slug>-timestamp.txt` (conversation transcripts).
+- Endpoints:
+  - `GET /health` - service status.
+  - `POST /stt` - audio in, normalized text out (legacy).
+  - `POST /chat` - text in, LLM reply out (legacy).
+  - `POST /tts` - text in, audio out (legacy).
+  - `GET /pronunciation-guide` - fetch pronunciation entries.
+  - `POST /pronunciation-guide` - update pronunciation entries.
+  - `POST /actions` - append a recent action.
+- WebSocket:
+  - `ws://<host>:<ws-port>` - realtime speech bridge for audio/text streaming.
+- Dependency: install `websockets` (`pip install websockets`) for realtime mode.
+- CLI:
+  - `--host`, `--port` server bind (default `127.0.0.1:8091`).
+  - `--ws-port` websocket bind (default `8092`).
+  - `--env-file` path to `.env` with `OPENAI_API_KEY`.
+  - `--lore`, `--backstories`, `--map`, `--locations`, `--actions`, `--pronunciation-guide` data paths.
+  - `--allowed-origin` repeatable CORS allowlist entries.
+  - `--allow-null-origin` allow `file://` origins.
+  - `--fast-model`, `--smart-model`, `--stt-model`, `--tts-model`, `--tts-voice`.
+  - `--realtime-model`, `--realtime-voice`, `--realtime-transcription-model`.
+  - `--realtime-input-format`, `--realtime-output-format`.
+  - `--realtime-url` override websocket endpoint (default `wss://api.openai.com/v1/realtime?model={model}`).
+  - `--realtime-idle-timeout` idle seconds before closing a realtime session.
+  - `--realtime-max-session` max seconds before forcing a realtime reconnect.
+  - `--realtime-silence-duration-ms` server VAD silence duration (ms) before ending a turn.
+  - `--no-fallback-smart` disable smart-model fallback.
+- Example usage:
+  - `.venv/bin/python scripts/speech_helper.py`
+  - `.venv/bin/python scripts/speech_helper.py --allow-null-origin`
 
 ## `scripts/interpolate_pony_sprites.py`
 

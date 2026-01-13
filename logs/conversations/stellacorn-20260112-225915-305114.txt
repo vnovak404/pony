@@ -1,0 +1,4 @@
+Stellacorn: <edit><path>src/lib/commands.ts</path><start_line>16</start_line><end_line>16</end_line></edit>
+<edit><path>src/lib/commands.ts</path><start_line>29</start_line><end_line>34</end_line></edit>
+<edit><path>src/lib/commands.ts</path><start_line>80</start_line><end_line>114</end_line></edit>
+Stellacorn: open_url("https://www.mayoclinic.org/drugs-supplements/levothyroxine-oral-route/proper-use/drg-20072137")

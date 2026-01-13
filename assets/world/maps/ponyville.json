@@ -555,8 +555,8 @@
         "id": "market",
         "kind": "building",
         "at": {
-          "x": 8.83,
-          "y": 15.94
+          "x": 8.95,
+          "y": 16.08
         },
         "sprite": "market_01",
         "locationId": "market-square",
@@ -570,8 +570,8 @@
         "id": "lumberyard",
         "kind": "location",
         "at": {
-          "x": 7.67,
-          "y": 11.35
+          "x": 4.26,
+          "y": 11.46
         },
         "sprite": "lumberyard_01",
         "locationId": "lumberyard",
@@ -601,7 +601,7 @@
         "kind": "building",
         "at": {
           "x": 24.05,
-          "y": 19.68
+          "y": 19.21
         },
         "sprite": "clinic_01",
         "locationId": "pony-clinic",
@@ -645,8 +645,8 @@
         "id": "observatory",
         "kind": "building",
         "at": {
-          "x": 35.59,
-          "y": 18.69
+          "x": 35.24,
+          "y": 19.11
         },
         "sprite": "observatory_01",
         "locationId": "starlight-observatory",
@@ -699,7 +699,7 @@
         "kind": "location",
         "at": {
           "x": 13.53,
-          "y": 18.65
+          "y": 18.68
         },
         "sprite": "cow_pasture_01",
         "locationId": "cow-pasture",
@@ -807,8 +807,8 @@
         "id": "whispering-forest",
         "kind": "nature",
         "at": {
-          "x": 2.93,
-          "y": 10.28
+          "x": 3.15,
+          "y": 9.01
         },
         "sprite": "forest_01",
         "locationId": "whispering-forest",
@@ -826,8 +826,8 @@
         "id": "silver-lake",
         "kind": "nature",
         "at": {
-          "x": 30.96,
-          "y": 12.68
+          "x": 30.99,
+          "y": 12.82
         },
         "sprite": "lake_01",
         "locationId": "silver-lake",
@@ -885,8 +885,8 @@
         "id": "rescue-cottage",
         "kind": "house",
         "at": {
-          "x": 4.48,
-          "y": 12.03
+          "x": 7.53,
+          "y": 11.12
         },
         "spritePath": "/assets/world/houses/rescue-cottage.webp",
         "label": "Rescue Cottage",
@@ -899,8 +899,8 @@
         "id": "racers-roost",
         "kind": "house",
         "at": {
-          "x": 35.91,
-          "y": 11.29
+          "x": 31.99,
+          "y": 18.9
         },
         "spritePath": "/assets/world/houses/racers-roost.webp",
         "label": "Racer's Roost",
@@ -941,8 +941,8 @@
         "id": "kindness-cottage",
         "kind": "house",
         "at": {
-          "x": 20.32,
-          "y": 19.11
+          "x": 20.6,
+          "y": 19.03
         },
         "spritePath": "/assets/world/houses/kindness-cottage.webp",
         "label": "Kindness Cottage",

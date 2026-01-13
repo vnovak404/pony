@@ -11,6 +11,117 @@ import {
 } from "./utils.js";
 import { HAS_API, apiUrl } from "./api_mode.js";
 
+const BACKSTORY_PATH = "data/pony_backstories.json";
+let backstoryCache = null;
+let backstoryPromise = null;
+
+const loadBackstories = async () => {
+  if (backstoryCache) return backstoryCache;
+  if (!backstoryPromise) {
+    backstoryPromise = loadJson(`${BACKSTORY_PATH}?t=${Date.now()}`)
+      .then((data) => {
+        const backstories = data && data.backstories ? data.backstories : {};
+        backstoryCache = backstories;
+        return backstories;
+      })
+      .catch((error) => {
+        backstoryPromise = null;
+        throw error;
+      });
+  }
+  return backstoryPromise;
+};
+
+const createParagraphs = (container, text) => {
+  container.replaceChildren();
+  const chunks = text.split(/\n\n+/).map((chunk) => chunk.trim()).filter(Boolean);
+  if (!chunks.length) {
+    container.textContent = text;
+    return;
+  }
+  chunks.forEach((chunk) => {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = chunk;
+    container.append(paragraph);
+  });
+};
+
+const normalizeBackstoryText = (text) => {
+  if (!text) return "";
+  const trimmed = text.trim();
+  if (!trimmed.startsWith("{") || !trimmed.includes("\"backstory\"")) {
+    return text;
+  }
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (parsed && parsed.backstory) return String(parsed.backstory);
+  } catch (error) {
+    const marker = "\"backstory\"";
+    const start = trimmed.indexOf(marker);
+    if (start === -1) return text;
+    const firstQuote = trimmed.indexOf("\"", start + marker.length);
+    if (firstQuote === -1) return text;
+    const suffixIndex = trimmed.lastIndexOf("\"");
+    const raw = trimmed.slice(firstQuote + 1, suffixIndex > firstQuote ? suffixIndex : trimmed.length);
+    return raw.replace(/\\n/g, "\n").replace(/\\"/g, "\"").trim();
+  }
+  return text;
+};
+
+const ensureBackstoryModal = () => {
+  let modal = document.querySelector("[data-backstory-modal]");
+  if (modal) return modal;
+  modal = document.createElement("div");
+  modal.className = "backstory-modal";
+  modal.dataset.backstoryModal = "true";
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="backstory-card" role="dialog" aria-modal="true" aria-labelledby="backstory-title">
+      <div class="backstory-hero">
+        <img alt="" loading="lazy" />
+      </div>
+      <div class="backstory-header">
+        <h3 id="backstory-title"></h3>
+        <button class="btn ghost small" type="button" data-backstory-close>Close</button>
+      </div>
+      <div class="backstory-body" data-backstory-body></div>
+    </div>
+  `;
+  document.body.append(modal);
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal || event.target.closest("[data-backstory-close]")) {
+      modal.hidden = true;
+    }
+  });
+  return modal;
+};
+
+const showBackstoryModal = (ponyName, text, imageSrc) => {
+  const modal = ensureBackstoryModal();
+  const title = modal.querySelector("#backstory-title");
+  const body = modal.querySelector("[data-backstory-body]");
+  const image = modal.querySelector(".backstory-hero img");
+  if (title) title.textContent = ponyName ? `${ponyName}'s Backstory` : "Backstory";
+  if (image) {
+    if (imageSrc) {
+      image.src = imageSrc;
+      image.alt = ponyName ? `${ponyName} portrait` : "Pony portrait";
+    } else {
+      image.removeAttribute("src");
+      image.alt = "";
+    }
+  }
+  if (body) {
+    if (text) {
+      const normalized = normalizeBackstoryText(text);
+      createParagraphs(body, normalized);
+    } else {
+      body.textContent = "Backstory not found yet. Generate lore or try again later.";
+    }
+  }
+  modal.hidden = false;
+};
+
 export const renderPonyCard = (pony, imagePath, addToTop = false) => {
   if (!ponyGrid) return;
   const ponyId = pony.slug || "";
@@ -48,6 +159,9 @@ export const renderPonyCard = (pony, imagePath, addToTop = false) => {
     ${
       ponyId
         ? `<div class="pony-actions">
+      <button class="btn ghost small" type="button" data-pony-backstory="${ponyId}">
+        Read Backstory
+      </button>
       <button class="btn ghost small" type="button" data-pony-action="sprites" data-pony-id="${ponyId}">
         Generate Sprites
       </button>
@@ -224,6 +338,22 @@ export const bindPonyCardActions = () => {
       updateCardStatus(card, error.message);
     } finally {
       toggleCardButtons(card, false);
+    }
+  });
+  ponyGrid.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-pony-backstory]");
+    if (!button) return;
+    const ponyId = button.dataset.ponyBackstory;
+    if (!ponyId) return;
+    const card = button.closest(".pony-card");
+    const ponyName = card ? card.querySelector("h3")?.textContent : "Pony";
+    const ponyImage = card ? card.querySelector(".pony-art img")?.src : "";
+    try {
+      const backstories = await loadBackstories();
+      const story = backstories[ponyId] || "";
+      showBackstoryModal(ponyName || "Pony", story, ponyImage);
+    } catch (error) {
+      showBackstoryModal(ponyName || "Pony", "", ponyImage);
     }
   });
 };

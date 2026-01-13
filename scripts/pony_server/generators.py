@@ -233,12 +233,34 @@ def run_house_state_generator(slug):
         )
 
 
+def run_lore_generator(slug, env_file=".env"):
+    command = [
+        sys.executable,
+        "scripts/generate_pony_lore.py",
+        "--only",
+        slug,
+        "--env-file",
+        env_file,
+        "--update-opinions",
+        "--opinions-scope",
+        "selected",
+    ]
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr or result.stdout or "Lore generation failed.")
+
+
 def launch_async(target, *args):
     thread = threading.Thread(target=target, args=args, daemon=True)
     thread.start()
 
 
-def run_post_create_tasks(slug, generate_house_variants=False):
+def run_post_create_tasks(slug, generate_house_variants=False, env_file=".env"):
     try:
         run_sprite_generator(slug, {"use_portrait": True})
         run_spritesheet_packer(
@@ -253,3 +275,7 @@ def run_post_create_tasks(slug, generate_house_variants=False):
             run_house_state_generator(slug)
     except Exception as exc:
         print(f"House generation failed for {slug}: {exc}", file=sys.stderr)
+    try:
+        run_lore_generator(slug, env_file=env_file)
+    except Exception as exc:
+        print(f"Lore generation failed for {slug}: {exc}", file=sys.stderr)

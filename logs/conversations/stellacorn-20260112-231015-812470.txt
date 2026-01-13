@@ -1,0 +1,4 @@
+Stellacorn: <edit><path>src/lib.css</path><start_line>9</start_line><end_line>28</end_line></edit>
+<edit><path>src/routes/+page.svelte</path><start_line>61</start_line><end_line>61</end_line></edit>
+Stellacorn: <edit><path>src/internals/encryption.ts</path><start_line>10</start_line><end_line>12</end_line></edit>
+Stellacorn: click([{"id": "search", "x": 203, "y": 307}])

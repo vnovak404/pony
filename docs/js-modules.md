@@ -8,7 +8,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ## `assets/js/app.js`
 
-- Purpose: app bootstrap (loads vibes, pony cards, form wiring, and map).
+- Purpose: app bootstrap (loads vibes, pony cards, form wiring, map, and speech UI).
 - Functions: none (module only imports + invokes other modules).
 
 ## `assets/js/dom.js`
@@ -62,9 +62,36 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `loadPonies()` — fetches `/data/ponies.json` and renders all cards.
 - `bindPonyCardActions()` — handles sprite generation and spritesheet preview buttons (API calls gated by `HAS_API`).
 - Internal helpers:
+  - `loadBackstories()` — loads `data/pony_backstories.json` once and caches it.
+  - `normalizeBackstoryText(text)` — strips JSON-wrapped backstory payloads.
+  - `showBackstoryModal(ponyName, text, imageSrc)` — opens the backstory overlay with the pony portrait.
   - `resolveSheetPath(metaPath, meta, fallbackPath)` — picks a preview sheet (prefers trot/walk).
   - `updateCardStatus(card, message)` — status line updates.
   - `toggleCardButtons(card, disabled)` — disables/enables action buttons.
+
+## `assets/js/speech/actions.js`
+
+- `dispatchSpeechCommand(action)` — emits a `pony-speech-command` event for the map listener.
+
+## `assets/js/speech/audio.js`
+
+- `downsampleBuffer(buffer, inputRate, targetRate)` — simple averaging downsampler for mic capture.
+- `floatTo16BitPCM(buffer)` — converts float audio to PCM16.
+- `encodePCM16(pcm16)` — base64-encodes PCM16 for websocket payloads.
+- `decodePCM16(base64)` — decodes base64 PCM16 from websocket payloads.
+- `concatInt16(chunks)` — concatenates PCM chunks for playback replay.
+- `pcm16ToWav(pcm16, sampleRate)` — wraps PCM audio in a WAV container.
+- `PcmStreamPlayer` — queues PCM16 chunks for near-realtime playback.
+
+## `assets/js/speech/client.js`
+
+- `SpeechClient` — websocket bridge for realtime speech; handles mic capture, audio streaming, transcripts, and audio playback.
+  - Emits `onTranscript({ text, final })` and `onReply({ text, final })` for UI consumers.
+  - Emits `onAudioActivity(active)` when audio response chunks start/end.
+
+## `assets/js/speech/ui.js`
+
+- `initSpeechUI()` — wires the speech UI, loads pony selector, starts/stops listening, updates pronunciation/actions, maintains a combined transcript log, updates the active pony avatar, and toggles the pronunciation helper panel.
 
 ## `assets/js/map.js`
 
@@ -81,6 +108,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/map/core.js`
 
 - `initMap(mapData, ponies, locations, runtimeState)` — orchestrates map bootstrap (scaling, indices, assets, actors, render loop, runtime saves).
+  - Listens for `pony-speech-command` events to issue manual tasks.
   - Defers pony spritesheet loading so the map renders before ponies stream in.
 
 ## `assets/js/map/config.js`
@@ -136,6 +164,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `createTaskHelpers({...})` — task selection utilities and manual commands.
   - returns `getSpotForLocationId`, `getSupplySourceForType`, `getRestockSupplyType`, `createRestockTask`, `createRepairTask`, `getTaskTargetPoint`, `getActorPosition`, `assignManualTask`.
   - `assignManualTask` supports a `market` command to trigger a market supply run.
+  - `assignManualTask` also accepts `{ command, ingredient }` for speech-triggered `gather` actions.
 
 ## `assets/js/map/assets.js`
 

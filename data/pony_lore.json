@@ -1,0 +1,940 @@
+{
+  "version": 1,
+  "ponies": {
+    "taticorn": {
+      "name": "Taticorn",
+      "slug": "taticorn",
+      "species": "unicorn",
+      "home": {
+        "id": "house-taticorn",
+        "name": "Taticorn's House"
+      },
+      "job": {
+        "title": "master builder",
+        "locationId": "lumberyard"
+      },
+      "talent": "building homes",
+      "personality": "strong and stern",
+      "relationships": {
+        "spouse": "nessie-star",
+        "children": [
+          "stellacorn",
+          "catohorn",
+          "tiny-horn"
+        ]
+      },
+      "creatorFeedback": "Male, strong, former warrior from Transylponia. Married to Nessie Star and father of Stellacorn (oldest daughter), Catohorn (middle son), and Tiny Horn (youngest son). He vowed to never use his spear unless Ponyville is threatened. He built all Ponyville structures and now repairs them.",
+      "opinions": {
+        "nessie-star": {
+          "sentiment": "adoring",
+          "notes": "Grateful for her healing and endlessly proud to be her partner."
+        },
+        "stellacorn": {
+          "sentiment": "protective",
+          "notes": "Proud of her kindness and trusts her judgment with animals."
+        },
+        "catohorn": {
+          "sentiment": "proud",
+          "notes": "Encourages his careful magic and thoughtful nature."
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": "Delights in his joy and keeps him close."
+        },
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "taticorn"
+    },
+    "nessie-star": {
+      "name": "Nessie Star",
+      "slug": "nessie-star",
+      "species": "pony",
+      "home": {
+        "id": "house-nessie-star",
+        "name": "Nessie Star's House"
+      },
+      "job": {
+        "title": "clinic caretaker",
+        "locationId": "pony-clinic"
+      },
+      "talent": "Star Gazing",
+      "personality": "protective and thoughtful",
+      "relationships": {
+        "spouse": "taticorn",
+        "children": [
+          "stellacorn",
+          "catohorn",
+          "tiny-horn"
+        ]
+      },
+      "creatorFeedback": "Super attractive, feminine, and a powerful healer. Married to Taticorn and mother of Stellacorn, Catohorn, and Tiny Horn. Protective, thoughtful, and kindly respected across Ponyville.",
+      "opinions": {
+        "taticorn": {
+          "sentiment": "adoring",
+          "notes": "Respects his strength and cherishes his gentle heart."
+        },
+        "stellacorn": {
+          "sentiment": "protective",
+          "notes": "Proud of her compassion and supports every rescue."
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": "Encourages his magical curiosity with patience."
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": "Delights in his joy and keeps him close."
+        },
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "nessie-star"
+    },
+    "stellacorn": {
+      "name": "Stellacorn",
+      "slug": "stellacorn",
+      "species": "unicorn",
+      "home": {
+        "id": "rescue-cottage",
+        "name": "Rescue Cottage"
+      },
+      "job": {
+        "title": "animal rescuer",
+        "locationId": "whispering-forest"
+      },
+      "talent": "animal rescuing",
+      "personality": "kind and gentle",
+      "relationships": {
+        "parents": [
+          "taticorn",
+          "nessie-star"
+        ],
+        "siblings": [
+          "catohorn",
+          "tiny-horn"
+        ],
+        "role": "oldest"
+      },
+      "creatorFeedback": "Oldest daughter of Taticorn and Nessie Star. Well loved and treated neutrally at worst by all ponies. Gentle animal rescuer and a calm leader.",
+      "opinions": {
+        "taticorn": {
+          "sentiment": "adoring",
+          "notes": "Respects his steadiness and seeks his guidance."
+        },
+        "nessie-star": {
+          "sentiment": "adoring",
+          "notes": "Looks up to her healing and calm presence."
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": "Encourages his magic and likes his quiet humor."
+        },
+        "tiny-horn": {
+          "sentiment": "protective",
+          "notes": "Cheers for him and keeps him safe."
+        },
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "stellacorn"
+    },
+    "catohorn": {
+      "name": "Catohorn",
+      "slug": "catohorn",
+      "species": "unicorn",
+      "home": {
+        "id": "mystic-tower",
+        "name": "Mystic Tower"
+      },
+      "job": {
+        "title": "arcane helper",
+        "locationId": "silver-lake"
+      },
+      "talent": "casting magic",
+      "personality": "mysterious",
+      "relationships": {
+        "parents": [
+          "taticorn",
+          "nessie-star"
+        ],
+        "siblings": [
+          "stellacorn",
+          "tiny-horn"
+        ],
+        "role": "middle"
+      },
+      "creatorFeedback": "Middle son of Taticorn and Nessie Star. Male foal with a mysterious, magical nature. Loves his family and admires Stellacorn and Tiny Horn.",
+      "opinions": {
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": "Respects his discipline and wants to make him proud."
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": "Finds comfort in her guidance and calm."
+        },
+        "stellacorn": {
+          "sentiment": "admiring",
+          "notes": "Looks up to her kindness and steady leadership."
+        },
+        "tiny-horn": {
+          "sentiment": "protective",
+          "notes": "Keeps an eye out for him and supports his fun."
+        },
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "catohorn"
+    },
+    "tiny-horn": {
+      "name": "Tiny Horn",
+      "slug": "tiny-horn",
+      "species": "unicorn",
+      "home": {
+        "id": "tiny-horns-tree-house",
+        "name": "Tiny Horn's Tree House"
+      },
+      "job": {
+        "title": "storytime helper",
+        "locationId": "sparkle-library"
+      },
+      "talent": "entertaining and clowning",
+      "personality": "playful, super-social, toy-loving, and happy",
+      "relationships": {
+        "parents": [
+          "taticorn",
+          "nessie-star"
+        ],
+        "siblings": [
+          "stellacorn",
+          "catohorn"
+        ],
+        "role": "youngest"
+      },
+      "creatorFeedback": "Youngest son of Taticorn and Nessie Star. Universally loved by other ponies. Playful, joyful, and always welcome in every home.",
+      "opinions": {
+        "taticorn": {
+          "sentiment": "adoring",
+          "notes": "Looks up to his dad and loves helping him."
+        },
+        "nessie-star": {
+          "sentiment": "adoring",
+          "notes": "Feels safest with her and tells her every story first."
+        },
+        "stellacorn": {
+          "sentiment": "adoring",
+          "notes": "Proud of her rescues and wants to help."
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": "Thinks his magic is amazing and fun."
+        },
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "tiny-horn"
+    },
+    "golden-violet": {
+      "name": "Golden Violet",
+      "slug": "golden-violet",
+      "species": "unicorn",
+      "home": {
+        "id": "starlight-manor",
+        "name": "Starlight Manor",
+        "shared": true
+      },
+      "job": {
+        "title": "lantern guide",
+        "service": "leads firefly lantern tours and keeps the Lemonade Bar stocked",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "lemonade-bar"
+      },
+      "talent": "firefly guiding",
+      "personality": "curious and gentle",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "golden-violet",
+      "arcBundle": "festival",
+      "arcTuple": [
+        "festival-origin-3",
+        "festival-spark-1",
+        "festival-challenge-3",
+        "festival-turning_point-3",
+        "festival-community_role-1",
+        "festival-ritual-2",
+        "festival-bond-3",
+        "festival-future-2"
+      ]
+    },
+    "sky-sprinter": {
+      "name": "Sky Sprinter",
+      "slug": "sky-sprinter",
+      "species": "pony",
+      "home": {
+        "id": "sunrise-loft",
+        "name": "Sunrise Loft",
+        "shared": true
+      },
+      "job": {
+        "title": "cloud sculptor",
+        "service": "shapes parade clouds and hosts Sunny Picnic Grove lunches",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        },
+        "locationId": "picnic-grove"
+      },
+      "talent": "cloud sculpting",
+      "personality": "playful and brave",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "sky-sprinter",
+      "arcBundle": "sky",
+      "arcTuple": [
+        "sky-origin-2",
+        "sky-spark-3",
+        "sky-challenge-3",
+        "sky-turning_point-2",
+        "sky-community_role-2",
+        "sky-ritual-2",
+        "sky-bond-1",
+        "sky-future-2"
+      ]
+    },
+    "sunny-pippin": {
+      "name": "Sunny Pippin",
+      "slug": "sunny-pippin",
+      "species": "pony",
+      "home": {
+        "id": "sunrise-loft",
+        "name": "Sunrise Loft",
+        "shared": true
+      },
+      "job": {
+        "title": "treasure scout",
+        "service": "tracks shiny finds and keeps the Golden Spoon market stocked",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 12,
+          "max": 15
+        },
+        "locationId": "pony-restaurant"
+      },
+      "talent": "treasure spotting",
+      "personality": "cheerful and helpful",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "sunny-pippin",
+      "arcBundle": "adventure",
+      "arcTuple": [
+        "adventure-origin-3",
+        "adventure-spark-3",
+        "adventure-challenge-2",
+        "adventure-turning_point-2",
+        "adventure-community_role-1",
+        "adventure-ritual-1",
+        "adventure-bond-2",
+        "adventure-future-1"
+      ]
+    },
+    "moonbeam": {
+      "name": "Moonbeam",
+      "slug": "moonbeam",
+      "species": "unicorn",
+      "home": {
+        "id": "starlight-manor",
+        "name": "Starlight Manor",
+        "shared": true
+      },
+      "job": {
+        "title": "stargazer",
+        "service": "tracks wishes and tends the Milk & Honey Well",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "milk-honey-well"
+      },
+      "talent": "star catching",
+      "personality": "calm and dreamy",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "moonbeam",
+      "arcBundle": "sky",
+      "arcTuple": [
+        "sky-origin-1",
+        "sky-spark-2",
+        "sky-challenge-1",
+        "sky-turning_point-3",
+        "sky-community_role-3",
+        "sky-ritual-3",
+        "sky-bond-2",
+        "sky-future-1"
+      ]
+    },
+    "gleam-treasure": {
+      "name": "Gleam Treasure",
+      "slug": "gleam-treasure",
+      "species": "pony",
+      "home": {
+        "id": "racers-roost",
+        "name": "Racer's Roost"
+      },
+      "job": {
+        "title": "race coach",
+        "service": "trains speed and balance at Ponyville Race Track",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 12,
+          "max": 15
+        },
+        "locationId": "pony-race-track"
+      },
+      "talent": "racing",
+      "personality": "brave",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "gleam-treasure",
+      "arcBundle": "athletic",
+      "arcTuple": [
+        "athletic-origin-1",
+        "athletic-spark-3",
+        "athletic-challenge-1",
+        "athletic-turning_point-3",
+        "athletic-community_role-3",
+        "athletic-ritual-1",
+        "athletic-bond-2",
+        "athletic-future-1"
+      ]
+    },
+    "pixie": {
+      "name": "Pixie",
+      "slug": "pixie",
+      "species": "unicorn",
+      "home": {
+        "id": "acrobat-atelier",
+        "name": "Acrobat Atelier"
+      },
+      "job": {
+        "title": "acrobat tutor",
+        "service": "teaches flips and balance at Songbird Pavilion",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 10,
+          "max": 13
+        },
+        "locationId": "songbird-pavilion"
+      },
+      "talent": "gymnastics",
+      "personality": "nice and friendly",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "maria": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "pixie",
+      "arcBundle": "athletic",
+      "arcTuple": [
+        "athletic-origin-3",
+        "athletic-spark-1",
+        "athletic-challenge-3",
+        "athletic-turning_point-1",
+        "athletic-community_role-1",
+        "athletic-ritual-2",
+        "athletic-bond-3",
+        "athletic-future-2"
+      ]
+    },
+    "maria": {
+      "name": "Maria",
+      "slug": "maria",
+      "species": "unicorn",
+      "home": {
+        "id": "kindness-cottage",
+        "name": "Kindness Cottage"
+      },
+      "job": {
+        "title": "kindness chef",
+        "service": "bakes comfort treats at Sunrise Bakery",
+        "paid_in": "pony coins",
+        "wage_range": {
+          "min": 11,
+          "max": 14
+        },
+        "locationId": "sunrise-bakery"
+      },
+      "talent": "sparkle sprinkling",
+      "personality": "kind and thoughtful",
+      "relationships": {},
+      "creatorFeedback": "",
+      "opinions": {
+        "golden-violet": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sky-sprinter": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "sunny-pippin": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "moonbeam": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "tiny-horn": {
+          "sentiment": "adoring",
+          "notes": ""
+        },
+        "catohorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "stellacorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "gleam-treasure": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "pixie": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "taticorn": {
+          "sentiment": "warm",
+          "notes": ""
+        },
+        "nessie-star": {
+          "sentiment": "warm",
+          "notes": ""
+        }
+      },
+      "backstoryRef": "maria",
+      "arcBundle": "culinary",
+      "arcTuple": [
+        "culinary-origin-2",
+        "culinary-spark-2",
+        "culinary-challenge-2",
+        "culinary-turning_point-1",
+        "culinary-community_role-1",
+        "culinary-ritual-2",
+        "culinary-bond-2",
+        "culinary-future-1"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1227 @@
+{
+  "version": 1,
+  "slots": [
+    "origin",
+    "spark",
+    "challenge",
+    "turning_point",
+    "community_role",
+    "ritual",
+    "bond",
+    "future"
+  ],
+  "bundles": [
+    "builder",
+    "healer",
+    "forest",
+    "library",
+    "sky",
+    "adventure",
+    "athletic",
+    "culinary",
+    "festival",
+    "magic"
+  ],
+  "arcs": [
+    {
+      "id": "builder-origin-1",
+      "slot": "origin",
+      "bundle": "builder",
+      "text": "Grew up near the lumberyard, where woodwork was part of daily life."
+    },
+    {
+      "id": "builder-origin-2",
+      "slot": "origin",
+      "bundle": "builder",
+      "text": "Moved to Ponyville to be closer to the lumberyard and learn building."
+    },
+    {
+      "id": "builder-spark-1",
+      "slot": "spark",
+      "bundle": "builder",
+      "text": "First discovered a gift for building during a busy day at the lumberyard."
+    },
+    {
+      "id": "builder-spark-2",
+      "slot": "spark",
+      "bundle": "builder",
+      "text": "A small moment at the lumberyard sparked a lifelong love of building."
+    },
+    {
+      "id": "builder-challenge-1",
+      "slot": "challenge",
+      "bundle": "builder",
+      "text": "Faced a tough day when a storm cracked the promenade boards tested their patience."
+    },
+    {
+      "id": "builder-challenge-2",
+      "slot": "challenge",
+      "bundle": "builder",
+      "text": "Learned resilience after a storm cracked the promenade boards threatened the calm of the lumberyard."
+    },
+    {
+      "id": "builder-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "builder",
+      "text": "Chose the path of builder after rebuilding a neighbor's porch."
+    },
+    {
+      "id": "builder-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "builder",
+      "text": "Promised to serve Ponyville when rebuilding a neighbor's porch."
+    },
+    {
+      "id": "builder-community_role-1",
+      "slot": "community_role",
+      "bundle": "builder",
+      "text": "Now keeps the lumberyard welcoming by using building with care."
+    },
+    {
+      "id": "builder-community_role-2",
+      "slot": "community_role",
+      "bundle": "builder",
+      "text": "Helps Ponyville thrive by guiding others with woodwork."
+    },
+    {
+      "id": "builder-ritual-1",
+      "slot": "ritual",
+      "bundle": "builder",
+      "text": "Starts each morning by checking every beam for a steady fit."
+    },
+    {
+      "id": "builder-ritual-2",
+      "slot": "ritual",
+      "bundle": "builder",
+      "text": "Keeps a small habit: checking every beam for a steady fit, no matter how busy."
+    },
+    {
+      "id": "builder-bond-1",
+      "slot": "bond",
+      "bundle": "builder",
+      "text": "Shares a close bond with a trusted apprentice, who reminds them to stay gentle."
+    },
+    {
+      "id": "builder-bond-2",
+      "slot": "bond",
+      "bundle": "builder",
+      "text": "Finds comfort in a trusted apprentice, a steady companion through busy days."
+    },
+    {
+      "id": "builder-future-1",
+      "slot": "future",
+      "bundle": "builder",
+      "text": "Dreams of building a new community hall with warm timber arches for Ponyville."
+    },
+    {
+      "id": "builder-future-2",
+      "slot": "future",
+      "bundle": "builder",
+      "text": "Hopes to create a new community hall with warm timber arches so every pony can feel welcome."
+    },
+    {
+      "id": "healer-origin-1",
+      "slot": "origin",
+      "bundle": "healer",
+      "text": "Grew up near the pony clinic, where care was part of daily life."
+    },
+    {
+      "id": "healer-origin-2",
+      "slot": "origin",
+      "bundle": "healer",
+      "text": "Moved to Ponyville to be closer to the pony clinic and learn healing."
+    },
+    {
+      "id": "healer-spark-1",
+      "slot": "spark",
+      "bundle": "healer",
+      "text": "First discovered a gift for healing during a busy day at the pony clinic."
+    },
+    {
+      "id": "healer-spark-2",
+      "slot": "spark",
+      "bundle": "healer",
+      "text": "A small moment at the pony clinic sparked a lifelong love of healing."
+    },
+    {
+      "id": "healer-challenge-1",
+      "slot": "challenge",
+      "bundle": "healer",
+      "text": "Faced a tough day when a wave of scrapes after a busy race day tested their patience."
+    },
+    {
+      "id": "healer-challenge-2",
+      "slot": "challenge",
+      "bundle": "healer",
+      "text": "Learned resilience after a wave of scrapes after a busy race day threatened the calm of the pony clinic."
+    },
+    {
+      "id": "healer-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "healer",
+      "text": "Chose the path of healer after a night spent tending frightened foals."
+    },
+    {
+      "id": "healer-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "healer",
+      "text": "Promised to serve Ponyville when a night spent tending frightened foals."
+    },
+    {
+      "id": "healer-community_role-1",
+      "slot": "community_role",
+      "bundle": "healer",
+      "text": "Now keeps the pony clinic welcoming by using healing with care."
+    },
+    {
+      "id": "healer-community_role-2",
+      "slot": "community_role",
+      "bundle": "healer",
+      "text": "Helps Ponyville thrive by guiding others with care."
+    },
+    {
+      "id": "healer-ritual-1",
+      "slot": "ritual",
+      "bundle": "healer",
+      "text": "Starts each morning by brewing a calming tea."
+    },
+    {
+      "id": "healer-ritual-2",
+      "slot": "ritual",
+      "bundle": "healer",
+      "text": "Keeps a small habit: brewing a calming tea, no matter how busy."
+    },
+    {
+      "id": "healer-bond-1",
+      "slot": "bond",
+      "bundle": "healer",
+      "text": "Shares a close bond with a grateful patient, who reminds them to stay gentle."
+    },
+    {
+      "id": "healer-bond-2",
+      "slot": "bond",
+      "bundle": "healer",
+      "text": "Finds comfort in a grateful patient, a steady companion through busy days."
+    },
+    {
+      "id": "healer-future-1",
+      "slot": "future",
+      "bundle": "healer",
+      "text": "Dreams of building a brighter wellness nook for everypony for Ponyville."
+    },
+    {
+      "id": "healer-future-2",
+      "slot": "future",
+      "bundle": "healer",
+      "text": "Hopes to create a brighter wellness nook for everypony so every pony can feel welcome."
+    },
+    {
+      "id": "forest-origin-1",
+      "slot": "origin",
+      "bundle": "forest",
+      "text": "Grew up near Whispering Forest, where gentle tracking was part of daily life."
+    },
+    {
+      "id": "forest-origin-2",
+      "slot": "origin",
+      "bundle": "forest",
+      "text": "Moved to Ponyville to be closer to Whispering Forest and learn animal rescue."
+    },
+    {
+      "id": "forest-spark-1",
+      "slot": "spark",
+      "bundle": "forest",
+      "text": "First discovered a gift for animal rescue during a busy day at Whispering Forest."
+    },
+    {
+      "id": "forest-spark-2",
+      "slot": "spark",
+      "bundle": "forest",
+      "text": "A small moment at Whispering Forest sparked a lifelong love of animal rescue."
+    },
+    {
+      "id": "forest-challenge-1",
+      "slot": "challenge",
+      "bundle": "forest",
+      "text": "Faced a tough day when a tangled thicket after a storm tested their patience."
+    },
+    {
+      "id": "forest-challenge-2",
+      "slot": "challenge",
+      "bundle": "forest",
+      "text": "Learned resilience after a tangled thicket after a storm threatened the calm of Whispering Forest."
+    },
+    {
+      "id": "forest-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "forest",
+      "text": "Chose the path of forest helper after guiding a lost fawn home."
+    },
+    {
+      "id": "forest-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "forest",
+      "text": "Promised to serve Ponyville when guiding a lost fawn home."
+    },
+    {
+      "id": "forest-community_role-1",
+      "slot": "community_role",
+      "bundle": "forest",
+      "text": "Now keeps Whispering Forest welcoming by using animal rescue with care."
+    },
+    {
+      "id": "forest-community_role-2",
+      "slot": "community_role",
+      "bundle": "forest",
+      "text": "Helps Ponyville thrive by guiding others with gentle tracking."
+    },
+    {
+      "id": "forest-ritual-1",
+      "slot": "ritual",
+      "bundle": "forest",
+      "text": "Starts each morning by listening for birdsong at dawn."
+    },
+    {
+      "id": "forest-ritual-2",
+      "slot": "ritual",
+      "bundle": "forest",
+      "text": "Keeps a small habit: listening for birdsong at dawn, no matter how busy."
+    },
+    {
+      "id": "forest-bond-1",
+      "slot": "bond",
+      "bundle": "forest",
+      "text": "Shares a close bond with a rescued critter, who reminds them to stay gentle."
+    },
+    {
+      "id": "forest-bond-2",
+      "slot": "bond",
+      "bundle": "forest",
+      "text": "Finds comfort in a rescued critter, a steady companion through busy days."
+    },
+    {
+      "id": "forest-future-1",
+      "slot": "future",
+      "bundle": "forest",
+      "text": "Dreams of building a safer woodland trail for Ponyville."
+    },
+    {
+      "id": "forest-future-2",
+      "slot": "future",
+      "bundle": "forest",
+      "text": "Hopes to create a safer woodland trail so every pony can feel welcome."
+    },
+    {
+      "id": "library-origin-1",
+      "slot": "origin",
+      "bundle": "library",
+      "text": "Grew up near Sparkle Library, where books was part of daily life."
+    },
+    {
+      "id": "library-origin-2",
+      "slot": "origin",
+      "bundle": "library",
+      "text": "Moved to Ponyville to be closer to Sparkle Library and learn storytelling."
+    },
+    {
+      "id": "library-spark-1",
+      "slot": "spark",
+      "bundle": "library",
+      "text": "First discovered a gift for storytelling during a busy day at Sparkle Library."
+    },
+    {
+      "id": "library-spark-2",
+      "slot": "spark",
+      "bundle": "library",
+      "text": "A small moment at Sparkle Library sparked a lifelong love of storytelling."
+    },
+    {
+      "id": "library-challenge-1",
+      "slot": "challenge",
+      "bundle": "library",
+      "text": "Faced a tough day when a mix-up of misplaced storybooks tested their patience."
+    },
+    {
+      "id": "library-challenge-2",
+      "slot": "challenge",
+      "bundle": "library",
+      "text": "Learned resilience after a mix-up of misplaced storybooks threatened the calm of Sparkle Library."
+    },
+    {
+      "id": "library-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "library",
+      "text": "Chose the path of storytime helper after a tale that calmed a whole room."
+    },
+    {
+      "id": "library-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "library",
+      "text": "Promised to serve Ponyville when a tale that calmed a whole room."
+    },
+    {
+      "id": "library-community_role-1",
+      "slot": "community_role",
+      "bundle": "library",
+      "text": "Now keeps Sparkle Library welcoming by using storytelling with care."
+    },
+    {
+      "id": "library-community_role-2",
+      "slot": "community_role",
+      "bundle": "library",
+      "text": "Helps Ponyville thrive by guiding others with books."
+    },
+    {
+      "id": "library-ritual-1",
+      "slot": "ritual",
+      "bundle": "library",
+      "text": "Starts each morning by arranging cushions before the day begins."
+    },
+    {
+      "id": "library-ritual-2",
+      "slot": "ritual",
+      "bundle": "library",
+      "text": "Keeps a small habit: arranging cushions before the day begins, no matter how busy."
+    },
+    {
+      "id": "library-bond-1",
+      "slot": "bond",
+      "bundle": "library",
+      "text": "Shares a close bond with a young reader, who reminds them to stay gentle."
+    },
+    {
+      "id": "library-bond-2",
+      "slot": "bond",
+      "bundle": "library",
+      "text": "Finds comfort in a young reader, a steady companion through busy days."
+    },
+    {
+      "id": "library-future-1",
+      "slot": "future",
+      "bundle": "library",
+      "text": "Dreams of building a new reading nook with twinkly lights for Ponyville."
+    },
+    {
+      "id": "library-future-2",
+      "slot": "future",
+      "bundle": "library",
+      "text": "Hopes to create a new reading nook with twinkly lights so every pony can feel welcome."
+    },
+    {
+      "id": "sky-origin-1",
+      "slot": "origin",
+      "bundle": "sky",
+      "text": "Grew up near the cloud ridge, where skywork was part of daily life."
+    },
+    {
+      "id": "sky-origin-2",
+      "slot": "origin",
+      "bundle": "sky",
+      "text": "Moved to Ponyville to be closer to the cloud ridge and learn cloud shaping."
+    },
+    {
+      "id": "sky-origin-3",
+      "slot": "origin",
+      "bundle": "sky",
+      "text": "Raised beside the cloud ridge, learning skywork from an early age."
+    },
+    {
+      "id": "sky-spark-1",
+      "slot": "spark",
+      "bundle": "sky",
+      "text": "First discovered a gift for cloud shaping during a busy day at the cloud ridge."
+    },
+    {
+      "id": "sky-spark-2",
+      "slot": "spark",
+      "bundle": "sky",
+      "text": "A small moment at the cloud ridge sparked a lifelong love of cloud shaping."
+    },
+    {
+      "id": "sky-spark-3",
+      "slot": "spark",
+      "bundle": "sky",
+      "text": "A friend at the cloud ridge asked for help, and cloud shaping suddenly clicked."
+    },
+    {
+      "id": "sky-challenge-1",
+      "slot": "challenge",
+      "bundle": "sky",
+      "text": "Faced a tough day when a sudden storm front over Ponyville tested their patience."
+    },
+    {
+      "id": "sky-challenge-2",
+      "slot": "challenge",
+      "bundle": "sky",
+      "text": "Learned resilience after a sudden storm front over Ponyville threatened the calm of the cloud ridge."
+    },
+    {
+      "id": "sky-challenge-3",
+      "slot": "challenge",
+      "bundle": "sky",
+      "text": "Was tested by a sudden storm front over Ponyville, and chose kindness anyway."
+    },
+    {
+      "id": "sky-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "sky",
+      "text": "Chose the path of sky guide after sculpting clouds for a town festival."
+    },
+    {
+      "id": "sky-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "sky",
+      "text": "Promised to serve Ponyville when sculpting clouds for a town festival."
+    },
+    {
+      "id": "sky-turning_point-3",
+      "slot": "turning_point",
+      "bundle": "sky",
+      "text": "Found their purpose during sculpting clouds for a town festival."
+    },
+    {
+      "id": "sky-community_role-1",
+      "slot": "community_role",
+      "bundle": "sky",
+      "text": "Now keeps the cloud ridge welcoming by using cloud shaping with care."
+    },
+    {
+      "id": "sky-community_role-2",
+      "slot": "community_role",
+      "bundle": "sky",
+      "text": "Helps Ponyville thrive by guiding others with skywork."
+    },
+    {
+      "id": "sky-community_role-3",
+      "slot": "community_role",
+      "bundle": "sky",
+      "text": "Known for making the cloud ridge feel safe and bright."
+    },
+    {
+      "id": "sky-ritual-1",
+      "slot": "ritual",
+      "bundle": "sky",
+      "text": "Starts each morning by checking the morning wind."
+    },
+    {
+      "id": "sky-ritual-2",
+      "slot": "ritual",
+      "bundle": "sky",
+      "text": "Keeps a small habit: checking the morning wind, no matter how busy."
+    },
+    {
+      "id": "sky-ritual-3",
+      "slot": "ritual",
+      "bundle": "sky",
+      "text": "Their favorite ritual is checking the morning wind before the day begins."
+    },
+    {
+      "id": "sky-bond-1",
+      "slot": "bond",
+      "bundle": "sky",
+      "text": "Shares a close bond with a cloud friend who loves to drift, who reminds them to stay gentle."
+    },
+    {
+      "id": "sky-bond-2",
+      "slot": "bond",
+      "bundle": "sky",
+      "text": "Finds comfort in a cloud friend who loves to drift, a steady companion through busy days."
+    },
+    {
+      "id": "sky-bond-3",
+      "slot": "bond",
+      "bundle": "sky",
+      "text": "Keeps a treasured connection with a cloud friend who loves to drift, a reminder of their roots."
+    },
+    {
+      "id": "sky-future-1",
+      "slot": "future",
+      "bundle": "sky",
+      "text": "Dreams of building a sky parade that everyone can see for Ponyville."
+    },
+    {
+      "id": "sky-future-2",
+      "slot": "future",
+      "bundle": "sky",
+      "text": "Hopes to create a sky parade that everyone can see so every pony can feel welcome."
+    },
+    {
+      "id": "sky-future-3",
+      "slot": "future",
+      "bundle": "sky",
+      "text": "Wants to someday guide the town toward a sky parade that everyone can see."
+    },
+    {
+      "id": "adventure-origin-1",
+      "slot": "origin",
+      "bundle": "adventure",
+      "text": "Grew up near the trailhead outside town, where curiosity was part of daily life."
+    },
+    {
+      "id": "adventure-origin-2",
+      "slot": "origin",
+      "bundle": "adventure",
+      "text": "Moved to Ponyville to be closer to the trailhead outside town and learn scouting."
+    },
+    {
+      "id": "adventure-origin-3",
+      "slot": "origin",
+      "bundle": "adventure",
+      "text": "Raised beside the trailhead outside town, learning curiosity from an early age."
+    },
+    {
+      "id": "adventure-spark-1",
+      "slot": "spark",
+      "bundle": "adventure",
+      "text": "First discovered a gift for scouting during a busy day at the trailhead outside town."
+    },
+    {
+      "id": "adventure-spark-2",
+      "slot": "spark",
+      "bundle": "adventure",
+      "text": "A small moment at the trailhead outside town sparked a lifelong love of scouting."
+    },
+    {
+      "id": "adventure-spark-3",
+      "slot": "spark",
+      "bundle": "adventure",
+      "text": "A friend at the trailhead outside town asked for help, and scouting suddenly clicked."
+    },
+    {
+      "id": "adventure-challenge-1",
+      "slot": "challenge",
+      "bundle": "adventure",
+      "text": "Faced a tough day when a hidden path that twisted in the hills tested their patience."
+    },
+    {
+      "id": "adventure-challenge-2",
+      "slot": "challenge",
+      "bundle": "adventure",
+      "text": "Learned resilience after a hidden path that twisted in the hills threatened the calm of the trailhead outside town."
+    },
+    {
+      "id": "adventure-challenge-3",
+      "slot": "challenge",
+      "bundle": "adventure",
+      "text": "Was tested by a hidden path that twisted in the hills, and chose kindness anyway."
+    },
+    {
+      "id": "adventure-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "adventure",
+      "text": "Chose the path of scout after a map that solved a mystery."
+    },
+    {
+      "id": "adventure-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "adventure",
+      "text": "Promised to serve Ponyville when a map that solved a mystery."
+    },
+    {
+      "id": "adventure-turning_point-3",
+      "slot": "turning_point",
+      "bundle": "adventure",
+      "text": "Found their purpose during a map that solved a mystery."
+    },
+    {
+      "id": "adventure-community_role-1",
+      "slot": "community_role",
+      "bundle": "adventure",
+      "text": "Now keeps the trailhead outside town welcoming by using scouting with care."
+    },
+    {
+      "id": "adventure-community_role-2",
+      "slot": "community_role",
+      "bundle": "adventure",
+      "text": "Helps Ponyville thrive by guiding others with curiosity."
+    },
+    {
+      "id": "adventure-community_role-3",
+      "slot": "community_role",
+      "bundle": "adventure",
+      "text": "Known for making the trailhead outside town feel safe and bright."
+    },
+    {
+      "id": "adventure-ritual-1",
+      "slot": "ritual",
+      "bundle": "adventure",
+      "text": "Starts each morning by packing a tiny compass and a snack."
+    },
+    {
+      "id": "adventure-ritual-2",
+      "slot": "ritual",
+      "bundle": "adventure",
+      "text": "Keeps a small habit: packing a tiny compass and a snack, no matter how busy."
+    },
+    {
+      "id": "adventure-ritual-3",
+      "slot": "ritual",
+      "bundle": "adventure",
+      "text": "Their favorite ritual is packing a tiny compass and a snack before the day begins."
+    },
+    {
+      "id": "adventure-bond-1",
+      "slot": "bond",
+      "bundle": "adventure",
+      "text": "Shares a close bond with a trail buddy with brave hooves, who reminds them to stay gentle."
+    },
+    {
+      "id": "adventure-bond-2",
+      "slot": "bond",
+      "bundle": "adventure",
+      "text": "Finds comfort in a trail buddy with brave hooves, a steady companion through busy days."
+    },
+    {
+      "id": "adventure-bond-3",
+      "slot": "bond",
+      "bundle": "adventure",
+      "text": "Keeps a treasured connection with a trail buddy with brave hooves, a reminder of their roots."
+    },
+    {
+      "id": "adventure-future-1",
+      "slot": "future",
+      "bundle": "adventure",
+      "text": "Dreams of building a grand treasure map for Ponyville for Ponyville."
+    },
+    {
+      "id": "adventure-future-2",
+      "slot": "future",
+      "bundle": "adventure",
+      "text": "Hopes to create a grand treasure map for Ponyville so every pony can feel welcome."
+    },
+    {
+      "id": "adventure-future-3",
+      "slot": "future",
+      "bundle": "adventure",
+      "text": "Wants to someday guide the town toward a grand treasure map for Ponyville."
+    },
+    {
+      "id": "athletic-origin-1",
+      "slot": "origin",
+      "bundle": "athletic",
+      "text": "Grew up near the race track, where speed and balance was part of daily life."
+    },
+    {
+      "id": "athletic-origin-2",
+      "slot": "origin",
+      "bundle": "athletic",
+      "text": "Moved to Ponyville to be closer to the race track and learn training."
+    },
+    {
+      "id": "athletic-origin-3",
+      "slot": "origin",
+      "bundle": "athletic",
+      "text": "Raised beside the race track, learning speed and balance from an early age."
+    },
+    {
+      "id": "athletic-spark-1",
+      "slot": "spark",
+      "bundle": "athletic",
+      "text": "First discovered a gift for training during a busy day at the race track."
+    },
+    {
+      "id": "athletic-spark-2",
+      "slot": "spark",
+      "bundle": "athletic",
+      "text": "A small moment at the race track sparked a lifelong love of training."
+    },
+    {
+      "id": "athletic-spark-3",
+      "slot": "spark",
+      "bundle": "athletic",
+      "text": "A friend at the race track asked for help, and training suddenly clicked."
+    },
+    {
+      "id": "athletic-challenge-1",
+      "slot": "challenge",
+      "bundle": "athletic",
+      "text": "Faced a tough day when a tough race against the wind tested their patience."
+    },
+    {
+      "id": "athletic-challenge-2",
+      "slot": "challenge",
+      "bundle": "athletic",
+      "text": "Learned resilience after a tough race against the wind threatened the calm of the race track."
+    },
+    {
+      "id": "athletic-challenge-3",
+      "slot": "challenge",
+      "bundle": "athletic",
+      "text": "Was tested by a tough race against the wind, and chose kindness anyway."
+    },
+    {
+      "id": "athletic-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "athletic",
+      "text": "Chose the path of coach after helping a friend find their stride."
+    },
+    {
+      "id": "athletic-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "athletic",
+      "text": "Promised to serve Ponyville when helping a friend find their stride."
+    },
+    {
+      "id": "athletic-turning_point-3",
+      "slot": "turning_point",
+      "bundle": "athletic",
+      "text": "Found their purpose during helping a friend find their stride."
+    },
+    {
+      "id": "athletic-community_role-1",
+      "slot": "community_role",
+      "bundle": "athletic",
+      "text": "Now keeps the race track welcoming by using training with care."
+    },
+    {
+      "id": "athletic-community_role-2",
+      "slot": "community_role",
+      "bundle": "athletic",
+      "text": "Helps Ponyville thrive by guiding others with speed and balance."
+    },
+    {
+      "id": "athletic-community_role-3",
+      "slot": "community_role",
+      "bundle": "athletic",
+      "text": "Known for making the race track feel safe and bright."
+    },
+    {
+      "id": "athletic-ritual-1",
+      "slot": "ritual",
+      "bundle": "athletic",
+      "text": "Starts each morning by stretching at sunrise."
+    },
+    {
+      "id": "athletic-ritual-2",
+      "slot": "ritual",
+      "bundle": "athletic",
+      "text": "Keeps a small habit: stretching at sunrise, no matter how busy."
+    },
+    {
+      "id": "athletic-ritual-3",
+      "slot": "ritual",
+      "bundle": "athletic",
+      "text": "Their favorite ritual is stretching at sunrise before the day begins."
+    },
+    {
+      "id": "athletic-bond-1",
+      "slot": "bond",
+      "bundle": "athletic",
+      "text": "Shares a close bond with a training partner who never gives up, who reminds them to stay gentle."
+    },
+    {
+      "id": "athletic-bond-2",
+      "slot": "bond",
+      "bundle": "athletic",
+      "text": "Finds comfort in a training partner who never gives up, a steady companion through busy days."
+    },
+    {
+      "id": "athletic-bond-3",
+      "slot": "bond",
+      "bundle": "athletic",
+      "text": "Keeps a treasured connection with a training partner who never gives up, a reminder of their roots."
+    },
+    {
+      "id": "athletic-future-1",
+      "slot": "future",
+      "bundle": "athletic",
+      "text": "Dreams of building a town relay that brings everypony together for Ponyville."
+    },
+    {
+      "id": "athletic-future-2",
+      "slot": "future",
+      "bundle": "athletic",
+      "text": "Hopes to create a town relay that brings everypony together so every pony can feel welcome."
+    },
+    {
+      "id": "athletic-future-3",
+      "slot": "future",
+      "bundle": "athletic",
+      "text": "Wants to someday guide the town toward a town relay that brings everypony together."
+    },
+    {
+      "id": "culinary-origin-1",
+      "slot": "origin",
+      "bundle": "culinary",
+      "text": "Grew up near Sunrise Bakery, where kindness treats was part of daily life."
+    },
+    {
+      "id": "culinary-origin-2",
+      "slot": "origin",
+      "bundle": "culinary",
+      "text": "Moved to Ponyville to be closer to Sunrise Bakery and learn baking."
+    },
+    {
+      "id": "culinary-spark-1",
+      "slot": "spark",
+      "bundle": "culinary",
+      "text": "First discovered a gift for baking during a busy day at Sunrise Bakery."
+    },
+    {
+      "id": "culinary-spark-2",
+      "slot": "spark",
+      "bundle": "culinary",
+      "text": "A small moment at Sunrise Bakery sparked a lifelong love of baking."
+    },
+    {
+      "id": "culinary-challenge-1",
+      "slot": "challenge",
+      "bundle": "culinary",
+      "text": "Faced a tough day when a busy market morning with too many orders tested their patience."
+    },
+    {
+      "id": "culinary-challenge-2",
+      "slot": "challenge",
+      "bundle": "culinary",
+      "text": "Learned resilience after a busy market morning with too many orders threatened the calm of Sunrise Bakery."
+    },
+    {
+      "id": "culinary-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "culinary",
+      "text": "Chose the path of chef after a recipe that cheered the whole town."
+    },
+    {
+      "id": "culinary-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "culinary",
+      "text": "Promised to serve Ponyville when a recipe that cheered the whole town."
+    },
+    {
+      "id": "culinary-community_role-1",
+      "slot": "community_role",
+      "bundle": "culinary",
+      "text": "Now keeps Sunrise Bakery welcoming by using baking with care."
+    },
+    {
+      "id": "culinary-community_role-2",
+      "slot": "community_role",
+      "bundle": "culinary",
+      "text": "Helps Ponyville thrive by guiding others with kindness treats."
+    },
+    {
+      "id": "culinary-ritual-1",
+      "slot": "ritual",
+      "bundle": "culinary",
+      "text": "Starts each morning by setting out warm bread for early visitors."
+    },
+    {
+      "id": "culinary-ritual-2",
+      "slot": "ritual",
+      "bundle": "culinary",
+      "text": "Keeps a small habit: setting out warm bread for early visitors, no matter how busy."
+    },
+    {
+      "id": "culinary-bond-1",
+      "slot": "bond",
+      "bundle": "culinary",
+      "text": "Shares a close bond with a neighbor who loves sweet rolls, who reminds them to stay gentle."
+    },
+    {
+      "id": "culinary-bond-2",
+      "slot": "bond",
+      "bundle": "culinary",
+      "text": "Finds comfort in a neighbor who loves sweet rolls, a steady companion through busy days."
+    },
+    {
+      "id": "culinary-future-1",
+      "slot": "future",
+      "bundle": "culinary",
+      "text": "Dreams of building a kindness menu for every season for Ponyville."
+    },
+    {
+      "id": "culinary-future-2",
+      "slot": "future",
+      "bundle": "culinary",
+      "text": "Hopes to create a kindness menu for every season so every pony can feel welcome."
+    },
+    {
+      "id": "festival-origin-1",
+      "slot": "origin",
+      "bundle": "festival",
+      "text": "Grew up near the town square, where light and welcome was part of daily life."
+    },
+    {
+      "id": "festival-origin-2",
+      "slot": "origin",
+      "bundle": "festival",
+      "text": "Moved to Ponyville to be closer to the town square and learn lantern guiding."
+    },
+    {
+      "id": "festival-origin-3",
+      "slot": "origin",
+      "bundle": "festival",
+      "text": "Raised beside the town square, learning light and welcome from an early age."
+    },
+    {
+      "id": "festival-spark-1",
+      "slot": "spark",
+      "bundle": "festival",
+      "text": "First discovered a gift for lantern guiding during a busy day at the town square."
+    },
+    {
+      "id": "festival-spark-2",
+      "slot": "spark",
+      "bundle": "festival",
+      "text": "A small moment at the town square sparked a lifelong love of lantern guiding."
+    },
+    {
+      "id": "festival-spark-3",
+      "slot": "spark",
+      "bundle": "festival",
+      "text": "A friend at the town square asked for help, and lantern guiding suddenly clicked."
+    },
+    {
+      "id": "festival-challenge-1",
+      "slot": "challenge",
+      "bundle": "festival",
+      "text": "Faced a tough day when a foggy night before a celebration tested their patience."
+    },
+    {
+      "id": "festival-challenge-2",
+      "slot": "challenge",
+      "bundle": "festival",
+      "text": "Learned resilience after a foggy night before a celebration threatened the calm of the town square."
+    },
+    {
+      "id": "festival-challenge-3",
+      "slot": "challenge",
+      "bundle": "festival",
+      "text": "Was tested by a foggy night before a celebration, and chose kindness anyway."
+    },
+    {
+      "id": "festival-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "festival",
+      "text": "Chose the path of lantern guide after lighting the way for a festival march."
+    },
+    {
+      "id": "festival-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "festival",
+      "text": "Promised to serve Ponyville when lighting the way for a festival march."
+    },
+    {
+      "id": "festival-turning_point-3",
+      "slot": "turning_point",
+      "bundle": "festival",
+      "text": "Found their purpose during lighting the way for a festival march."
+    },
+    {
+      "id": "festival-community_role-1",
+      "slot": "community_role",
+      "bundle": "festival",
+      "text": "Now keeps the town square welcoming by using lantern guiding with care."
+    },
+    {
+      "id": "festival-community_role-2",
+      "slot": "community_role",
+      "bundle": "festival",
+      "text": "Helps Ponyville thrive by guiding others with light and welcome."
+    },
+    {
+      "id": "festival-community_role-3",
+      "slot": "community_role",
+      "bundle": "festival",
+      "text": "Known for making the town square feel safe and bright."
+    },
+    {
+      "id": "festival-ritual-1",
+      "slot": "ritual",
+      "bundle": "festival",
+      "text": "Starts each morning by polishing lanterns at dusk."
+    },
+    {
+      "id": "festival-ritual-2",
+      "slot": "ritual",
+      "bundle": "festival",
+      "text": "Keeps a small habit: polishing lanterns at dusk, no matter how busy."
+    },
+    {
+      "id": "festival-ritual-3",
+      "slot": "ritual",
+      "bundle": "festival",
+      "text": "Their favorite ritual is polishing lanterns at dusk before the day begins."
+    },
+    {
+      "id": "festival-bond-1",
+      "slot": "bond",
+      "bundle": "festival",
+      "text": "Shares a close bond with a parade partner who loves the glow, who reminds them to stay gentle."
+    },
+    {
+      "id": "festival-bond-2",
+      "slot": "bond",
+      "bundle": "festival",
+      "text": "Finds comfort in a parade partner who loves the glow, a steady companion through busy days."
+    },
+    {
+      "id": "festival-bond-3",
+      "slot": "bond",
+      "bundle": "festival",
+      "text": "Keeps a treasured connection with a parade partner who loves the glow, a reminder of their roots."
+    },
+    {
+      "id": "festival-future-1",
+      "slot": "future",
+      "bundle": "festival",
+      "text": "Dreams of building a glowing promenade of lanterns for Ponyville."
+    },
+    {
+      "id": "festival-future-2",
+      "slot": "future",
+      "bundle": "festival",
+      "text": "Hopes to create a glowing promenade of lanterns so every pony can feel welcome."
+    },
+    {
+      "id": "festival-future-3",
+      "slot": "future",
+      "bundle": "festival",
+      "text": "Wants to someday guide the town toward a glowing promenade of lanterns."
+    },
+    {
+      "id": "magic-origin-1",
+      "slot": "origin",
+      "bundle": "magic",
+      "text": "Grew up near Mystic Tower, where mystic study was part of daily life."
+    },
+    {
+      "id": "magic-origin-2",
+      "slot": "origin",
+      "bundle": "magic",
+      "text": "Moved to Ponyville to be closer to Mystic Tower and learn spellwork."
+    },
+    {
+      "id": "magic-origin-3",
+      "slot": "origin",
+      "bundle": "magic",
+      "text": "Raised beside Mystic Tower, learning mystic study from an early age."
+    },
+    {
+      "id": "magic-spark-1",
+      "slot": "spark",
+      "bundle": "magic",
+      "text": "First discovered a gift for spellwork during a busy day at Mystic Tower."
+    },
+    {
+      "id": "magic-spark-2",
+      "slot": "spark",
+      "bundle": "magic",
+      "text": "A small moment at Mystic Tower sparked a lifelong love of spellwork."
+    },
+    {
+      "id": "magic-spark-3",
+      "slot": "spark",
+      "bundle": "magic",
+      "text": "A friend at Mystic Tower asked for help, and spellwork suddenly clicked."
+    },
+    {
+      "id": "magic-challenge-1",
+      "slot": "challenge",
+      "bundle": "magic",
+      "text": "Faced a tough day when a tangled enchantment near the lake tested their patience."
+    },
+    {
+      "id": "magic-challenge-2",
+      "slot": "challenge",
+      "bundle": "magic",
+      "text": "Learned resilience after a tangled enchantment near the lake threatened the calm of Mystic Tower."
+    },
+    {
+      "id": "magic-challenge-3",
+      "slot": "challenge",
+      "bundle": "magic",
+      "text": "Was tested by a tangled enchantment near the lake, and chose kindness anyway."
+    },
+    {
+      "id": "magic-turning_point-1",
+      "slot": "turning_point",
+      "bundle": "magic",
+      "text": "Chose the path of arcane helper after a spell that saved Silver Lake."
+    },
+    {
+      "id": "magic-turning_point-2",
+      "slot": "turning_point",
+      "bundle": "magic",
+      "text": "Promised to serve Ponyville when a spell that saved Silver Lake."
+    },
+    {
+      "id": "magic-turning_point-3",
+      "slot": "turning_point",
+      "bundle": "magic",
+      "text": "Found their purpose during a spell that saved Silver Lake."
+    },
+    {
+      "id": "magic-community_role-1",
+      "slot": "community_role",
+      "bundle": "magic",
+      "text": "Now keeps Mystic Tower welcoming by using spellwork with care."
+    },
+    {
+      "id": "magic-community_role-2",
+      "slot": "community_role",
+      "bundle": "magic",
+      "text": "Helps Ponyville thrive by guiding others with mystic study."
+    },
+    {
+      "id": "magic-community_role-3",
+      "slot": "community_role",
+      "bundle": "magic",
+      "text": "Known for making Mystic Tower feel safe and bright."
+    },
+    {
+      "id": "magic-ritual-1",
+      "slot": "ritual",
+      "bundle": "magic",
+      "text": "Starts each morning by practicing a calming spell."
+    },
+    {
+      "id": "magic-ritual-2",
+      "slot": "ritual",
+      "bundle": "magic",
+      "text": "Keeps a small habit: practicing a calming spell, no matter how busy."
+    },
+    {
+      "id": "magic-ritual-3",
+      "slot": "ritual",
+      "bundle": "magic",
+      "text": "Their favorite ritual is practicing a calming spell before the day begins."
+    },
+    {
+      "id": "magic-bond-1",
+      "slot": "bond",
+      "bundle": "magic",
+      "text": "Shares a close bond with a well-worn spellbook, who reminds them to stay gentle."
+    },
+    {
+      "id": "magic-bond-2",
+      "slot": "bond",
+      "bundle": "magic",
+      "text": "Finds comfort in a well-worn spellbook, a steady companion through busy days."
+    },
+    {
+      "id": "magic-bond-3",
+      "slot": "bond",
+      "bundle": "magic",
+      "text": "Keeps a treasured connection with a well-worn spellbook, a reminder of their roots."
+    },
+    {
+      "id": "magic-future-1",
+      "slot": "future",
+      "bundle": "magic",
+      "text": "Dreams of building a new protective charm for Ponyville for Ponyville."
+    },
+    {
+      "id": "magic-future-2",
+      "slot": "future",
+      "bundle": "magic",
+      "text": "Hopes to create a new protective charm for Ponyville so every pony can feel welcome."
+    },
+    {
+      "id": "magic-future-3",
+      "slot": "future",
+      "bundle": "magic",
+      "text": "Wants to someday guide the town toward a new protective charm for Ponyville."
+    }
+  ]
+}

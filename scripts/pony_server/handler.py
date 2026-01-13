@@ -327,7 +327,7 @@ class PonyHandler(SimpleHTTPRequestHandler):
             return
 
         generate_variants = True
-        launch_async(run_post_create_tasks, pony["slug"], generate_variants)
+        launch_async(run_post_create_tasks, pony["slug"], generate_variants, self.env_file)
 
         image_path = f"{self.output_dir}/{pony['slug']}.webp"
         self.send_json(

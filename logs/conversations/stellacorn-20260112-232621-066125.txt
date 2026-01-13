@@ -1,0 +1,5 @@
+Stellacorn: <edit><path>src/mypackage/__init__.py</path><start_line>9</start_line><end_line>13</end_line></edit>
+Stellacorn: search("order to show cause requirements")
+Stellacorn: <edit><path>cmd/delegate.go</path><start_line>8</start_line><end_line>9</end_line></edit>
+Stellacorn: <edit><path>src/js/Value.js</path><start_line>100</start_line><end_line>109</end_line></edit>
+Stellacorn: mclick([11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
