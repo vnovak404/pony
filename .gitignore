@@ -46,3 +46,4 @@ assets/ui/icons/*
 !assets/ui/icons/*.webp
 assets/ui/**/.DS_Store
 public/
+certs/

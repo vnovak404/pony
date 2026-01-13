@@ -103,7 +103,7 @@ BACKSTORY_TOOL = {
 TOOLS = [ACTION_TOOL, BACKSTORY_TOOL]
 
 
-def start_realtime_server(config):
+def start_realtime_server(config, ssl_context=None):
     try:
         import websockets  # type: ignore
     except ImportError:
@@ -601,7 +601,11 @@ def start_realtime_server(config):
 
     async def server_loop():
         async with websockets.serve(
-            handle_client, config.host, config.ws_port, max_size=2**20
+            handle_client,
+            config.host,
+            config.ws_port,
+            max_size=2**20,
+            ssl=ssl_context,
         ):
             await asyncio.Future()
 

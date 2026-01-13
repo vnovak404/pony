@@ -45,7 +45,7 @@ BANNED_REPLY_PHRASES = [
 ]
 
 
-def start_pipeline_server(config):
+def start_pipeline_server(config, ssl_context=None):
     try:
         import websockets  # type: ignore
     except ImportError:
@@ -393,7 +393,11 @@ def start_pipeline_server(config):
 
     async def server_loop():
         async with websockets.serve(
-            handle_client, config.host, config.ws_port, max_size=2**20
+            handle_client,
+            config.host,
+            config.ws_port,
+            max_size=2**20,
+            ssl=ssl_context,
         ):
             await asyncio.Future()
 

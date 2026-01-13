@@ -1,5 +1,7 @@
 import argparse
+import ssl
 from http.server import ThreadingHTTPServer
+from pathlib import Path
 
 from .config import (
     DEFAULT_ALLOWED_ORIGINS,
@@ -29,6 +31,8 @@ from .config import (
     SpeechConfig,
     DEFAULT_REALTIME_URL,
     DEFAULT_SPEECH_MODE,
+    DEFAULT_SPEECH_TLS_CERT,
+    DEFAULT_SPEECH_TLS_KEY,
 )
 from .handler import SpeechHandler
 from .pipeline import start_pipeline_server
@@ -100,6 +104,8 @@ def parse_args():
         default=DEFAULT_SPEECH_MODE,
         help="Speech mode: realtime or pipeline.",
     )
+    parser.add_argument("--tls-cert", default=DEFAULT_SPEECH_TLS_CERT)
+    parser.add_argument("--tls-key", default=DEFAULT_SPEECH_TLS_KEY)
     parser.add_argument(
         "--no-fallback-smart",
         action="store_true",
@@ -116,6 +122,15 @@ def _resolve_allowed_origins(arg_list):
 
 def main():
     args = parse_args()
+    root = Path(__file__).resolve().parents[2]
+    tls_cert = args.tls_cert
+    tls_key = args.tls_key
+    if not tls_cert and not tls_key:
+        default_cert = root / "certs" / "localhost-cert.pem"
+        default_key = root / "certs" / "localhost-key.pem"
+        if default_cert.exists() and default_key.exists():
+            tls_cert = str(default_cert)
+            tls_key = str(default_key)
     config = SpeechConfig(
         host=args.host,
         port=args.port,
@@ -145,6 +160,8 @@ def main():
         realtime_silence_duration_ms=args.realtime_silence_duration_ms,
         fallback_to_smart=not args.no_fallback_smart,
         speech_mode=args.speech_mode,
+        tls_cert_path=tls_cert,
+        tls_key_path=tls_key,
     )
 
     handler = lambda *handler_args, **handler_kwargs: SpeechHandler(  # noqa: E731
@@ -154,15 +171,24 @@ def main():
     )
 
     speech_mode = (config.speech_mode or "").strip().lower()
+    ssl_context = None
+    if config.tls_cert_path and config.tls_key_path:
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_context.load_cert_chain(config.tls_cert_path, config.tls_key_path)
+
     if speech_mode == "pipeline":
-        realtime_thread = start_pipeline_server(config)
+        realtime_thread = start_pipeline_server(config, ssl_context=ssl_context)
     else:
-        realtime_thread = start_realtime_server(config)
+        realtime_thread = start_realtime_server(config, ssl_context=ssl_context)
 
     with ThreadingHTTPServer((config.host, config.port), handler) as server:
-        print(f"Speech helper running at http://{config.host}:{config.port}")
+        scheme = "https" if ssl_context else "http"
+        if ssl_context:
+            server.socket = ssl_context.wrap_socket(server.socket, server_side=True)
+        print(f"Speech helper running at {scheme}://{config.host}:{config.port}")
         if realtime_thread:
-            print(f"Realtime WS running at ws://{config.host}:{config.ws_port}")
+            ws_scheme = "wss" if ssl_context else "ws"
+            print(f"Realtime WS running at {ws_scheme}://{config.host}:{config.ws_port}")
         try:
             server.serve_forever()
         except KeyboardInterrupt:

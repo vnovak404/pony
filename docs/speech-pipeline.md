@@ -83,6 +83,7 @@ Communication:
 - Frontend connects via HTTP/WS to localhost service.
 - Only local origins allowed (secure CORS).
 - No API key passed to frontend.
+- For https sites, the helper must run on HTTPS/WSS with a trusted local cert.
 
 ### 7) Data Flow
 

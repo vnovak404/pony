@@ -205,6 +205,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `SPEECH_FORCE_FALLBACK` (`1` or `0`, default `0`) to bypass LLM and use the fallback reply.
   - `SPEECH_HISTORY_TURNS` (default `4`) to keep the last N user/pony turns in the LLM context.
   - `SPEECH_MAX_OUTPUT_TOKENS` (default `3000`) to cap LLM output length in pipeline mode.
+  - `SPEECH_TLS_CERT`, `SPEECH_TLS_KEY` for HTTPS/WSS helper mode.
   - `OPENAI_REALTIME_MODEL` (default `gpt-4o-realtime-preview`).
   - `OPENAI_REALTIME_VOICE` (default `coral`).
   - `OPENAI_REALTIME_TRANSCRIPTION_MODEL` (default `whisper-1`).
@@ -253,11 +254,29 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--realtime-max-session` max seconds before forcing a realtime reconnect.
   - `--realtime-silence-duration-ms` server VAD silence duration (ms) before ending a turn.
   - `--speech-mode` set `realtime` or `pipeline`.
+  - `--tls-cert`, `--tls-key` enable HTTPS/WSS (required for https sites).
+  - If `certs/localhost-cert.pem` + `certs/localhost-key.pem` exist, the helper auto-loads them.
   - `--no-fallback-smart` disable smart-model fallback.
 - Example usage:
   - `.venv/bin/python scripts/speech_helper.py`
   - `.venv/bin/python scripts/speech_helper.py --allow-null-origin`
   - The realtime prompt includes a ~100-word backstory summary for the active pony.
+
+## `scripts/setup_local_tls.py`
+
+- Purpose: generate a local CA + localhost cert (SANs for `localhost` + `127.0.0.1`) so the helper can run on HTTPS/WSS for `https://` sites.
+- Output: `certs/ponyparade-ca-cert.pem`, `certs/ponyparade-ca-key.pem`, `certs/localhost-cert.pem`, `certs/localhost-key.pem`.
+- CLI:
+  - `--output-dir` (default `certs`)
+  - `--ca-name` CA common name
+  - `--hostname`, `--ip` for SAN entries (default `localhost`, `127.0.0.1`)
+  - `--days` cert validity (default 365)
+  - `--force` overwrite existing files
+  - `--install` attempt to install CA into the OS trust store
+- Example usage:
+  - `.venv/bin/python scripts/setup_local_tls.py`
+  - `.venv/bin/python scripts/setup_local_tls.py --install`
+  - `.venv/bin/python scripts/speech_helper.py --tls-cert certs/localhost-cert.pem --tls-key certs/localhost-key.pem`
 
 ## `scripts/interpolate_pony_sprites.py`
 

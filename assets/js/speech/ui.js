@@ -8,9 +8,17 @@ const resolveHelperHost = () => {
   return "localhost";
 };
 
+const resolveHelperScheme = () => {
+  if (window.location.protocol === "https:") {
+    return { http: "https", ws: "wss" };
+  }
+  return { http: "http", ws: "ws" };
+};
+
 const helperHost = resolveHelperHost();
-const helperHttp = `http://${helperHost}:8091`;
-const helperWs = `ws://${helperHost}:8092`;
+const helperScheme = resolveHelperScheme();
+const helperHttp = `${helperScheme.http}://${helperHost}:8091`;
+const helperWs = `${helperScheme.ws}://${helperHost}:8092`;
 
 const requestJson = async (url, options = {}) => {
   const response = await fetch(url, options);

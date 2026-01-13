@@ -49,6 +49,8 @@ DEFAULT_SPEECH_HISTORY_TURNS = int(os.getenv("SPEECH_HISTORY_TURNS", "4"))
 DEFAULT_SPEECH_MAX_OUTPUT_TOKENS = int(
     os.getenv("SPEECH_MAX_OUTPUT_TOKENS", "3000")
 )
+DEFAULT_SPEECH_TLS_CERT = os.getenv("SPEECH_TLS_CERT", "")
+DEFAULT_SPEECH_TLS_KEY = os.getenv("SPEECH_TLS_KEY", "")
 
 
 @dataclass
@@ -89,3 +91,5 @@ class SpeechConfig:
     }
     speech_history_turns: int = DEFAULT_SPEECH_HISTORY_TURNS
     speech_max_output_tokens: int = DEFAULT_SPEECH_MAX_OUTPUT_TOKENS
+    tls_cert_path: str = DEFAULT_SPEECH_TLS_CERT
+    tls_key_path: str = DEFAULT_SPEECH_TLS_KEY

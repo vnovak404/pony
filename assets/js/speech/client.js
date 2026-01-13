@@ -13,9 +13,18 @@ const resolveHelperHost = () => {
   return "localhost";
 };
 
+const resolveHelperScheme = () => {
+  if (window.location.protocol === "https:") {
+    return { http: "https", ws: "wss" };
+  }
+  return { http: "http", ws: "ws" };
+};
+
+const { http: helperHttpScheme, ws: helperWsScheme } = resolveHelperScheme();
+
 const defaultConfig = {
-  httpBase: `http://${resolveHelperHost()}:8091`,
-  wsUrl: `ws://${resolveHelperHost()}:8092`,
+  httpBase: `${helperHttpScheme}://${resolveHelperHost()}:8091`,
+  wsUrl: `${helperWsScheme}://${resolveHelperHost()}:8092`,
   targetSampleRate: 24000,
   bufferSize: 4096,
 };
