@@ -28,6 +28,7 @@ from .config import (
     DEFAULT_REALTIME_IDLE_TIMEOUT,
     DEFAULT_REALTIME_MAX_SESSION,
     DEFAULT_REALTIME_SILENCE_DURATION_MS,
+    DEFAULT_REALTIME_BARGE_IN_MIN_CHARS,
     SpeechConfig,
     DEFAULT_REALTIME_URL,
     DEFAULT_SPEECH_MODE,
@@ -100,6 +101,12 @@ def parse_args():
         help="Silence duration (ms) before server VAD ends a turn.",
     )
     parser.add_argument(
+        "--realtime-barge-in-min-chars",
+        type=int,
+        default=DEFAULT_REALTIME_BARGE_IN_MIN_CHARS,
+        help="Minimum transcript characters before barge-in cancels playback.",
+    )
+    parser.add_argument(
         "--speech-mode",
         default=DEFAULT_SPEECH_MODE,
         help="Speech mode: realtime or pipeline.",
@@ -158,6 +165,7 @@ def main():
         realtime_idle_timeout=args.realtime_idle_timeout,
         realtime_max_session=args.realtime_max_session,
         realtime_silence_duration_ms=args.realtime_silence_duration_ms,
+        realtime_barge_in_min_chars=args.realtime_barge_in_min_chars,
         fallback_to_smart=not args.no_fallback_smart,
         speech_mode=args.speech_mode,
         tls_cert_path=tls_cert,

@@ -81,17 +81,20 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - `decodePCM16(base64)` — decodes base64 PCM16 from websocket payloads.
 - `concatInt16(chunks)` — concatenates PCM chunks for playback replay.
 - `pcm16ToWav(pcm16, sampleRate)` — wraps PCM audio in a WAV container.
-- `PcmStreamPlayer` — queues PCM16 chunks for near-realtime playback.
+- `PcmStreamPlayer` — queues PCM16 chunks for near-realtime playback; accepts an optional `onPlaybackStart({ scheduledStart, delayMs })` hook.
 
 ## `assets/js/speech/client.js`
 
 - `SpeechClient` — websocket bridge for realtime speech; handles mic capture, audio streaming, transcripts, and audio playback.
   - Emits `onTranscript({ text, final })` and `onReply({ text, final, reset })` for UI consumers.
   - Emits `onAudioActivity(active)` when audio response chunks start/end.
+  - Supports pipeline vs realtime with `setMode`, `startConvo`, `hangup`, and `isLiveReady` for session lifecycle.
+  - Sends telemetry over the websocket for latency markers (`capture_start`, `utterance_stop`, `tts_first_audio_byte`, `audio_play_start`); toggle via `config.telemetry`.
 
 ## `assets/js/speech/ui.js`
 
-- `initSpeechUI()` — wires the speech UI, loads pony selector, starts/stops listening (buttons + spacebar push-to-talk), updates pronunciation/actions, maintains a combined transcript log, updates the active pony avatar, and toggles the pronunciation helper panel.
+- `initSpeechUI()` — async; wires the speech UI, loads pony selector, manages pipeline vs Live (STS) mode with Start Convo/Hang Up controls + auto-close warning, starts/stops pipeline listening (hold-to-speak button with mouse/keyboard + spacebar push-to-talk), streams hands-free audio in Live mode, updates pronunciation/actions, maintains a combined transcript log, updates the active pony avatar, and toggles the pronunciation helper panel.
+  - Detects HTTPS helper on HTTP pages; override with `speech_helper_scheme` query param or `localStorage.speechHelperScheme`.
 
 ## `assets/js/map.js`
 

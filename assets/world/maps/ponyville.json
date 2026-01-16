@@ -503,8 +503,8 @@
         "id": "bakery",
         "kind": "building",
         "at": {
-          "x": 17.12,
-          "y": 7.91
+          "x": 35.83,
+          "y": 11.19
         },
         "sprite": "bakery_01",
         "locationId": "sunrise-bakery"
@@ -513,8 +513,8 @@
         "id": "restaurant",
         "kind": "food",
         "at": {
-          "x": 29.26,
-          "y": 15.97
+          "x": 28.63,
+          "y": 16.5
         },
         "sprite": "restaurant_01",
         "locationId": "pony-restaurant",
@@ -541,8 +541,8 @@
         "id": "library",
         "kind": "building",
         "at": {
-          "x": 24.02,
-          "y": 15.87
+          "x": 37.2,
+          "y": 18.73
         },
         "sprite": "library_01",
         "locationId": "sparkle-library",
@@ -555,8 +555,8 @@
         "id": "market",
         "kind": "building",
         "at": {
-          "x": 8.95,
-          "y": 16.08
+          "x": 9.06,
+          "y": 16.07
         },
         "sprite": "market_01",
         "locationId": "market-square",
@@ -570,8 +570,8 @@
         "id": "lumberyard",
         "kind": "location",
         "at": {
-          "x": 4.26,
-          "y": 11.46
+          "x": 23.57,
+          "y": 8.19
         },
         "sprite": "lumberyard_01",
         "locationId": "lumberyard",
@@ -586,8 +586,8 @@
         "id": "milk-honey-well",
         "kind": "landmark",
         "at": {
-          "x": 20.56,
-          "y": 15.87
+          "x": 20.25,
+          "y": 16.02
         },
         "sprite": "well_01",
         "locationId": "milk-honey-well",
@@ -600,7 +600,7 @@
         "id": "clinic",
         "kind": "building",
         "at": {
-          "x": 24.05,
+          "x": 24.12,
           "y": 19.21
         },
         "sprite": "clinic_01",
@@ -613,8 +613,8 @@
         "id": "inn",
         "kind": "building",
         "at": {
-          "x": 16.88,
-          "y": 15.88
+          "x": 24.18,
+          "y": 15.93
         },
         "sprite": "inn_01",
         "locationId": "moonlit-inn",
@@ -625,7 +625,7 @@
         "kind": "landmark",
         "at": {
           "x": 32.26,
-          "y": 15.82
+          "y": 15.8
         },
         "sprite": "pavilion_01",
         "locationId": "songbird-pavilion"
@@ -634,8 +634,8 @@
         "id": "race-track",
         "kind": "landmark",
         "at": {
-          "x": 17.2,
-          "y": 11.45
+          "x": 17.87,
+          "y": 11.93
         },
         "sprite": "race_track_01",
         "locationId": "pony-race-track",
@@ -645,8 +645,8 @@
         "id": "observatory",
         "kind": "building",
         "at": {
-          "x": 35.24,
-          "y": 19.11
+          "x": 19.58,
+          "y": 7.95
         },
         "sprite": "observatory_01",
         "locationId": "starlight-observatory",
@@ -678,8 +678,8 @@
         "id": "honeybee-field",
         "kind": "location",
         "at": {
-          "x": 4.36,
-          "y": 18.38
+          "x": 4.62,
+          "y": 19.38
         },
         "sprite": "honeybee_field_01",
         "locationId": "honeybee-field",
@@ -736,8 +736,8 @@
         "id": "sugar-cane-field",
         "kind": "location",
         "at": {
-          "x": 4.63,
-          "y": 20.61
+          "x": 4.64,
+          "y": 22.27
         },
         "sprite": "sugar_cane_field_01",
         "locationId": "sugar-cane-field",
@@ -774,7 +774,7 @@
         "kind": "location",
         "at": {
           "x": 29.49,
-          "y": 8.11
+          "y": 8.12
         },
         "sprite": "crystal_creek_01",
         "locationId": "crystal-creek",
@@ -793,8 +793,8 @@
         "id": "picnic-spot",
         "kind": "food",
         "at": {
-          "x": 4.12,
-          "y": 15.09
+          "x": 4.54,
+          "y": 16.93
         },
         "sprite": "picnic_01",
         "locationId": "picnic-grove",
@@ -807,8 +807,8 @@
         "id": "whispering-forest",
         "kind": "nature",
         "at": {
-          "x": 3.15,
-          "y": 9.01
+          "x": 3.14,
+          "y": 11.21
         },
         "sprite": "forest_01",
         "locationId": "whispering-forest",
@@ -841,8 +841,8 @@
         "id": "starlight-manor",
         "kind": "house",
         "at": {
-          "x": 25.81,
-          "y": 7.7
+          "x": 16.71,
+          "y": 8.29
         },
         "spritePath": "/assets/world/houses/starlight-manor.webp",
         "label": "Starlight Manor",
@@ -871,8 +871,8 @@
         "id": "mystic-tower",
         "kind": "house",
         "at": {
-          "x": 13.47,
-          "y": 15.7
+          "x": 13.37,
+          "y": 16.02
         },
         "spritePath": "/assets/world/houses/mystic-tower.webp",
         "label": "Mystic Tower",
@@ -885,8 +885,8 @@
         "id": "rescue-cottage",
         "kind": "house",
         "at": {
-          "x": 7.53,
-          "y": 11.12
+          "x": 4.71,
+          "y": 13.94
         },
         "spritePath": "/assets/world/houses/rescue-cottage.webp",
         "label": "Rescue Cottage",
@@ -899,8 +899,8 @@
         "id": "racers-roost",
         "kind": "house",
         "at": {
-          "x": 31.99,
-          "y": 18.9
+          "x": 16.94,
+          "y": 15.76
         },
         "spritePath": "/assets/world/houses/racers-roost.webp",
         "label": "Racer's Roost",
@@ -913,8 +913,8 @@
         "id": "tiny-horns-tree-house",
         "kind": "house",
         "at": {
-          "x": 10.52,
-          "y": 11.39
+          "x": 33.14,
+          "y": 18.92
         },
         "spritePath": "/assets/world/houses/tiny-horns-tree-house.webp",
         "label": "Tiny Horn's Tree House",
@@ -941,8 +941,8 @@
         "id": "kindness-cottage",
         "kind": "house",
         "at": {
-          "x": 20.6,
-          "y": 19.03
+          "x": 20.58,
+          "y": 19.16
         },
         "spritePath": "/assets/world/houses/kindness-cottage.webp",
         "label": "Kindness Cottage",
@@ -955,8 +955,8 @@
         "id": "house-taticorn",
         "kind": "house",
         "at": {
-          "x": 22.57,
-          "y": 7.97
+          "x": 26.17,
+          "y": 7.95
         },
         "spritePath": "/assets/world/houses/house-taticorn.webp",
         "label": "Taticorn's House",
@@ -969,7 +969,7 @@
         "id": "house-nessie-star",
         "kind": "house",
         "at": {
-          "x": 20.83,
+          "x": 10.17,
           "y": 11.12
         },
         "spritePath": "/assets/world/houses/house-nessie-star.webp",

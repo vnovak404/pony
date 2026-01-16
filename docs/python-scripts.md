@@ -201,7 +201,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Purpose: run the local BYOK speech helper for realtime speech (S2S) plus pronunciation handling.
 - Environment: `OPENAI_API_KEY` (from env or `.env`).
 - Optional env:
-  - `SPEECH_MODE` (`realtime` or `pipeline`, default `pipeline`).
+  - `SPEECH_MODE` (`realtime` or `pipeline`, default `realtime`).
   - `SPEECH_FORCE_FALLBACK` (`1` or `0`, default `0`) to bypass LLM and use the fallback reply.
   - `SPEECH_HISTORY_TURNS` (default `4`) to keep the last N user/pony turns in the LLM context.
   - `SPEECH_MAX_OUTPUT_TOKENS` (default `3000`) to cap LLM output length in pipeline mode.
@@ -213,17 +213,20 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `OPENAI_REALTIME_OUTPUT_FORMAT` (default `pcm16`).
   - `OPENAI_REALTIME_IDLE_TIMEOUT` (default `120` seconds; 0 disables).
   - `OPENAI_REALTIME_MAX_SESSION` (default `900` seconds; 0 disables).
-  - `OPENAI_REALTIME_SILENCE_DURATION_MS` (default `2500`; 0 disables).
+  - `OPENAI_REALTIME_SILENCE_DURATION_MS` (default `500`; 0 disables).
+  - `OPENAI_REALTIME_BARGE_IN_MIN_CHARS` (default `4`; min transcript chars to cancel playback).
   - `OPENAI_FAST_MODEL`, `OPENAI_SMART_MODEL` (defaults to `gpt-5-nano-2025-08-07`).
 - Reads:
   - `data/pony_lore.json` (pony lore + opinions).
   - `data/pony_backstories.json` (long-form backstories served via tool calls; not embedded in prompt context).
-  - `assets/world/maps/ponyville.json` (structure + house layout).
   - `data/world_locations.json` (location summary).
   - `data/_generated/speech_recent_actions.json` (recent actions).
   - `data/_generated/pronunciation_guide.json` (pronunciation entries).
+  - Prompt context includes: location names + tags, the active pony's attitudes toward other ponies, and recent actions.
+  - Pronunciation guide is used for STT normalization, not included in the LLM prompt.
 - Writes:
   - `logs/conversations/<pony-slug>-timestamp.txt` (conversation transcripts).
+  - Log timestamps are written in UTC with a `Z` suffix.
 - Endpoints:
   - `GET /health` - service status.
   - `POST /stt` - audio in, normalized text out (legacy).
@@ -236,8 +239,21 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `ws://<host>:<ws-port>` - speech bridge for audio/text streaming (pipeline or realtime).
 - Pipeline mode:
   - `SPEECH_MODE=pipeline` switches the WS bridge to STT → LLM → QA/FILTER/RETRY → TTS.
-  - Audio is synthesized via `tts-1` with `response_format=pcm` and streamed as base64 PCM16 chunks.
+  - Audio is synthesized via `tts-1` with `response_format=pcm` and streamed from the API as base64 PCM16 chunks.
   - Logs include a brief response-shape hint when the LLM returns empty text.
+  - Tool calls (`pony_action`, `pony_backstory`) are supported in pipeline mode.
+  - LLM replies stream token deltas and forward them over WS as `llm_delta` messages.
+  - Turns shorter than 0.5s (button hold) are skipped before STT/LLM/TTS.
+- Realtime mode:
+  - Hands-free STS: client sends `start_convo` to begin; server VAD handles turn detection with `create_response=true`.
+  - Client streams continuous audio chunks; no manual `commit` or `response.create` on stop.
+  - Session update uses a short persona anchor; place names + pony attitudes are inserted once per session, and the full backstory follows as a system item.
+  - Transcript events are treated as rolling updates; the helper emits a single `final` transcript per turn at the model response boundary.
+  - Barge-in is supported: server VAD `input_audio_buffer.speech_started` cancels playback (with a short grace window + debounce).
+- Latency telemetry:
+  - Logs stage markers with millisecond timestamps (`capture_start`, `utterance_stop`, `stt_start`, `stt_first_partial`, `stt_final`, `llm_start`, `llm_first_token`, `llm_done`, `tts_start`, `tts_first_audio_byte`, `tts_done`, `audio_play_start`).
+  - Logs `latency_excl_speech ms=<n>` using client timestamps when available.
+  - Client-side telemetry is sent over the WS for capture/playback milestones.
 - Dependency: install `websockets` (`pip install websockets`) for realtime mode.
 - CLI:
   - `--host`, `--port` server bind (default `127.0.0.1:8091`).
@@ -252,7 +268,8 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--realtime-url` override websocket endpoint (default `wss://api.openai.com/v1/realtime?model={model}`).
   - `--realtime-idle-timeout` idle seconds before closing a realtime session.
   - `--realtime-max-session` max seconds before forcing a realtime reconnect.
-  - `--realtime-silence-duration-ms` server VAD silence duration (ms) before ending a turn.
+  - `--realtime-silence-duration-ms` sets server VAD silence detection for hands-free STS.
+  - `--realtime-barge-in-min-chars` minimum transcript chars to trigger barge-in cancel.
   - `--speech-mode` set `realtime` or `pipeline`.
   - `--tls-cert`, `--tls-key` enable HTTPS/WSS (required for https sites).
   - If `certs/localhost-cert.pem` + `certs/localhost-key.pem` exist, the helper auto-loads them.
@@ -260,7 +277,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Example usage:
   - `.venv/bin/python scripts/speech_helper.py`
   - `.venv/bin/python scripts/speech_helper.py --allow-null-origin`
-  - The realtime prompt includes a ~100-word backstory summary for the active pony.
+  - The realtime prompt inserts the full backstory once per session for the active pony.
 
 ## `scripts/setup_local_tls.py`
 

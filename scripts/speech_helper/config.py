@@ -41,9 +41,12 @@ DEFAULT_REALTIME_URL = os.getenv(
 DEFAULT_REALTIME_IDLE_TIMEOUT = int(os.getenv("OPENAI_REALTIME_IDLE_TIMEOUT", "120"))
 DEFAULT_REALTIME_MAX_SESSION = int(os.getenv("OPENAI_REALTIME_MAX_SESSION", "900"))
 DEFAULT_REALTIME_SILENCE_DURATION_MS = int(
-    os.getenv("OPENAI_REALTIME_SILENCE_DURATION_MS", "2500")
+    os.getenv("OPENAI_REALTIME_SILENCE_DURATION_MS", "500")
 )
-DEFAULT_SPEECH_MODE = os.getenv("SPEECH_MODE", "pipeline")
+DEFAULT_REALTIME_BARGE_IN_MIN_CHARS = int(
+    os.getenv("OPENAI_REALTIME_BARGE_IN_MIN_CHARS", "4")
+)
+DEFAULT_SPEECH_MODE = os.getenv("SPEECH_MODE", "realtime")
 DEFAULT_SPEECH_FORCE_FALLBACK = os.getenv("SPEECH_FORCE_FALLBACK", "0")
 DEFAULT_SPEECH_HISTORY_TURNS = int(os.getenv("SPEECH_HISTORY_TURNS", "4"))
 DEFAULT_SPEECH_MAX_OUTPUT_TOKENS = int(
@@ -81,6 +84,7 @@ class SpeechConfig:
     realtime_idle_timeout: int = DEFAULT_REALTIME_IDLE_TIMEOUT
     realtime_max_session: int = DEFAULT_REALTIME_MAX_SESSION
     realtime_silence_duration_ms: int = DEFAULT_REALTIME_SILENCE_DURATION_MS
+    realtime_barge_in_min_chars: int = DEFAULT_REALTIME_BARGE_IN_MIN_CHARS
     fallback_to_smart: bool = True
     speech_mode: str = DEFAULT_SPEECH_MODE
     force_fallback: bool = DEFAULT_SPEECH_FORCE_FALLBACK.strip().lower() in {

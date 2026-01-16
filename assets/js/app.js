@@ -14,7 +14,7 @@ const boot = async () => {
   bindPonyCardActions();
   initPonyForm();
   loadMap();
-  initSpeechUI();
+  await initSpeechUI();
 };
 
 boot();

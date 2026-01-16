@@ -69,6 +69,7 @@ Example entries:
 - For `gather`, include an `ingredient` field (e.g., `lumber`, `water`, `honey`).
 - Full life stories are available via `pony_backstory` tool calls when requested.
 - Frontend listens for action messages and issues map commands.
+- Pipeline mode supports the same `pony_action` / `pony_backstory` tool calls.
 
 ### 6) Protocol & Endpoints (local helper)
 

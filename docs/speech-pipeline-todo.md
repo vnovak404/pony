@@ -11,7 +11,7 @@ Keep it up to date if work spans multiple sessions.
 - New pony lore: generated via API call on creation (future helper).
 - Relationship matrix: per-pony opinions of every other pony.
 - Stellacorn sentiment: neutral at worst. Tiny Horn: universally loved.
-- Speech helper: local service assembles session context (lore, opinions, layout, recent actions).
+- Speech helper: local service assembles session context (lore, opinions, locations, recent actions).
 - Model policy: realtime S2S via `gpt-4o-realtime-preview` by default.
 
 ## Immediate Todo
@@ -24,7 +24,7 @@ Keep it up to date if work spans multiple sessions.
   - [x] Endpoints: `/health`, `/stt`, `/chat`, `/tts`, `/pronunciation-guide` (GET/POST).
   - [x] CORS allowlist for known local origins + optional `null` origin.
   - [x] Load API key from env or `.env`.
-  - [x] Prompt assembly includes lore, opinions, Ponyville layout, and recent actions.
+  - [x] Prompt assembly includes lore, opinions, Ponyville locations, and recent actions.
 - [x] Add pronuncation guide storage:
   - [x] File: `data/_generated/pronunciation_guide.json` (create if missing).
   - [x] Support upserts + deletes via API.
@@ -41,8 +41,8 @@ Keep it up to date if work spans multiple sessions.
 - [x] Store recent actions:
   - [x] File: `data/_generated/speech_recent_actions.json`.
   - [x] Keep last 30 actions, newest last.
-- [x] Ponyville layout summary helper:
-  - [x] Pull from `assets/world/maps/ponyville.json` + `data/world_locations.json`.
+- [x] Ponyville locations summary helper:
+  - [x] Pull from `data/world_locations.json`.
   - [x] Provide quick list of landmarks, houses, and locations for LLM context.
 
 ## Later

@@ -104,13 +104,16 @@ export const pcm16ToWav = (pcm16, sampleRate) => {
 };
 
 export class PcmStreamPlayer {
-  constructor(sampleRate = 24000) {
+  constructor(sampleRate = 24000, options = {}) {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.context = new AudioContext({ sampleRate });
     this.sampleRate = sampleRate;
     this.outputSampleRate = this.context.sampleRate;
     this.nextTime = this.context.currentTime;
     this.sources = new Set();
+    this.onPlaybackStart = options.onPlaybackStart || null;
+    this.playbackTimer = null;
+    this.hasPlaybackStarted = false;
   }
 
   enqueue(pcm16) {
@@ -142,6 +145,24 @@ export class PcmStreamPlayer {
     if (this.nextTime < this.context.currentTime) {
       this.nextTime = this.context.currentTime + 0.02;
     }
+    if (!this.hasPlaybackStarted && this.onPlaybackStart) {
+      this.hasPlaybackStarted = true;
+      const scheduledStart = this.nextTime;
+      const delayMs = Math.max(
+        0,
+        (scheduledStart - this.context.currentTime) * 1000
+      );
+      if (this.playbackTimer) {
+        clearTimeout(this.playbackTimer);
+      }
+      this.playbackTimer = setTimeout(() => {
+        this.playbackTimer = null;
+        this.onPlaybackStart({
+          scheduledStart,
+          delayMs,
+        });
+      }, delayMs);
+    }
     source.start(this.nextTime);
     this.nextTime += buffer.duration;
   }
@@ -161,9 +182,18 @@ export class PcmStreamPlayer {
     });
     this.sources.clear();
     this.nextTime = this.context.currentTime;
+    this.hasPlaybackStarted = false;
+    if (this.playbackTimer) {
+      clearTimeout(this.playbackTimer);
+      this.playbackTimer = null;
+    }
   }
 
   async close() {
+    if (this.playbackTimer) {
+      clearTimeout(this.playbackTimer);
+      this.playbackTimer = null;
+    }
     if (this.context && this.context.state !== "closed") {
       await this.context.close();
     }

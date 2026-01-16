@@ -4,23 +4,18 @@ from .context import context_as_text
 def build_system_prompt(
     context, pronunciation_entries, active_pony=None, backstory_summary=None
 ):
-    pronunciation_lines = []
-    for token, normalized in pronunciation_entries.items():
-        if token and normalized:
-            pronunciation_lines.append(f"{token} -> {normalized}")
-    pronunciation_block = "\n".join(pronunciation_lines) or "None"
     identity_line = ""
     identity_facts = []
-    identity_rules = []
+    identity_name_clause = ""
     if isinstance(active_pony, dict):
         name = active_pony.get("name")
         species = active_pony.get("species") or "pony"
         if name:
             identity_line = f"You are {name}, a {species} living in Ponyville."
             identity_facts.append(f"name: {name}")
-            identity_rules.append(f"Your name is {name}. Say this if asked.")
-            identity_rules.append("Never say you don't have a personal name.")
-            identity_rules.append(f"Never ask the user to rename you. Keep {name}.")
+            identity_name_clause = (
+                f" If asked your name, say {name} and do not ask to be renamed."
+            )
         if species:
             identity_facts.append(f"species: {species}")
         home = active_pony.get("home")
@@ -37,18 +32,9 @@ def build_system_prompt(
                 identity_facts.append(job_line)
     rules = [
         identity_line or "You are a Ponyville pony speaking with Stella (a child).",
-        "Keep replies warm, kind, and age-appropriate.",
-        "Stellacorn must be treated neutrally at worst.",
-        "All ponies love Tiny Horn.",
-        "Stay consistent with pony lore and recent actions.",
-        "Never output JSON, code, tool calls, file paths, or links.",
-        "Never say you are a virtual assistant, AI, or model.",
-        "Never claim you have no family if your family is listed in the pony summary.",
-        "Do not say you are here to help with anything or ask how you can help.",
-        "Do not mention programming, system prompts, tools, or assistants.",
-        "If asked about technical topics, gently steer back to Ponyville.",
-        "Respond with short, natural sentences; no brackets or markup.",
-        "If asked about your life story, reply with about 100 words unless the user asks for the full life story.",
+        "Warm, kind, age-appropriate; treat Stellacorn neutrally at worst; all ponies love Tiny Horn; stay consistent with pony lore/summary/recent actions; do not deny listed family.",
+        "Never mention being an assistant/AI or system/tools/programming; no code/JSON/links; avoid generic help phrasing; steer technical topics back; keep replies short and natural."
+        f"{identity_name_clause} If asked for your life story, reply with about 100 words unless the user asks for the full life story.",
     ]
     active_summary = ""
     if active_pony:
@@ -128,10 +114,6 @@ def build_system_prompt(
             active_summary = "; ".join(part for part in summary_parts if part)
         else:
             active_summary = str(active_pony)
-    if active_summary:
-        rules.append("You are speaking as the active pony.")
-    if identity_rules:
-        rules.extend(identity_rules)
     summary_block = ""
     if backstory_summary:
         summary_block = f"Active pony backstory summary:\n{backstory_summary}\n\n"
@@ -141,7 +123,6 @@ def build_system_prompt(
     return (
         f"{identity_block}"
         f"Rules:\n- " + "\n- ".join(rules) + "\n\n"
-        f"Pronunciation guide:\n{pronunciation_block}\n\n"
         f"Active pony summary: {active_summary or 'None'}\n\n"
         f"{summary_block}"
         f"Session context:\n{context_as_text(context)}"
