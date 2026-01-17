@@ -386,6 +386,12 @@
   animation: rise 0.8s ease both;
 }
 
+.adventure-link {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
 .adventure:nth-child(1) {
   animation-delay: 0.1s;
 }

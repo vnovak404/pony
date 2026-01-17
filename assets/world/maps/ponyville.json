@@ -527,8 +527,8 @@
         "id": "lemonade-bar",
         "kind": "building",
         "at": {
-          "x": 13.44,
-          "y": 8.0
+          "x": 13.9,
+          "y": 12.1
         },
         "sprite": "lemonade_bar_01",
         "locationId": "lemonade-bar",
@@ -555,8 +555,8 @@
         "id": "market",
         "kind": "building",
         "at": {
-          "x": 9.06,
-          "y": 16.07
+          "x": 7.94,
+          "y": 11.37
         },
         "sprite": "market_01",
         "locationId": "market-square",
@@ -570,8 +570,8 @@
         "id": "lumberyard",
         "kind": "location",
         "at": {
-          "x": 23.57,
-          "y": 8.19
+          "x": 28.71,
+          "y": 7.22
         },
         "sprite": "lumberyard_01",
         "locationId": "lumberyard",
@@ -600,8 +600,8 @@
         "id": "clinic",
         "kind": "building",
         "at": {
-          "x": 24.12,
-          "y": 19.21
+          "x": 23.78,
+          "y": 18.83
         },
         "sprite": "clinic_01",
         "locationId": "pony-clinic",
@@ -613,8 +613,8 @@
         "id": "inn",
         "kind": "building",
         "at": {
-          "x": 24.18,
-          "y": 15.93
+          "x": 24.17,
+          "y": 15.81
         },
         "sprite": "inn_01",
         "locationId": "moonlit-inn",
@@ -634,8 +634,8 @@
         "id": "race-track",
         "kind": "landmark",
         "at": {
-          "x": 17.87,
-          "y": 11.93
+          "x": 17.3,
+          "y": 12.87
         },
         "sprite": "race_track_01",
         "locationId": "pony-race-track",
@@ -659,8 +659,8 @@
         "id": "farm",
         "kind": "location",
         "at": {
-          "x": 7.93,
-          "y": 18.87
+          "x": 13.94,
+          "y": 23.87
         },
         "sprite": "farm_01",
         "locationId": "windmill-farm",
@@ -736,8 +736,8 @@
         "id": "sugar-cane-field",
         "kind": "location",
         "at": {
-          "x": 4.64,
-          "y": 22.27
+          "x": 7.15,
+          "y": 17.46
         },
         "sprite": "sugar_cane_field_01",
         "locationId": "sugar-cane-field",
@@ -807,8 +807,8 @@
         "id": "whispering-forest",
         "kind": "nature",
         "at": {
-          "x": 3.14,
-          "y": 11.21
+          "x": 3.21,
+          "y": 8.76
         },
         "sprite": "forest_01",
         "locationId": "whispering-forest",
@@ -827,7 +827,7 @@
         "kind": "nature",
         "at": {
           "x": 30.99,
-          "y": 12.82
+          "y": 12.69
         },
         "sprite": "lake_01",
         "locationId": "silver-lake",
@@ -841,8 +841,8 @@
         "id": "starlight-manor",
         "kind": "house",
         "at": {
-          "x": 16.71,
-          "y": 8.29
+          "x": 16.42,
+          "y": 7.96
         },
         "spritePath": "/assets/world/houses/starlight-manor.webp",
         "label": "Starlight Manor",
@@ -941,8 +941,8 @@
         "id": "kindness-cottage",
         "kind": "house",
         "at": {
-          "x": 20.58,
-          "y": 19.16
+          "x": 19.99,
+          "y": 19.14
         },
         "spritePath": "/assets/world/houses/kindness-cottage.webp",
         "label": "Kindness Cottage",
@@ -969,8 +969,8 @@
         "id": "house-nessie-star",
         "kind": "house",
         "at": {
-          "x": 10.17,
-          "y": 11.12
+          "x": 10.5,
+          "y": 15.59
         },
         "spritePath": "/assets/world/houses/house-nessie-star.webp",
         "label": "Nessie Star's House",

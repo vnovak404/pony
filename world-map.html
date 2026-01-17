@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Transylponia Map</title>
+    <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+      text-align: center;
+      background: radial-gradient(1100px 680px at 18% 12%, #1f2f2b, #0a0d12 70%);
+      color: #e6efe9;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(140px 80px at 12% 18%, rgba(255, 255, 255, 0.06), transparent 65%),
+        radial-gradient(220px 140px at 86% 26%, rgba(255, 255, 255, 0.04), transparent 70%),
+        radial-gradient(120px 70px at 30% 78%, rgba(255, 255, 255, 0.05), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    h2,
+    #controls {
+      position: relative;
+      z-index: 1;
+    }
+    #worldCanvas {
+      border: 1px solid rgba(198, 214, 205, 0.2);
+      margin-top: 10px;
+      background: linear-gradient(160deg, #1c2426, #0f1417 60%);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    #controls {
+      margin-top: 12px;
+    }
+    .btn {
+      padding: 6px 12px;
+      font-size: 15px;
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      background: #d8dbc9;
+      color: #1b1e21;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(36, 40, 41, 0.35);
+    }
+    </style>
+  </head>
+  <body>
+    <h2>Transylponia</h2>
+    <canvas id="worldCanvas" width="900" height="500"></canvas>
+    <div id="controls">
+      <button class="btn" onclick="location.href='index.html'">
+        Back to Home
+      </button>
+    </div>
+    <script type="module" src="assets/js/world-map.js"></script>
+  </body>
+</html>

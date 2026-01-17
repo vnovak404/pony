@@ -63,4 +63,5 @@ Do not commit secrets. Store local configuration in `.env` files and add them to
 - Before editing frontend JavaScript, read `docs/js-modules.md` and keep it updated with module/function changes.
 - Before editing Python scripts, read `docs/python-scripts.md` and keep it updated with module/function changes.
 - When running Python scripts from the repo, use the local virtual environment interpreter (e.g. `.venv/bin/python`) to ensure required libraries are available.
+- For new visuals, you may generate images/textures via the OpenAI image API. Convert any asset to `.webp` for use in-repo, and move the original source file outside the repo into `../pony_generated_assets`. Avoid SVG creation except for basic filler (e.g., simple grass).
 - When providing the after-action-report, first provide it normally, then on a new line preface with ">>> For a 7 year old >>>" and provide a concise version summarized for a girl with the intellectual level of a 9-10 year old.

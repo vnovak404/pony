@@ -11,6 +11,10 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 - Purpose: app bootstrap (loads vibes, pony cards, form wiring, map, and speech UI).
 - Functions: none (module only imports + invokes other modules).
 
+## `assets/js/world-map.js`
+
+- Purpose: render the world map prototype from `assets/world/maps/world-map.json`.
+
 ## `assets/js/dom.js`
 
 - Purpose: central DOM references shared across modules.

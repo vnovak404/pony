@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": "QUIET_WOODS",
+      "name": "Quiet Woods",
+      "x": 140,
+      "y": 360,
+      "unlocked": true
+    },
+    { "id": "WHISPERING_FOREST", "name": "Whispering Forest", "x": 340, "y": 260 },
+    { "id": "HIDDEN_WORKSHOPS", "name": "Hidden Workshops", "x": 540, "y": 300 },
+    { "id": "LANTERNLESS_VILLAGE", "name": "Lanternless Village", "x": 720, "y": 200 }
+  ],
+  "edges": [
+    ["QUIET_WOODS", "WHISPERING_FOREST"],
+    ["WHISPERING_FOREST", "HIDDEN_WORKSHOPS"],
+    ["HIDDEN_WORKSHOPS", "LANTERNLESS_VILLAGE"]
+  ]
+}
