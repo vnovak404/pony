@@ -1,9 +1,0 @@
-[2026-01-13 11:35:18] session_start mode=pipeline pony=Stellacorn slug=stellacorn stt=whisper-1 llm_fast=gpt-5-mini-2025-08-07 llm_smart=gpt-5-nano-2025-08-07 tts=tts-1 voice=alloy sample_rate=24000
-[2026-01-13 11:35:23] utterance_stop bytes=188416 chunks=46 capture_ms=4008
-[2026-01-13 11:35:25] stt_done ms=1532 chars=19
-Stella: Test 1, 2, 3, test.
-[2026-01-13 11:35:25] llm_skipped reason=force_fallback
-[2026-01-13 11:35:25] llm_done ms=0 attempts=0 chars=53
-Stellacorn: Hi! I'm Stellacorn from Ponyville. How are you today?
-[2026-01-13 11:35:26] tts_done ms=1764 bytes=153000
-[2026-01-13 11:35:26] utterance_done ms=3322

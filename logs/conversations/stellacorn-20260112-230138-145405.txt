@@ -1,4 +1,0 @@
-Stellacorn: <edit><path>src/format.ts</path><start_line>175</start_line><end_line>177</end_line></edit>
-Stellacorn: open_url("https://apps.apple.com/app/id1632875360")
-Stellacorn: <edit><path>src/main/java/com/ff/notekeeper/notes/NotesStorage.java</path><start_line>19</start_line><end_line>92</end_line></edit>
-Stellacorn: search("average cost of airplane maintenance per hour")

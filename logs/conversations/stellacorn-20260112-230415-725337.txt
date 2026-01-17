@@ -1,1 +1,0 @@
-Stellacorn: <edit><path>xml/report.go</path><start_line>446</start_line><end_line>453</end_line></edit>

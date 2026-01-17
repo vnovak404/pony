@@ -417,6 +417,35 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `python3 scripts/generate_ui_icons.py --size 512 --force`
   - `python3 scripts/generate_ui_icons.py --dry-run`
 
+## `scripts/generate_adventure_assets.py`
+
+- Purpose: generate adventure prototype tiles/icons/sprites via OpenAI ImageGen.
+- Uses: `scripts/sprites/images_api.py`.
+- Output:
+  - Original PNGs: `../pony_generated_assets/adventure_assets/{tiles,icons,sprites}`.
+  - WebP outputs: `prototype/{tiles,icons,sprites}`.
+  - Forest overlays: `prototype/tiles/forest-canopy.webp`, `prototype/tiles/forest-border.webp`.
+  - Tree sprites: `prototype/overlays/forest-tree-*.webp`.
+  - Overlay icons: `prototype/overlays/mouse.webp`.
+  - Hero portraits: `prototype/heroes/*-scared.webp`, `prototype/heroes/*-pile.webp`.
+  - Icons + hero portraits are auto-trimmed to center opaque content before resizing.
+- CLI:
+  - `--generated-root` override PNG output root (default `../pony_generated_assets/adventure_assets`).
+  - `--target-root` override WebP output root (default `prototype`).
+  - `--request-size` API size (default 1024).
+  - `--tile-size`, `--icon-size`, `--sprite-size`, `--tree-size`, `--overlay-size`, `--hero-size` WebP sizes.
+  - `--tiles`, `--icons`, `--sprites`, `--trees`, `--overlays`, `--heroes` to limit which groups are generated.
+  - `--force` overwrite existing WebPs.
+  - `--dry-run` print prompts only.
+- Example usage:
+  - `.venv/bin/python scripts/generate_adventure_assets.py`
+  - `.venv/bin/python scripts/generate_adventure_assets.py --tiles`
+  - `.venv/bin/python scripts/generate_adventure_assets.py --icons --force`
+  - `.venv/bin/python scripts/generate_adventure_assets.py --trees --force`
+  - `.venv/bin/python scripts/generate_adventure_assets.py --overlays --force`
+  - `.venv/bin/python scripts/generate_adventure_assets.py --heroes --force`
+  - `.venv/bin/python scripts/generate_adventure_assets.py --dry-run`
+
 ## `scripts/pony_server.py`
 
 - Purpose: local HTTP server for creating ponies, triggering sprite generation,

@@ -1,5 +1,0 @@
-Stellacorn: click("https://www.kayak.com/flights/NAS-MIA/2024-01-01/2024-01-02?sort=price_a")
-Stellacorn: <edit><path>src/main/java/org/graphwalker/core/condition/WeightedRandomEdge.java</path><start_line>40</start_line><end_line>54</end_line></edit>
-<edit><path>src/main/java/org/graphwalker/core/condition/WeightedRandomEdge.java</path><start_line>74</start_line><end_line>109</end_line></edit>
-<edit><path>src/main/java/org/graphwalker/core/condition/WeightedRandomVertex.java</path><start_line>39</start_line><end_line>53</end_line></edit>
-<edit><path>src/main/java/org/graphwalker/core/condition/WeightedRandomVertex.java</path><start_line>73</start_line><end_line>108</end_line></edit>

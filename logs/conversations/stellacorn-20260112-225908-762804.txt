@@ -1,2 +1,0 @@
-Stellacorn: {"edits": [{"path": "lib/number-to-words/locale.js", "start_line": 6, "end_line": 15}, {"path": "lib/to-words.js", "start_line": 29, "end_line": 29}, {"path": "lib/to-words.js", "start_line": 31, "end_line": 31}]}
-Stellacorn: open_url("https://www.walmart.com")
