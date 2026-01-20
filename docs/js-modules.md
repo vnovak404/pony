@@ -13,7 +13,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ## `assets/js/world-map.js`
 
-- Purpose: render the world map prototype from `assets/world/maps/world-map.json`.
+- Purpose: render the adventure world map from `assets/world/maps/world-map.json` (used by `adventures/world-map.html`).
 
 ## `assets/js/dom.js`
 
@@ -42,7 +42,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ## `assets/js/vibes.js`
 
-- `ensureVibes()` — loads `/data/pony_vibes.json` once and caches it.
+- `ensureVibes()` — loads `data/pony_vibes.json` once and caches it.
 - `applySuggestions(name, fields, fillEmptyOnly)` — populates form fields with vibe-based suggestions.
 - `buildRandomName()` — returns a two-term random pony name.
 - Internal helpers:
@@ -63,10 +63,10 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 ## `assets/js/pony-cards.js`
 
 - `renderPonyCard(pony, imagePath, addToTop)` — builds the pony card markup and inserts it.
-- `loadPonies()` — fetches `/data/ponies.json` and renders all cards.
+- `loadPonies()` — fetches `data/ponies.json` and renders all cards.
 - `bindPonyCardActions()` — handles sprite generation and spritesheet preview buttons (API calls gated by `HAS_API`).
 - Internal helpers:
-  - `loadBackstories()` — loads `data/pony_backstories.json` once and caches it.
+- `loadBackstories()` — loads `data/pony_backstories.json` once and caches it.
   - `normalizeBackstoryText(text)` — strips JSON-wrapped backstory payloads.
   - `showBackstoryModal(ponyName, text, imageSrc)` — opens the backstory overlay with the pony portrait.
   - `resolveSheetPath(metaPath, meta, fallbackPath)` — picks a preview sheet (prefers trot/walk).
@@ -329,3 +329,34 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
   - `saveStructureLocation(item)` — persists structure location to the server.
   - `handleDragEnd(event)` — releases drag state and saves.
   - `handlePonyClick(event)` — opens/updates the command menu.
+
+## `assets/js/stellacorn/world-map.js`
+
+- Purpose: renders the Whispering Forest mission map, manages unlock/clear state, and exports/imports progress.
+- Functions: none (module script).
+
+## `assets/js/stellacorn/adventure.js`
+
+- Purpose: entrypoint for Stellacorn missions; boots the runtime + mission script.
+- Functions: none (module script).
+
+## `assets/js/stellacorn/adventure/runtime.js`
+
+- Purpose: mission runtime engine (map load, fog-of-war, movement, interactions, and render loop).
+- `loadRuntime({...})` — loads mission config + assets, wires input, and returns a runtime API.
+
+## `adventures/missions/stellacorn/*/mission.js`
+
+- Purpose: mission-specific story logic co-located with mission assets (loaded dynamically via `mission.json`).
+- `createMission(runtime, ui)` — configures interactions and visibility triggers for the mission.
+
+## `assets/js/stellacorn/adventure/render.js`
+
+- Purpose: rendering helpers for the Stellacorn mission runtime.
+- `drawFrame(state)` — paints tiles, objects, and player each frame.
+- `updatePlayerAnimation(state, delta)` — steps sprite animation timing.
+
+## `assets/js/stellacorn/adventure/pathfinding.js`
+
+- Purpose: shared A* pathfinding helpers for Stellacorn missions.
+- `findPath(start, goal, { neighbors, isWalkable, heuristic })` — returns a tile path using callbacks for grid rules.

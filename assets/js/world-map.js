@@ -1,4 +1,4 @@
-const MAP_URL = "assets/world/maps/world-map.json";
+const MAP_URL = "../assets/world/maps/world-map.json";
 const PROGRESS_KEY = "PP_PROGRESS_V1";
 const SELECTED_KEY = "PP_SELECTED_NODE";
 const NODE_RADIUS = 22;
@@ -166,7 +166,7 @@ function onCanvasClick(event) {
 
 function startAdventure(nodeId) {
   localStorage.setItem(SELECTED_KEY, nodeId);
-  window.location.href = "prototype/adventure.html";
+  window.location.href = "adventure.html";
 }
 
 function ensureProgress() {

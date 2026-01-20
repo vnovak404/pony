@@ -1,0 +1,61 @@
+{
+  "title": "Whispering Forest",
+  "nodes": [
+    {
+      "id": "WF_M1",
+      "name": "Missing Deer",
+      "x": 120,
+      "y": 320,
+      "unlocked": true,
+      "mission": "../missions/stellacorn/mission1/mission.json",
+      "stats": ["Core: Healing", "Clue: Footprints"]
+    },
+    {
+      "id": "WF_M2",
+      "name": "Investigating",
+      "x": 260,
+      "y": 240,
+      "requires": ["WF_M1"],
+      "stats": ["Core: Investigation", "Threat: Traps"]
+    },
+    {
+      "id": "WF_M3",
+      "name": "Weaves of Deceit",
+      "x": 400,
+      "y": 200,
+      "requires": ["WF_M2"],
+      "stats": ["Core: Perception", "Theme: Illusions"]
+    },
+    {
+      "id": "WF_M4",
+      "name": "Rally the Forest",
+      "x": 540,
+      "y": 240,
+      "requires": ["WF_M3"],
+      "stats": ["Core: Alliances", "Allies: Forest Packs"]
+    },
+    {
+      "id": "WF_M5",
+      "name": "Drive Off Pixies",
+      "x": 680,
+      "y": 300,
+      "requires": ["WF_M4"],
+      "stats": ["Core: Teamwork", "Focus: Non-lethal"]
+    },
+    {
+      "id": "WF_M6",
+      "name": "Restoration",
+      "x": 820,
+      "y": 240,
+      "requires": ["WF_M5"],
+      "stats": ["Core: Closure", "Tone: Healing"]
+    }
+  ],
+  "edges": [
+    ["WF_M1", "WF_M2"],
+    ["WF_M2", "WF_M3"],
+    ["WF_M3", "WF_M4"],
+    ["WF_M4", "WF_M5"],
+    ["WF_M5", "WF_M6"]
+  ]
+}

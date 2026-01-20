@@ -10,13 +10,17 @@ const PLAYER_SPRITE_META_URL =
 const PLAYER_SPRITE_SHEET_URL =
   "../assets/ponies/taticorn/sheets/spritesheet.webp";
 
+const WOODS_TILE = 1;
+const DEEP_FOREST_TILE = 6;
+
 const TILE_TYPES = {
   0: { name: "GRASS", walkable: true, speed: 1.0, color: "#8fd16a" },
-  1: { name: "FOREST", walkable: true, speed: 0.55, color: "#2f8f4e" },
+  1: { name: "WOODS", walkable: true, speed: 0.85, color: "#2f8f4e" },
   2: { name: "ROAD", walkable: true, speed: 1.5, color: "#b08a5a" },
   3: { name: "MOUNTAIN", walkable: false, speed: 1.0, color: "#6b6b6b" },
   4: { name: "WATER", walkable: false, speed: 1.0, color: "#4a79d8" },
   5: { name: "VILLAGE", walkable: true, speed: 1.0, color: "#d6c2a3" },
+  6: { name: "DEEP_FOREST", walkable: false, speed: 0.6, color: "#1f5f38" },
 };
 const TILE_TEXTURES = {
   0: "./tiles/grass.webp",
@@ -25,6 +29,7 @@ const TILE_TEXTURES = {
   3: "./tiles/mountain.webp",
   4: "./tiles/water.webp",
   5: "./tiles/village.webp",
+  6: "./tiles/forest.webp",
 };
 const FOREST_OVERLAY = "./tiles/forest-canopy.webp";
 const FOREST_BORDER_OVERLAY = "./tiles/forest-border.webp";
@@ -33,6 +38,10 @@ const FOREST_TREE_SPRITES = [
   "./overlays/forest-tree-02.webp",
   "./overlays/forest-tree-03.webp",
 ];
+const LETTER_BACKGROUNDS = {
+  scroll: "./letters/scroll-letter.webp",
+  torn_letter: "./letters/torn-letter.webp",
+};
 const PLAYER_HERO_IMAGE = "../assets/ponies/taticorn.webp";
 const RESOURCE_KIND = "RESOURCE";
 const CREATURE_KIND = "CREATURE";
@@ -73,6 +82,9 @@ const MAX_SPEED = WALKABLE_SPEEDS.length
   ? Math.max(...WALKABLE_SPEEDS)
   : 1;
 const MIN_STEP_COST = 1 / MAX_SPEED;
+const FOG_RADIUS = 7;
+const FOG_DIM_ALPHA = 0.55;
+const FOG_HIDDEN_ALPHA = 0.92;
 
 const canvas = document.getElementById("adventureCanvas");
 const ctx = canvas ? canvas.getContext("2d") : null;
@@ -85,11 +97,19 @@ const objectivesEl = document.getElementById("objectives");
 const progressEl = document.getElementById("progress");
 const inventoryEl = document.getElementById("inventory");
 const statusEl = document.getElementById("status");
+const completionEl = document.getElementById("completion");
+const completionMessageEl = document.getElementById("completion-message");
+const completionReturnBtn = document.getElementById("completion-return");
 const dialogEl = document.getElementById("dialog");
 const dialogTextEl = document.getElementById("dialog-text");
 const dialogHeroEl = document.getElementById("dialog-hero");
 const dialogHeroImg = document.getElementById("dialog-hero-img");
 const dialogCloseBtn = document.getElementById("dialog-close");
+const letterEl = document.getElementById("letter-modal");
+const letterCardEl = document.getElementById("letter-card");
+const letterContextEl = document.getElementById("letter-context");
+const letterBodyEl = document.getElementById("letter-body");
+const letterCloseBtn = document.getElementById("letter-close");
 const returnBtn = document.getElementById("return-btn");
 const titleEl = document.getElementById("map-title");
 const tileImages = new Map();
@@ -100,6 +120,7 @@ let forestBorderImage = null;
 let forestTreeImages = [];
 let hoverTarget = null;
 let hoverAnchor = null;
+let completionTimer = null;
 
 let mapData = null;
 let tileSize = 32;
@@ -121,6 +142,8 @@ let lastPlayerTileKey = null;
 const toasts = [];
 let progress = loadProgress();
 let playerSprite = null;
+let discoveredTiles = new Set();
+let visibleTiles = new Set();
 
 const player = {
   tx: 0,
@@ -138,6 +161,8 @@ if (canvas && ctx) {
   window.addEventListener("mouseleave", clearHover);
   window.addEventListener("keydown", handleKey);
   dialogCloseBtn?.addEventListener("click", closeDialog);
+  letterCloseBtn?.addEventListener("click", closeLetter);
+  completionReturnBtn?.addEventListener("click", returnToWorldMap);
   returnBtn?.addEventListener("click", returnToWorldMap);
   loadTileTextures();
   loadResourceIcons();
@@ -172,14 +197,17 @@ function hydrateMap(data) {
   objects = Array.isArray(data.objects)
     ? data.objects.map((obj) => ({ ...obj, interacted: false }))
     : [];
+  resetResourceStateOnLoad(data);
   applyCollectedResources();
   rebuildResourceIndex();
   rebuildBlockingIndex();
+  resetFogOfWar();
   const spawn = data.spawn || { tx: 0, ty: 0 };
   player.tx = spawn.tx;
   player.ty = spawn.ty;
   player.px = (spawn.tx + 0.5) * tileSize;
   player.py = (spawn.ty + 0.5) * tileSize;
+  updateFogOfWar();
   if (titleEl) {
     titleEl.textContent = data.title || "Quiet Woods";
   }
@@ -197,7 +225,13 @@ function loadProgress() {
         acc[type] = DEFAULT_INVENTORY[type] ?? 0;
         return acc;
       }, {});
-      return { cleared: {}, unlocked: {}, inventory, collected: {} };
+      return {
+        cleared: {},
+        unlocked: {},
+        inventory,
+        collected: {},
+        resourceResets: {},
+      };
     }
     const parsed = JSON.parse(raw);
     const inventory = RESOURCE_TYPES.reduce((acc, type) => {
@@ -210,18 +244,40 @@ function loadProgress() {
       unlocked: parsed.unlocked || {},
       inventory,
       collected: parsed.collected || {},
+      resourceResets: parsed.resourceResets || {},
     };
   } catch (error) {
     const inventory = RESOURCE_TYPES.reduce((acc, type) => {
       acc[type] = DEFAULT_INVENTORY[type] ?? 0;
       return acc;
     }, {});
-    return { cleared: {}, unlocked: {}, inventory, collected: {} };
+    return {
+      cleared: {},
+      unlocked: {},
+      inventory,
+      collected: {},
+      resourceResets: {},
+    };
   }
 }
 
 function saveProgress() {
   localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+}
+
+function resetResourceStateOnLoad(data) {
+  const inventory = RESOURCE_TYPES.reduce((acc, type) => {
+    acc[type] = DEFAULT_INVENTORY[type] ?? 0;
+    return acc;
+  }, {});
+  progress.inventory = inventory;
+  const resourceIds = (data.objects || [])
+    .filter((obj) => obj.kind === RESOURCE_KIND)
+    .map((obj) => obj.id);
+  resourceIds.forEach((id) => {
+    delete progress.collected[id];
+  });
+  saveProgress();
 }
 
 function handleClick(event) {
@@ -321,6 +377,10 @@ function clearHover() {
 
 function openDialog(target) {
   if (!dialogEl || !dialogTextEl) return;
+  if (target.letter) {
+    openLetter(target);
+    return;
+  }
   dialogOpen = true;
   const text = Array.isArray(target.text) ? target.text.join(" ") : target.text;
   dialogTextEl.textContent = text || "....";
@@ -346,6 +406,33 @@ function closeDialog() {
   checkCompletion();
 }
 
+function openLetter(target) {
+  if (!letterEl || !letterBodyEl || !letterContextEl || !letterCardEl) return;
+  dialogOpen = true;
+  const context = Array.isArray(target.letterContext)
+    ? target.letterContext.join(" ")
+    : target.letterContext || "";
+  const body = Array.isArray(target.letterText)
+    ? target.letterText.join("\n")
+    : target.letterText || "";
+  const letterTag = target.letter || "scroll";
+  const background = LETTER_BACKGROUNDS[letterTag] || LETTER_BACKGROUNDS.scroll;
+  letterCardEl.style.backgroundImage = `url('${background}')`;
+  letterContextEl.textContent = context;
+  letterBodyEl.textContent = body;
+  letterEl.classList.add("active");
+  promptEl?.setAttribute("hidden", "true");
+}
+
+function closeLetter() {
+  if (!letterEl || !letterBodyEl || !letterContextEl || !letterCardEl) return;
+  letterEl.classList.remove("active");
+  letterCardEl.style.backgroundImage = "";
+  letterBodyEl.textContent = "";
+  letterContextEl.textContent = "";
+  dialogOpen = false;
+}
+
 function checkCompletion() {
   if (!mapData || completed) return;
   const rule = mapData.complete || {};
@@ -360,6 +447,7 @@ function checkCompletion() {
     if (returnBtn) {
       returnBtn.disabled = false;
     }
+    showCompletion();
     markComplete();
   }
   updateObjectiveStatus();
@@ -377,7 +465,21 @@ function markComplete() {
 }
 
 function returnToWorldMap() {
-  window.location.href = "../world-map.html";
+  window.location.href = "./world-map.html";
+}
+
+function showCompletion() {
+  if (!completionEl) return;
+  completionEl.classList.add("active");
+  if (completionMessageEl) {
+    completionMessageEl.textContent = "Returning to the World Map...";
+  }
+  if (completionTimer) {
+    clearTimeout(completionTimer);
+  }
+  completionTimer = window.setTimeout(() => {
+    returnToWorldMap();
+  }, 1600);
 }
 
 function updateObjectiveStatus() {
@@ -423,6 +525,7 @@ function loop(timestamp) {
 
 function update(delta) {
   updateMovement(delta);
+  updateFogOfWar();
   updateCamera();
   updateInteractable();
   updateToasts(delta);
@@ -432,6 +535,38 @@ function update(delta) {
     lastPlayerTileKey = currentKey;
     checkResourceCollection();
   }
+}
+
+function resetFogOfWar() {
+  discoveredTiles = new Set();
+  visibleTiles = new Set();
+}
+
+function updateFogOfWar() {
+  if (!mapData) return;
+  const radius = FOG_RADIUS;
+  const radiusSq = radius * radius;
+  const nextVisible = new Set();
+  for (let dy = -radius; dy <= radius; dy += 1) {
+    for (let dx = -radius; dx <= radius; dx += 1) {
+      if (dx * dx + dy * dy > radiusSq) continue;
+      const tx = player.tx + dx;
+      const ty = player.ty + dy;
+      if (tx < 0 || ty < 0 || tx >= mapWidth || ty >= mapHeight) continue;
+      const key = tileKey(tx, ty);
+      nextVisible.add(key);
+      discoveredTiles.add(key);
+    }
+  }
+  visibleTiles = nextVisible;
+}
+
+function isTileDiscovered(tx, ty) {
+  return discoveredTiles.has(tileKey(tx, ty));
+}
+
+function isTileVisible(tx, ty) {
+  return visibleTiles.has(tileKey(tx, ty));
 }
 
 function updateMovement(delta) {
@@ -472,8 +607,9 @@ function updateInteractable() {
   if (!mapData || dialogOpen) return;
   interactable = null;
   for (const obj of objects) {
-    if (obj.kind === RESOURCE_KIND) continue;
+    if (obj.kind !== CREATURE_KIND) continue;
     if (obj.interacted) continue;
+    if (!isTileVisible(obj.tx, obj.ty)) continue;
     const center = tileCenter(obj.tx, obj.ty);
     const radius = (obj.r || 1) * tileSize;
     const distance = Math.hypot(player.px - center.x, player.py - center.y);
@@ -522,27 +658,39 @@ function drawTiles() {
       const img = tileImages.get(tileId);
       const x = tx * tileSize - camera.x;
       const y = ty * tileSize - camera.y;
+      if (!isTileDiscovered(tx, ty)) {
+        ctx.fillStyle = `rgba(5, 7, 10, ${FOG_HIDDEN_ALPHA})`;
+        ctx.fillRect(x, y, tileSize, tileSize);
+        continue;
+      }
       if (img && img.complete && img.naturalWidth > 0) {
         ctx.drawImage(img, x, y, tileSize, tileSize);
       } else {
         ctx.fillStyle = config.color;
         ctx.fillRect(x, y, tileSize, tileSize);
       }
-      if (tileId === 1) {
-        const edges = roadEdgesForForest(tx, ty);
+      if (tileId === WOODS_TILE || tileId === DEEP_FOREST_TILE) {
         const nearRoad = isRoadNearby(tx, ty, 2);
-        if (!nearRoad) {
+        if (tileId === DEEP_FOREST_TILE || !nearRoad) {
           drawForestTreeOverlay(tx, ty, x, y);
         } else {
           drawForestBorderOverlay(x, y);
         }
-        ctx.fillStyle = "rgba(10, 18, 14, 0.18)";
+        const shade =
+          tileId === DEEP_FOREST_TILE
+            ? "rgba(6, 10, 9, 0.32)"
+            : "rgba(10, 18, 14, 0.18)";
+        ctx.fillStyle = shade;
         ctx.fillRect(x, y, tileSize, tileSize);
       }
       if (tileId === 2) {
         ctx.strokeStyle = "rgba(78, 58, 38, 0.45)";
         ctx.lineWidth = 1;
         ctx.strokeRect(x + 0.5, y + 0.5, tileSize - 1, tileSize - 1);
+      }
+      if (!isTileVisible(tx, ty)) {
+        ctx.fillStyle = `rgba(5, 8, 10, ${FOG_DIM_ALPHA})`;
+        ctx.fillRect(x, y, tileSize, tileSize);
       }
     }
   }
@@ -551,6 +699,9 @@ function drawTiles() {
 function drawObjects() {
   if (!ctx) return;
   objects.forEach((obj) => {
+    if (!isTileVisible(obj.tx, obj.ty)) {
+      return;
+    }
     if (obj.kind === RESOURCE_KIND) {
       if (obj.collected) return;
       drawResource(obj);
@@ -809,6 +960,7 @@ function loadCreatureSprites() {
     OWL: "./sprites/owl.webp",
     SQUIRREL: "./sprites/squirrel.webp",
     DEER: "./sprites/deer.webp",
+    PONY_SKELETON: "./sprites/pony-skeleton.webp",
   };
   Object.entries(sprites).forEach(([id, src]) => {
     const image = new Image();
@@ -1047,6 +1199,7 @@ function findHoverTarget(worldX, worldY) {
   objects.forEach((obj) => {
     if (obj.kind !== CREATURE_KIND) return;
     if (obj.interacted) return;
+    if (!isTileVisible(obj.tx, obj.ty)) return;
     const center = tileCenter(obj.tx, obj.ty);
     const scale = CREATURE_SIZE_SCALE[obj.size || "medium"] ?? 1;
     const size = tileSize * scale;
@@ -1069,6 +1222,7 @@ function findHoverTarget(worldX, worldY) {
   objects.forEach((obj) => {
     if (obj.kind !== RESOURCE_KIND) return;
     if (obj.collected) return;
+    if (!isTileVisible(obj.tx, obj.ty)) return;
     const center = tileCenter(obj.tx, obj.ty);
     const size = Math.min(tileSize, 36);
     const bounds = {

@@ -1,0 +1,196 @@
+{
+  "tiles": [
+    {
+      "id": 0,
+      "name": "grass",
+      "color": "#8bcf7a",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/plains_grass_v2.webp",
+      "categories": ["plains", "grass", "universal"]
+    },
+    {
+      "id": 1,
+      "name": "beach",
+      "color": "#e4cc98",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/beach_sand.webp",
+      "categories": ["beach", "shore", "sand"]
+    },
+    {
+      "id": 2,
+      "name": "village",
+      "color": "#e0c092",
+      "walkable": true,
+      "asset": "/adventures/tiles/village.webp",
+      "categories": ["town"]
+    },
+    {
+      "id": 3,
+      "name": "water",
+      "color": "#6bb4d6",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/deep_water.webp",
+      "categories": ["water"]
+    },
+    {
+      "id": 4,
+      "name": "mountain",
+      "color": "#9a9a9a",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/mountain.webp",
+      "categories": ["mountain"]
+    },
+    {
+      "id": 5,
+      "name": "forest",
+      "color": "#4d8c63",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/light_forest.webp",
+      "categories": ["forest", "light"]
+    },
+    {
+      "id": 6,
+      "name": "forest-border",
+      "color": "#5e9b6a",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/deep_forest.webp",
+      "categories": ["forest", "deep"]
+    },
+    {
+      "id": 7,
+      "name": "forest-canopy",
+      "color": "#3b6f4d",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/deep_forest.webp",
+      "categories": ["forest", "deep"]
+    },
+    {
+      "id": 8,
+      "name": "plains-dirt",
+      "color": "#c9a57c",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/plains_dirt.webp",
+      "categories": ["plains", "dirt"]
+    },
+    {
+      "id": 9,
+      "name": "plains-sand",
+      "color": "#e6cfa1",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/plains_sand.webp",
+      "categories": ["plains", "sand"]
+    },
+    {
+      "id": 10,
+      "name": "hill-grass",
+      "color": "#7fbf72",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/hill_grass.webp",
+      "categories": ["hill", "grass"]
+    },
+    {
+      "id": 11,
+      "name": "hill-dirt",
+      "color": "#b08a63",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/hill_dirt.webp",
+      "categories": ["hill", "dirt"]
+    },
+    {
+      "id": 12,
+      "name": "hill-sand",
+      "color": "#d9be8b",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/hill_sand.webp",
+      "categories": ["hill", "sand"]
+    },
+    {
+      "id": 13,
+      "name": "swamp",
+      "color": "#6f7f5d",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/swamp.webp",
+      "categories": ["swamp", "slow"]
+    },
+    {
+      "id": 14,
+      "name": "frozen-plains",
+      "color": "#cfe4f0",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/frozen_plains.webp",
+      "categories": ["frozen", "plains"]
+    },
+    {
+      "id": 15,
+      "name": "frozen-hill",
+      "color": "#b7d0dd",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/frozen_hill.webp",
+      "categories": ["frozen", "hill"]
+    },
+    {
+      "id": 16,
+      "name": "frozen-light-forest",
+      "color": "#9fb9b5",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/frozen_light_forest.webp",
+      "categories": ["frozen", "forest", "light"]
+    },
+    {
+      "id": 17,
+      "name": "frozen-deep-forest",
+      "color": "#6a7f83",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/frozen_deep_forest.webp",
+      "categories": ["frozen", "forest", "deep"]
+    },
+    {
+      "id": 18,
+      "name": "frozen-mountain",
+      "color": "#a1b0ba",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/frozen_mountain.webp",
+      "categories": ["frozen", "mountain"]
+    },
+    {
+      "id": 19,
+      "name": "desert-plains",
+      "color": "#e0c38c",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/desert_plains.webp",
+      "categories": ["desert", "plains"]
+    },
+    {
+      "id": 20,
+      "name": "desert-hill",
+      "color": "#d1b07b",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/desert_hill.webp",
+      "categories": ["desert", "hill"]
+    },
+    {
+      "id": 21,
+      "name": "desert-light-forest",
+      "color": "#c6b073",
+      "walkable": true,
+      "asset": "/adventures/tiles/terrain/desert_light_forest.webp",
+      "categories": ["desert", "forest", "light"]
+    },
+    {
+      "id": 22,
+      "name": "desert-mountain",
+      "color": "#b58a63",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/desert_mountain.webp",
+      "categories": ["desert", "mountain"]
+    },
+    {
+      "id": 23,
+      "name": "desert-deep-desert",
+      "color": "#e7d4a4",
+      "walkable": false,
+      "asset": "/adventures/tiles/terrain/desert_deep_desert.webp",
+      "categories": ["desert", "deep"]
+    }
+  ]
+}

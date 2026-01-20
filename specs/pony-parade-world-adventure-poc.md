@@ -35,17 +35,17 @@ Target stack: vanilla ES modules + HTML5 Canvas + custom loop. Minimal placehold
 
 ## FILES / PATHS (suggested)
 Create a new folder so nothing collides with existing site:
-- `prototype/world-map.html`
-- `prototype/adventure.html`
-- `prototype/adventure.js`
-- `prototype/maps/QUIET_WOODS.json`
+- `adventures/world-map.html`
+- `adventures/adventure.html`
+- `adventures/adventure.js`
+- `adventures/maps/QUIET_WOODS.json`
 
-Add a link from root `index.html` to the prototype:
-- `<a href="./prototype/world-map.html">World Map Prototype</a>`
+Add a link from `index.html` to the adventure map:
+- `<a href="./adventures/world-map.html">World Map</a>`
 
 ---
 
-## WORLD MAP REQUIREMENTS (prototype/world-map.html)
+## WORLD MAP REQUIREMENTS (adventures/world-map.html)
 
 ### World map behavior
 - World map is an abstract progression graph with nodes + edges.
@@ -94,7 +94,7 @@ Edges:
 
 ---
 
-## ADVENTURE MAP REQUIREMENTS (prototype/adventure.html + prototype/adventure.js)
+## ADVENTURE MAP REQUIREMENTS (adventures/adventure.html + adventures/adventure.js)
 
 ### General model
 - HOMM-like 2D map: tile grid with camera following player.
@@ -131,7 +131,7 @@ Road subtile variants: NOT required for MVP. Use a single ROAD tile. (Later: com
 
 Village: multi-tile area by placing multiple VILLAGE tiles in the grid.
 
-### Adventure map JSON format (prototype/maps/QUIET_WOODS.json)
+### Adventure map JSON format (adventures/maps/QUIET_WOODS.json)
 Example structure:
 ```json
 {
@@ -203,7 +203,7 @@ All other locked nodes are hidden.
 ---
 
 ## ACCEPTANCE TESTS (manual)
-1. Open prototype/world-map.html:
+1. Open adventures/world-map.html:
    - See QUIET_WOODS unlocked and clickable.
    - See WHISPERING_FOREST as gray + lock.
    - HIDDEN_WORKSHOPS and LANTERNLESS_VILLAGE are hidden.

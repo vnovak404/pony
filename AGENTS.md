@@ -7,7 +7,7 @@ and a lightweight local HTTP server.
 
 High-level layout:
 
-- `index.html`, `styles.css` — static entrypoint and styles
+- `index.html`, `styles.css` — Pony Parade entrypoint and styles
 - `assets/js/` — ES module frontend (map sim, UI, actors)
 - `data/` — game data and runtime state (`data/_generated/`)
 - `scripts/` — Python asset generation + local server
@@ -64,4 +64,5 @@ Do not commit secrets. Store local configuration in `.env` files and add them to
 - Before editing Python scripts, read `docs/python-scripts.md` and keep it updated with module/function changes.
 - When running Python scripts from the repo, use the local virtual environment interpreter (e.g. `.venv/bin/python`) to ensure required libraries are available.
 - For new visuals, you may generate images/textures via the OpenAI image API. Convert any asset to `.webp` for use in-repo, and move the original source file outside the repo into `../pony_generated_assets`. Avoid SVG creation except for basic filler (e.g., simple grass).
+- For world map/minimap UX, use mission-map logistics: node grid with unlock/complete states; explicit progress save/load UI (file export/import plus localStorage); per-node hover/selection metadata (mission title, lock/clear state, and 1-2 key stats in a hover card or side panel).
 - When providing the after-action-report, first provide it normally, then on a new line preface with ">>> For a 7 year old >>>" and provide a concise version summarized for a girl with the intellectual level of a 9-10 year old.

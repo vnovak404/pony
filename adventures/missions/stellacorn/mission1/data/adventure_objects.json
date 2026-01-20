@@ -1,0 +1,808 @@
+{
+  "objects": [
+    {
+      "type": "tree",
+      "name": "Forest Tree",
+      "color": "#3f6f4d",
+      "asset": "/adventures/trees/forest-tree-01.webp",
+      "class": "structure",
+      "categories": [
+        "forest"
+      ]
+    },
+    {
+      "type": "wood-pile",
+      "name": "Wood Pile",
+      "color": "#b08968",
+      "asset": "/adventures/heroes/wood-pile.webp",
+      "class": "structure",
+      "categories": [
+        "town",
+        "forest",
+        "universal"
+      ]
+    },
+    {
+      "type": "stone-pile",
+      "name": "Stone Pile",
+      "color": "#9d9d9d",
+      "asset": "/adventures/heroes/stone-pile.webp",
+      "class": "structure",
+      "categories": [
+        "mountain",
+        "town",
+        "universal"
+      ]
+    },
+    {
+      "type": "gold-pile",
+      "name": "Gold Pile",
+      "color": "#d4b24c",
+      "asset": "/adventures/heroes/gold-pile.webp",
+      "class": "structure",
+      "categories": [
+        "mountain",
+        "town",
+        "universal"
+      ]
+    },
+    {
+      "type": "owl",
+      "name": "Owl",
+      "color": "#7a5f3c",
+      "asset": "/adventures/sprites/owl.webp",
+      "class": "creature",
+      "categories": [
+        "forest",
+        "mountain"
+      ]
+    },
+    {
+      "type": "deer",
+      "name": "Deer",
+      "color": "#a97854",
+      "asset": "/adventures/sprites/deer.webp",
+      "class": "creature",
+      "categories": [
+        "forest",
+        "field"
+      ]
+    },
+    {
+      "type": "squirrel",
+      "name": "Squirrel",
+      "color": "#b8845c",
+      "asset": "/adventures/sprites/squirrel.webp",
+      "class": "creature",
+      "categories": [
+        "forest"
+      ]
+    },
+    {
+      "type": "pony-skeleton",
+      "name": "Pony Skeleton",
+      "color": "#cfc6b8",
+      "asset": "/adventures/sprites/pony-skeleton-ai-01.webp",
+      "class": "creature",
+      "categories": [
+        "mountain",
+        "desert"
+      ]
+    },
+    {
+      "type": "pony-skeleton-02",
+      "name": "Pony Skeleton (Collapsed)",
+      "color": "#cfc6b8",
+      "asset": "/adventures/sprites/pony-skeleton-ai-02.webp",
+      "class": "creature",
+      "categories": [
+        "mountain",
+        "desert"
+      ]
+    },
+    {
+      "type": "pony-skeleton-03",
+      "name": "Pony Skeleton (Raised)",
+      "color": "#cfc6b8",
+      "asset": "/adventures/sprites/pony-skeleton-ai-03.webp",
+      "class": "creature",
+      "categories": [
+        "mountain",
+        "desert"
+      ]
+    },
+    {
+      "type": "fallen-messenger",
+      "name": "Fallen Messenger",
+      "color": "#9c6b5d",
+      "asset": "/adventures/heroes/fallen-messenger.webp",
+      "class": "structure",
+      "categories": [
+        "town",
+        "forest"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-anchor",
+      "name": "Clue - Rabbit Footprints (Anchor)",
+      "color": "#c8d5c8",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-hedgehog-berries-anchor",
+      "name": "Clue - Hedgehog Berries (Anchor)",
+      "color": "#a1453a",
+      "asset": "/adventures/sprites/mission1/clue-hedgehog-berries-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-hedgehog-tracks-anchor",
+      "name": "Clue - Hedgehog Tracks (Anchor)",
+      "color": "#6e5a3e",
+      "asset": "/adventures/sprites/mission1/clue-hedgehog-tracks-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-fox-leaves-anchor",
+      "name": "Clue - Fox Leaves (Anchor)",
+      "color": "#8a6a3d",
+      "asset": "/adventures/sprites/mission1/clue-fox-leaves-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-owl-feathers-anchor",
+      "name": "Clue - Owl Feathers (Anchor)",
+      "color": "#9aa9bd",
+      "asset": "/adventures/sprites/mission1/clue-owl-feathers-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-owl-feather-loose",
+      "name": "Clue - Owl Loose Feather",
+      "color": "#9aa9bd",
+      "asset": "/adventures/sprites/mission1/clue-owl-feather-loose.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-deer-hoofprints-anchor",
+      "name": "Clue - Deer Hoofprints (Anchor)",
+      "color": "#8b6a4c",
+      "asset": "/adventures/sprites/mission1/clue-deer-hoofprints-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-bear-blood-anchor",
+      "name": "Clue - Bear Blood (Anchor)",
+      "color": "#5b1e1e",
+      "asset": "/adventures/sprites/mission1/clue-bear-blood-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-n",
+      "name": "Clue - Rabbit Trail N",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-ne",
+      "name": "Clue - Rabbit Trail NE",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-ne.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-e",
+      "name": "Clue - Rabbit Trail E",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-se",
+      "name": "Clue - Rabbit Trail SE",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-se.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-s",
+      "name": "Clue - Rabbit Trail S",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-sw",
+      "name": "Clue - Rabbit Trail SW",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-sw.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-w",
+      "name": "Clue - Rabbit Trail W",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-rabbit-footprints-trail-nw",
+      "name": "Clue - Rabbit Trail NW",
+      "color": "#7edfd0",
+      "asset": "/adventures/sprites/mission1/clue-rabbit-footprints-trail-nw.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-hedgehog-trail-n",
+      "name": "Clue - Hedgehog Trail N",
+      "color": "#e4d48a",
+      "asset": "/adventures/sprites/mission1/clue-hedgehog-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-hedgehog-trail-e",
+      "name": "Clue - Hedgehog Trail E",
+      "color": "#e4d48a",
+      "asset": "/adventures/sprites/mission1/clue-hedgehog-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-hedgehog-trail-s",
+      "name": "Clue - Hedgehog Trail S",
+      "color": "#e4d48a",
+      "asset": "/adventures/sprites/mission1/clue-hedgehog-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-hedgehog-trail-w",
+      "name": "Clue - Hedgehog Trail W",
+      "color": "#e4d48a",
+      "asset": "/adventures/sprites/mission1/clue-hedgehog-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-fox-trail-n",
+      "name": "Clue - Fox Trail N",
+      "color": "#e39a4b",
+      "asset": "/adventures/sprites/mission1/clue-fox-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-fox-trail-e",
+      "name": "Clue - Fox Trail E",
+      "color": "#e39a4b",
+      "asset": "/adventures/sprites/mission1/clue-fox-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-fox-trail-s",
+      "name": "Clue - Fox Trail S",
+      "color": "#e39a4b",
+      "asset": "/adventures/sprites/mission1/clue-fox-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-fox-trail-w",
+      "name": "Clue - Fox Trail W",
+      "color": "#e39a4b",
+      "asset": "/adventures/sprites/mission1/clue-fox-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-owl-trail-n",
+      "name": "Clue - Owl Trail N",
+      "color": "#7bb0e0",
+      "asset": "/adventures/sprites/mission1/clue-owl-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-owl-trail-e",
+      "name": "Clue - Owl Trail E",
+      "color": "#7bb0e0",
+      "asset": "/adventures/sprites/mission1/clue-owl-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-owl-trail-s",
+      "name": "Clue - Owl Trail S",
+      "color": "#7bb0e0",
+      "asset": "/adventures/sprites/mission1/clue-owl-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-owl-trail-w",
+      "name": "Clue - Owl Trail W",
+      "color": "#7bb0e0",
+      "asset": "/adventures/sprites/mission1/clue-owl-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-deer-trail-n",
+      "name": "Clue - Deer Trail N",
+      "color": "#f2d58f",
+      "asset": "/adventures/sprites/mission1/clue-deer-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-deer-trail-e",
+      "name": "Clue - Deer Trail E",
+      "color": "#f2d58f",
+      "asset": "/adventures/sprites/mission1/clue-deer-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-deer-trail-s",
+      "name": "Clue - Deer Trail S",
+      "color": "#f2d58f",
+      "asset": "/adventures/sprites/mission1/clue-deer-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-deer-trail-w",
+      "name": "Clue - Deer Trail W",
+      "color": "#f2d58f",
+      "asset": "/adventures/sprites/mission1/clue-deer-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-bear-trail-n",
+      "name": "Clue - Bear Trail N",
+      "color": "#7a2a2a",
+      "asset": "/adventures/sprites/mission1/clue-bear-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-bear-trail-e",
+      "name": "Clue - Bear Trail E",
+      "color": "#7a2a2a",
+      "asset": "/adventures/sprites/mission1/clue-bear-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-bear-trail-s",
+      "name": "Clue - Bear Trail S",
+      "color": "#7a2a2a",
+      "asset": "/adventures/sprites/mission1/clue-bear-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-bear-trail-w",
+      "name": "Clue - Bear Trail W",
+      "color": "#7a2a2a",
+      "asset": "/adventures/sprites/mission1/clue-bear-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "animal-rabbit-sick",
+      "name": "Animal - Rabbit (Sick)",
+      "color": "#c7c0b0",
+      "asset": "/adventures/sprites/mission1/animal-rabbit-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-rabbit-healed",
+      "name": "Animal - Rabbit (Healed)",
+      "color": "#c7c0b0",
+      "asset": "/adventures/sprites/mission1/animal-rabbit-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    },
+    {
+      "type": "animal-hedgehog-sick",
+      "name": "Animal - Hedgehog (Sick)",
+      "color": "#8c6f5a",
+      "asset": "/adventures/sprites/mission1/animal-hedgehog-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-hedgehog-healed",
+      "name": "Animal - Hedgehog (Healed)",
+      "color": "#8c6f5a",
+      "asset": "/adventures/sprites/mission1/animal-hedgehog-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    },
+    {
+      "type": "animal-fox-sick",
+      "name": "Animal - Fox (Sick)",
+      "color": "#c7733b",
+      "asset": "/adventures/sprites/mission1/animal-fox-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-fox-healed",
+      "name": "Animal - Fox (Healed)",
+      "color": "#c7733b",
+      "asset": "/adventures/sprites/mission1/animal-fox-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    },
+    {
+      "type": "animal-owl-sick",
+      "name": "Animal - Owl (Sick)",
+      "color": "#7a5f3c",
+      "asset": "/adventures/sprites/mission1/animal-owl-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-owl-healed",
+      "name": "Animal - Owl (Healed)",
+      "color": "#7a5f3c",
+      "asset": "/adventures/sprites/mission1/animal-owl-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    },
+    {
+      "type": "animal-deer-sick",
+      "name": "Animal - Deer (Sick)",
+      "color": "#a97854",
+      "asset": "/adventures/sprites/mission1/animal-deer-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-deer-healed",
+      "name": "Animal - Deer (Healed)",
+      "color": "#a97854",
+      "asset": "/adventures/sprites/mission1/animal-deer-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    },
+    {
+      "type": "animal-bear-sick",
+      "name": "Animal - Bear (Sick)",
+      "color": "#5b3b2a",
+      "asset": "/adventures/sprites/mission1/animal-bear-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-bear-healed",
+      "name": "Animal - Bear (Healed)",
+      "color": "#5b3b2a",
+      "asset": "/adventures/sprites/mission1/animal-bear-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    },
+    {
+      "type": "prop-salt-dropoff-with-salt",
+      "name": "Prop - Salt Drop-off (With Salt)",
+      "color": "#f4f1e6",
+      "asset": "/adventures/sprites/mission1/prop-salt-dropoff-with-salt.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "prop"
+      ]
+    },
+    {
+      "type": "prop-salt-dropoff-without-salt",
+      "name": "Prop - Salt Drop-off (Without Salt)",
+      "color": "#d8d0c4",
+      "asset": "/adventures/sprites/mission1/prop-salt-dropoff-without-salt.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "prop"
+      ]
+    },
+    {
+      "type": "clue-badger-burrow-anchor",
+      "name": "Clue - Badger Burrow (Anchor)",
+      "color": "#6d5b4a",
+      "asset": "/adventures/sprites/mission1/clue-badger-burrow-anchor.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "anchor"
+      ]
+    },
+    {
+      "type": "clue-badger-trail-n",
+      "name": "Clue - Badger Trail N",
+      "color": "#d4b28a",
+      "asset": "/adventures/sprites/mission1/clue-badger-trail-n.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-badger-trail-e",
+      "name": "Clue - Badger Trail E",
+      "color": "#d4b28a",
+      "asset": "/adventures/sprites/mission1/clue-badger-trail-e.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-badger-trail-s",
+      "name": "Clue - Badger Trail S",
+      "color": "#d4b28a",
+      "asset": "/adventures/sprites/mission1/clue-badger-trail-s.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "clue-badger-trail-w",
+      "name": "Clue - Badger Trail W",
+      "color": "#d4b28a",
+      "asset": "/adventures/sprites/mission1/clue-badger-trail-w.webp",
+      "class": "structure",
+      "categories": [
+        "mission-1",
+        "clue",
+        "trail"
+      ]
+    },
+    {
+      "type": "animal-badger-sick",
+      "name": "Animal - Badger (Sick)",
+      "color": "#6b5b4a",
+      "asset": "/adventures/sprites/mission1/animal-badger-sick.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "sick"
+      ]
+    },
+    {
+      "type": "animal-badger-healed",
+      "name": "Animal - Badger (Healed)",
+      "color": "#6b5b4a",
+      "asset": "/adventures/sprites/mission1/animal-badger-healed.webp",
+      "class": "creature",
+      "categories": [
+        "mission-1",
+        "animal",
+        "healed"
+      ]
+    }
+  ]
+}

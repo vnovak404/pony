@@ -225,7 +225,11 @@ const resolveSheetPath = (metaPath, meta, fallbackPath) => {
     return fallbackPath;
   }
   const basePath = metaPath.slice(0, metaPath.lastIndexOf("/") + 1);
-  if (imageName.startsWith("/") || imageName.startsWith("assets/")) {
+  if (
+    imageName.startsWith("/") ||
+    imageName.startsWith("assets/") ||
+    imageName.startsWith("../assets/")
+  ) {
     return imageName;
   }
   return `${basePath}${imageName}`;

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AdventureMapDraft",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "tileSize": { "type": "integer", "minimum": 1 },
+    "w": { "type": "integer", "minimum": 1 },
+    "h": { "type": "integer", "minimum": 1 },
+    "tiles": {
+      "type": "array",
+      "items": { "type": "integer" }
+    },
+    "spawn": { "$ref": "#/$defs/point" },
+    "objects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/object" }
+    },
+    "complete": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "count": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["type"],
+      "additionalProperties": true
+    },
+    "resourceGoals": {
+      "type": "object",
+      "additionalProperties": { "type": "number", "minimum": 0 }
+    },
+    "resourceResetVersion": { "type": "integer", "minimum": 0 },
+    "unlocks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "storyZones": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/storyZone" }
+    },
+    "draft": {
+      "type": "object",
+      "properties": {
+        "seed": { "type": "integer" },
+        "version": { "type": "integer", "minimum": 0 },
+        "generator": { "type": "object", "additionalProperties": true },
+        "locks": { "type": "array", "items": { "$ref": "#/$defs/zoneRect" } },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["id", "tileSize", "w", "h", "tiles", "spawn", "objects"],
+  "additionalProperties": false,
+  "$defs": {
+    "point": {
+      "type": "object",
+      "properties": {
+        "tx": { "type": "integer", "minimum": 0 },
+        "ty": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["tx", "ty"],
+      "additionalProperties": false
+    },
+    "object": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "type": "string" },
+        "tx": { "type": "integer", "minimum": 0 },
+        "ty": { "type": "integer", "minimum": 0 },
+        "size": { "type": "string" },
+        "hero": { "type": "string" },
+        "name": { "type": "string" },
+        "stats": { "type": "object", "additionalProperties": true },
+        "r": { "type": "number", "minimum": 0 },
+        "text": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "letter": { "type": "string" },
+        "letterContext": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "letterText": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "type": { "type": "string" },
+        "amount": { "type": "number" }
+      },
+      "required": ["id", "kind", "tx", "ty"],
+      "additionalProperties": true
+    },
+    "storyZone": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "kind": { "type": "string" },
+        "rect": { "$ref": "#/$defs/zoneRect" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "rect"],
+      "additionalProperties": true
+    },
+    "zoneRect": {
+      "type": "object",
+      "properties": {
+        "tx": { "type": "integer", "minimum": 0 },
+        "ty": { "type": "integer", "minimum": 0 },
+        "w": { "type": "integer", "minimum": 1 },
+        "h": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["tx", "ty", "w", "h"],
+      "additionalProperties": false
+    }
+  }
+}

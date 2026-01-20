@@ -118,6 +118,7 @@ def main():
     if (ROOT / "_headers").exists():
         copy_file(ROOT / "_headers", output_dir / "_headers")
 
+    copy_tree(ROOT / "adventures", output_dir / "adventures")
     copy_tree(ROOT / "assets" / "js", output_dir / "assets" / "js")
     copy_tree_assets(ROOT / "assets" / "author", output_dir / "assets" / "author", prefer_webp=True)
     copy_tree_assets(ROOT / "assets" / "ui", output_dir / "assets" / "ui", prefer_webp=True)

@@ -1,0 +1,15 @@
+{
+  "id": "WF_MISSION_1",
+  "title": "The Missing Deer",
+  "subtitle": "Whispering Forest (Outer Paths)",
+  "map": "./adventures/maps/_drafts/stellacorn-mission1-map-6.json",
+  "tiles": "./data/adventure_tiles.json",
+  "objects": "./data/adventure_objects.json",
+  "assetRoot": "./adventures",
+  "logic": "./mission.js",
+  "tileSize": 64,
+  "spawn": {
+    "tx": 7,
+    "ty": 40
+  }
+}

@@ -71,6 +71,17 @@ OVERLAY_ICON_PROMPTS = {
     ),
 }
 
+LETTER_PROMPTS = {
+    "scroll-letter": (
+        "Old parchment letter background styled like a fantasy scroll, "
+        "ornate edges, warm ivory paper, subtle stains, transparent background, no text."
+    ),
+    "torn-letter": (
+        "Old parchment letter background with the bottom edge torn away, "
+        "fantasy scroll style, warm ivory paper, subtle stains, transparent background, no text."
+    ),
+}
+
 HERO_PROMPTS = {
     "owl-scared": (
         "Portrait of a friendly owl with a scared expression, big eyes, "
@@ -82,6 +93,10 @@ HERO_PROMPTS = {
     ),
     "deer-scared": (
         "Portrait of a gentle deer looking worried, big eyes, "
+        "storybook fantasy style, soft lighting, transparent background, no text."
+    ),
+    "fallen-messenger": (
+        "Portrait of a fallen royal messenger pony with a travel bag, lifeless posture, "
         "storybook fantasy style, soft lighting, transparent background, no text."
     ),
     "gold-pile": (
@@ -126,6 +141,11 @@ SPRITE_PROMPTS = {
         "Tiny game sprite of a gentle deer, isometric 3/4 view, facing right, "
         "storybook fantasy style, transparent background, 64x64, no text."
     ),
+    "pony-skeleton": (
+        "Game sprite of a fallen royal messenger pony with a travel bag, no crown, "
+        "clearly lifeless (not sleeping), isometric 3/4 view, facing right, "
+        "storybook fantasy style, transparent background, 96x96, no text."
+    ),
 }
 
 
@@ -142,8 +162,8 @@ def parse_args():
     parser.add_argument(
         "--target-root",
         type=Path,
-        default=ROOT / "prototype",
-        help="Folder to write WebP assets (default: prototype/).",
+        default=ROOT / "adventures",
+        help="Folder to write WebP assets (default: adventures/).",
     )
     parser.add_argument("--request-size", default=1024, type=int, help="API size.")
     parser.add_argument("--tile-size", default=64, type=int, help="Tile WebP size.")
@@ -152,24 +172,55 @@ def parse_args():
     parser.add_argument("--tree-size", default=256, type=int, help="Tree WebP size.")
     parser.add_argument("--overlay-size", default=32, type=int, help="Overlay WebP size.")
     parser.add_argument("--hero-size", default=256, type=int, help="Hero WebP size.")
+    parser.add_argument("--letter-size", default=640, type=int, help="Letter WebP size.")
     parser.add_argument("--tiles", action="store_true", help="Generate tiles only.")
     parser.add_argument("--icons", action="store_true", help="Generate icons only.")
     parser.add_argument("--sprites", action="store_true", help="Generate sprites only.")
     parser.add_argument("--trees", action="store_true", help="Generate tree sprites only.")
     parser.add_argument("--overlays", action="store_true", help="Generate overlays only.")
+    parser.add_argument("--letters", action="store_true", help="Generate letter backgrounds only.")
     parser.add_argument("--heroes", action="store_true", help="Generate hero portraits only.")
+    parser.add_argument("--tile", action="append", dest="tile_names", help="Generate a single tile by name (repeatable).")
+    parser.add_argument("--icon", action="append", dest="icon_names", help="Generate a single icon by name (repeatable).")
+    parser.add_argument("--sprite", action="append", dest="sprite_names", help="Generate a single sprite by name (repeatable).")
+    parser.add_argument("--tree", action="append", dest="tree_names", help="Generate a single tree sprite by name (repeatable).")
+    parser.add_argument("--overlay", action="append", dest="overlay_names", help="Generate a single overlay icon by name (repeatable).")
+    parser.add_argument("--letter", action="append", dest="letter_names", help="Generate a single letter background by name (repeatable).")
+    parser.add_argument("--hero", action="append", dest="hero_names", help="Generate a single hero portrait by name (repeatable).")
     parser.add_argument("--force", action="store_true", help="Overwrite existing WebPs.")
     parser.add_argument("--dry-run", action="store_true", help="Print prompts only.")
     return parser.parse_args()
 
 
 def should_generate(args):
+    has_specific = any(
+        [
+            args.tile_names,
+            args.icon_names,
+            args.sprite_names,
+            args.tree_names,
+            args.overlay_names,
+            args.letter_names,
+            args.hero_names,
+        ]
+    )
+    if has_specific:
+        return {
+            "tiles": args.tiles or bool(args.tile_names),
+            "icons": args.icons or bool(args.icon_names),
+            "sprites": args.sprites or bool(args.sprite_names),
+            "trees": args.trees or bool(args.tree_names),
+            "overlays": args.overlays or bool(args.overlay_names),
+            "letters": args.letters or bool(args.letter_names),
+            "heroes": args.heroes or bool(args.hero_names),
+        }
     if (
         args.tiles
         or args.icons
         or args.sprites
         or args.trees
         or args.overlays
+        or args.letters
         or args.heroes
     ):
         return {
@@ -178,6 +229,7 @@ def should_generate(args):
             "sprites": args.sprites,
             "trees": args.trees,
             "overlays": args.overlays,
+            "letters": args.letters,
             "heroes": args.heroes,
         }
     return {
@@ -186,6 +238,7 @@ def should_generate(args):
         "sprites": True,
         "trees": True,
         "overlays": True,
+        "letters": True,
         "heroes": True,
     }
 
@@ -253,12 +306,14 @@ def main():
     sprites_dir = args.generated_root / "sprites"
     trees_dir = args.generated_root / "trees"
     overlays_dir = args.generated_root / "overlays"
+    letters_dir = args.generated_root / "letters"
     heroes_dir = args.generated_root / "heroes"
     tiles_dir.mkdir(parents=True, exist_ok=True)
     icons_dir.mkdir(parents=True, exist_ok=True)
     sprites_dir.mkdir(parents=True, exist_ok=True)
     trees_dir.mkdir(parents=True, exist_ok=True)
     overlays_dir.mkdir(parents=True, exist_ok=True)
+    letters_dir.mkdir(parents=True, exist_ok=True)
     heroes_dir.mkdir(parents=True, exist_ok=True)
 
     tile_out = args.target_root / "tiles"
@@ -266,16 +321,28 @@ def main():
     sprite_out = args.target_root / "sprites"
     tree_out = args.target_root / "overlays"
     overlay_out = args.target_root / "overlays"
+    letter_out = args.target_root / "letters"
     hero_out = args.target_root / "heroes"
     tile_out.mkdir(parents=True, exist_ok=True)
     icon_out.mkdir(parents=True, exist_ok=True)
     sprite_out.mkdir(parents=True, exist_ok=True)
     tree_out.mkdir(parents=True, exist_ok=True)
     overlay_out.mkdir(parents=True, exist_ok=True)
+    letter_out.mkdir(parents=True, exist_ok=True)
     hero_out.mkdir(parents=True, exist_ok=True)
+
+    tile_names = set(args.tile_names or [])
+    icon_names = set(args.icon_names or [])
+    sprite_names = set(args.sprite_names or [])
+    tree_names = set(args.tree_names or [])
+    overlay_names = set(args.overlay_names or [])
+    letter_names = set(args.letter_names or [])
+    hero_names = set(args.hero_names or [])
 
     if modes["tiles"]:
         for name, prompt in TILE_PROMPTS.items():
+            if tile_names and name not in tile_names:
+                continue
             generate_and_convert(
                 prompt,
                 args.request_size,
@@ -286,6 +353,8 @@ def main():
                 args.dry_run,
             )
         for name, prompt in OVERLAY_PROMPTS.items():
+            if tile_names and name not in tile_names:
+                continue
             target_size = args.tile_size * 2 if "canopy" in name else args.tile_size
             generate_and_convert(
                 prompt,
@@ -299,6 +368,8 @@ def main():
 
     if modes["icons"]:
         for name, prompt in ICON_PROMPTS.items():
+            if icon_names and name not in icon_names:
+                continue
             generate_and_convert(
                 prompt,
                 args.request_size,
@@ -312,6 +383,8 @@ def main():
 
     if modes["sprites"]:
         for name, prompt in SPRITE_PROMPTS.items():
+            if sprite_names and name not in sprite_names:
+                continue
             generate_and_convert(
                 prompt,
                 args.request_size,
@@ -324,6 +397,8 @@ def main():
 
     if modes["trees"]:
         for name, prompt in TREE_PROMPTS.items():
+            if tree_names and name not in tree_names:
+                continue
             generate_and_convert(
                 prompt,
                 args.request_size,
@@ -336,6 +411,8 @@ def main():
 
     if modes["overlays"]:
         for name, prompt in OVERLAY_ICON_PROMPTS.items():
+            if overlay_names and name not in overlay_names:
+                continue
             generate_and_convert(
                 prompt,
                 args.request_size,
@@ -346,8 +423,24 @@ def main():
                 args.dry_run,
             )
 
+    if modes["letters"]:
+        for name, prompt in LETTER_PROMPTS.items():
+            if letter_names and name not in letter_names:
+                continue
+            generate_and_convert(
+                prompt,
+                args.request_size,
+                letters_dir / f"{name}.png",
+                letter_out / f"{name}.webp",
+                args.letter_size,
+                args.force,
+                args.dry_run,
+            )
+
     if modes["heroes"]:
         for name, prompt in HERO_PROMPTS.items():
+            if hero_names and name not in hero_names:
+                continue
             generate_and_convert(
                 prompt,
                 args.request_size,

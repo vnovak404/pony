@@ -128,6 +128,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Purpose: build a minimal `public/` folder for static deployment.
 - Output includes:
   - `index.html`, `styles.css`, `styles/` (CSS partials)
+  - `adventures/` (world map + adventure prototype pages/assets)
   - `assets/js/`, `assets/ui/`, `assets/world/` (prefers `.webp` for image assets)
   - `assets/ponies/*.webp` (falls back to `.png` if no WebP)
   - `assets/ponies/<pony>/sheets/spritesheet.webp` + `spritesheet.json`
@@ -423,18 +424,20 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 - Uses: `scripts/sprites/images_api.py`.
 - Output:
   - Original PNGs: `../pony_generated_assets/adventure_assets/{tiles,icons,sprites}`.
-  - WebP outputs: `prototype/{tiles,icons,sprites}`.
-  - Forest overlays: `prototype/tiles/forest-canopy.webp`, `prototype/tiles/forest-border.webp`.
-  - Tree sprites: `prototype/overlays/forest-tree-*.webp`.
-  - Overlay icons: `prototype/overlays/mouse.webp`.
-  - Hero portraits: `prototype/heroes/*-scared.webp`, `prototype/heroes/*-pile.webp`.
+  - WebP outputs: `adventures/{tiles,icons,sprites}`.
+  - Forest overlays: `adventures/tiles/forest-canopy.webp`, `adventures/tiles/forest-border.webp`.
+  - Tree sprites: `adventures/overlays/forest-tree-*.webp`.
+  - Overlay icons: `adventures/overlays/mouse.webp`.
+  - Letter backgrounds: `adventures/letters/scroll-letter.webp`, `adventures/letters/torn-letter.webp`.
+  - Hero portraits: `adventures/heroes/*-scared.webp`, `adventures/heroes/*-pile.webp`.
   - Icons + hero portraits are auto-trimmed to center opaque content before resizing.
 - CLI:
   - `--generated-root` override PNG output root (default `../pony_generated_assets/adventure_assets`).
-  - `--target-root` override WebP output root (default `prototype`).
+  - `--target-root` override WebP output root (default `adventures`).
   - `--request-size` API size (default 1024).
-  - `--tile-size`, `--icon-size`, `--sprite-size`, `--tree-size`, `--overlay-size`, `--hero-size` WebP sizes.
-  - `--tiles`, `--icons`, `--sprites`, `--trees`, `--overlays`, `--heroes` to limit which groups are generated.
+  - `--tile-size`, `--icon-size`, `--sprite-size`, `--tree-size`, `--overlay-size`, `--letter-size`, `--hero-size` WebP sizes.
+  - `--tiles`, `--icons`, `--sprites`, `--trees`, `--overlays`, `--letters`, `--heroes` to limit which groups are generated.
+  - `--tile <name>`, `--icon <name>`, `--sprite <name>`, `--tree <name>`, `--overlay <name>`, `--letter <name>`, `--hero <name>` to generate specific assets (repeatable).
   - `--force` overwrite existing WebPs.
   - `--dry-run` print prompts only.
 - Example usage:

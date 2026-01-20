@@ -513,8 +513,8 @@
         "id": "restaurant",
         "kind": "food",
         "at": {
-          "x": 28.63,
-          "y": 16.5
+          "x": 28.31,
+          "y": 15.91
         },
         "sprite": "restaurant_01",
         "locationId": "pony-restaurant",
@@ -659,8 +659,8 @@
         "id": "farm",
         "kind": "location",
         "at": {
-          "x": 13.94,
-          "y": 23.87
+          "x": 7.71,
+          "y": 21.19
         },
         "sprite": "farm_01",
         "locationId": "windmill-farm",
