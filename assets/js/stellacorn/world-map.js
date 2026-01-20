@@ -2,6 +2,7 @@ const MAP_URL = "./world-map.json";
 const PROGRESS_KEY = "WF_PROGRESS_V1";
 const SELECTED_KEY = "WF_SELECTED_MISSION";
 const NODE_RADIUS = 22;
+const BG_URL = "../missions/stellacorn/stellacorn-whispering-forest.webp";
 
 const canvas = document.getElementById("worldCanvas");
 const ctx = canvas ? canvas.getContext("2d") : null;
@@ -19,8 +20,13 @@ let progress = null;
 let hoverNode = null;
 let selectedNode = null;
 let toastTimer = null;
+const backgroundImage = new Image();
 
 if (canvas && ctx) {
+  backgroundImage.src = BG_URL;
+  backgroundImage.addEventListener("load", () => {
+    drawMap();
+  });
   canvas.addEventListener("click", onCanvasClick);
   canvas.addEventListener("mousemove", onCanvasMove);
   canvas.addEventListener("mouseleave", () => {
@@ -104,6 +110,7 @@ function nodeCleared(node) {
 function drawMap() {
   if (!ctx || !canvas || !worldMap) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBackground();
 
   ctx.lineWidth = 4;
   ctx.lineCap = "round";
@@ -180,6 +187,28 @@ function drawMap() {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
   });
+}
+
+function drawBackground() {
+  if (!backgroundImage.complete) return;
+  const canvasRatio = canvas.width / canvas.height;
+  const imageRatio = backgroundImage.width / backgroundImage.height;
+  let drawWidth = canvas.width;
+  let drawHeight = canvas.height;
+  let offsetX = 0;
+  let offsetY = 0;
+  if (imageRatio > canvasRatio) {
+    drawHeight = canvas.height;
+    drawWidth = drawHeight * imageRatio;
+    offsetX = (canvas.width - drawWidth) / 2;
+  } else {
+    drawWidth = canvas.width;
+    drawHeight = drawWidth / imageRatio;
+    offsetY = (canvas.height - drawHeight) / 2;
+  }
+  ctx.drawImage(backgroundImage, offsetX, offsetY, drawWidth, drawHeight);
+  ctx.fillStyle = "rgba(10, 13, 18, 0.45)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawError(message) {

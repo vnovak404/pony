@@ -405,6 +405,16 @@
   text-decoration: none;
 }
 
+.adventure-media {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(44, 33, 54, 0.08);
+  box-shadow: 0 12px 26px rgba(44, 33, 54, 0.12);
+}
+
 .adventure-link.muted {
   pointer-events: none;
   cursor: default;
