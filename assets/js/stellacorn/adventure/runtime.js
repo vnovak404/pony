@@ -9,6 +9,7 @@ const FOG_HIDDEN_ALPHA = 0.92;
 const IS_TOUCH_DEVICE =
   typeof window !== "undefined" &&
   ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+const DOUBLE_TAP_MS = 320;
 
 export async function loadRuntime({
   missionPath,
@@ -51,6 +52,8 @@ export async function loadRuntime({
   let touchHoldPointerId = null;
   let touchHoldTileKey = null;
   let suppressClick = false;
+  let lastTapTime = 0;
+  let lastTapTileKey = null;
   let interactionHandler = null;
   let visibilityHandler = null;
 
@@ -345,8 +348,8 @@ export async function loadRuntime({
       const baseLabel = interactable.interaction?.label || "Hold I to act";
       elements.promptEl.textContent = IS_TOUCH_DEVICE
         ? baseLabel
-            .replace(/^Hold [A-Z] to /, "Press and hold to ")
-            .replace(/^Hold [a-z] to /, "Press and hold to ")
+            .replace(/^Hold [A-Z] to /, "Double-tap to ")
+            .replace(/^Hold [a-z] to /, "Double-tap to ")
         : baseLabel;
       elements.promptEl.removeAttribute("hidden");
     } else {
@@ -356,7 +359,7 @@ export async function loadRuntime({
 
   function updateHold() {
     if (!holdState) return;
-    if (!heldKeys.has(holdState.key)) {
+    if (holdState.requiresKey && !heldKeys.has(holdState.key)) {
       cancelHold();
       return;
     }
@@ -375,7 +378,7 @@ export async function loadRuntime({
     }
   }
 
-  function startHold(target) {
+  function startHold(target, options = {}) {
     if (!target?.interaction) return;
     holdState = {
       targetId: target.id,
@@ -384,6 +387,7 @@ export async function loadRuntime({
       durationMs: target.interaction.durationMs,
       action: target.interaction.action || "",
       startedAt: performance.now(),
+      requiresKey: options.requiresKey ?? true,
     };
     updateActionProgress(holdState.label, 0);
   }
@@ -480,28 +484,6 @@ export async function loadRuntime({
   function handlePointerDown(event) {
     if (dialogOpen) return;
     if (event.pointerType === "mouse") return;
-    const tile = screenToTile(event);
-    if (!tile) return;
-    const target = objects.find(
-      (obj) =>
-        !obj.hidden &&
-        obj.interaction &&
-        isTileVisible(obj.tx, obj.ty) &&
-        obj.tx === tile.tx &&
-        obj.ty === tile.ty
-    );
-    if (!target) return;
-    const dx = Math.abs(player.tx - target.tx);
-    const dy = Math.abs(player.ty - target.ty);
-    if (Math.max(dx, dy) > 1) return;
-    startHold(target);
-    touchHoldActive = true;
-    touchHoldPointerId = event.pointerId;
-    touchHoldTileKey = tileKey(tile.tx, tile.ty);
-    suppressClick = true;
-    if (canvas.setPointerCapture) {
-      canvas.setPointerCapture(event.pointerId);
-    }
     event.preventDefault();
   }
 
@@ -521,14 +503,43 @@ export async function loadRuntime({
   }
 
   function handlePointerUp(event) {
-    if (!touchHoldActive) return;
-    if (touchHoldPointerId !== null && event.pointerId !== touchHoldPointerId) {
+    if (event.pointerType === "mouse") return;
+    if (touchHoldActive) {
+      if (touchHoldPointerId !== null && event.pointerId !== touchHoldPointerId) {
+        return;
+      }
+      if (canvas.releasePointerCapture) {
+        canvas.releasePointerCapture(event.pointerId);
+      }
+      cancelHold();
       return;
     }
-    if (canvas.releasePointerCapture) {
-      canvas.releasePointerCapture(event.pointerId);
+    const tile = screenToTile(event);
+    if (!tile) return;
+    const now = performance.now();
+    const key = tileKey(tile.tx, tile.ty);
+    const target = findInteractableAt(tile);
+    const inRange =
+      target &&
+      Math.max(Math.abs(player.tx - target.tx), Math.abs(player.ty - target.ty)) <= 1;
+    if (lastTapTime && now - lastTapTime <= DOUBLE_TAP_MS && key === lastTapTileKey) {
+      if (target) {
+        const dx = Math.abs(player.tx - target.tx);
+        const dy = Math.abs(player.ty - target.ty);
+        if (Math.max(dx, dy) <= 1) {
+          startHold(target, { requiresKey: false });
+          suppressClick = true;
+        }
+      }
+      lastTapTime = 0;
+      lastTapTileKey = null;
+      return;
     }
-    cancelHold();
+    if (inRange) {
+      suppressClick = true;
+    }
+    lastTapTime = now;
+    lastTapTileKey = key;
   }
 
   function handleHover(event) {
@@ -568,7 +579,7 @@ export async function loadRuntime({
     const key = event.key.toLowerCase();
     heldKeys.add(key);
     if (interactable?.interaction?.key === key && !holdState) {
-      startHold(interactable);
+      startHold(interactable, { requiresKey: true });
     }
   }
 
@@ -635,6 +646,19 @@ export async function loadRuntime({
 
   function tileKey(tx, ty) {
     return `${tx},${ty}`;
+  }
+
+  function findInteractableAt(tile) {
+    return (
+      objects.find(
+        (obj) =>
+          !obj.hidden &&
+          obj.interaction &&
+          isTileVisible(obj.tx, obj.ty) &&
+          obj.tx === tile.tx &&
+          obj.ty === tile.ty
+      ) || null
+    );
   }
 
   function resetFogOfWar() {
