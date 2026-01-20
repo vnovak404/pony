@@ -16,6 +16,8 @@ const elements = {
   actionFillEl: document.getElementById("action-fill"),
   dialogEl: document.getElementById("dialog"),
   dialogTextEl: document.getElementById("dialog-text"),
+  dialogHeroEl: document.getElementById("dialog-hero"),
+  dialogHeroImg: document.getElementById("dialog-hero-img"),
   dialogCloseBtn: document.getElementById("dialog-close"),
   hoverCardEl: document.getElementById("hover-card"),
   hoverNameEl: document.getElementById("hover-name"),

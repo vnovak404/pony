@@ -344,6 +344,7 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - Purpose: mission runtime engine (map load, fog-of-war, movement, interactions, and render loop).
 - `loadRuntime({...})` — loads mission config + assets, wires input, and returns a runtime API.
+- Runtime API note: `openDialog(text, hero)` accepts an optional hero image, and `returnToWorldMap()` navigates back to the Whispering Forest map.
 
 ## `adventures/missions/stellacorn/*/mission.js`
 

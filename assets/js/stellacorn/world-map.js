@@ -9,6 +9,7 @@ const missionNameEl = document.getElementById("mission-name");
 const missionStatusEl = document.getElementById("mission-status");
 const missionStatsEl = document.getElementById("mission-stats");
 const missionActionEl = document.getElementById("mission-action");
+const toastEl = document.getElementById("toast");
 const exportBtn = document.getElementById("export-progress");
 const importBtn = document.getElementById("import-progress");
 const importFile = document.getElementById("import-file");
@@ -17,6 +18,7 @@ let worldMap = null;
 let progress = null;
 let hoverNode = null;
 let selectedNode = null;
+let toastTimer = null;
 
 if (canvas && ctx) {
   canvas.addEventListener("click", onCanvasClick);
@@ -263,9 +265,32 @@ function updatePanel() {
 }
 
 function startMission(node) {
-  if (!node || !nodeUnlocked(node) || !node.mission) return;
+  if (!node || !nodeUnlocked(node)) return;
+  if (!node.mission) {
+    if (node.id === "WF_M2") {
+      if (missionStatusEl) missionStatusEl.textContent = "Coming soon!";
+      if (missionActionEl) {
+        missionActionEl.textContent = "Coming soon!";
+        missionActionEl.disabled = true;
+      }
+      showToast("Coming soon!");
+    }
+    return;
+  }
   localStorage.setItem(SELECTED_KEY, node.mission);
   window.location.href = "adventure.html";
+}
+
+function showToast(message) {
+  if (!toastEl) return;
+  toastEl.textContent = message;
+  toastEl.removeAttribute("hidden");
+  toastEl.classList.add("active");
+  if (toastTimer) window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toastEl.classList.remove("active");
+    toastEl.setAttribute("hidden", "true");
+  }, 1800);
 }
 
 function exportProgress() {

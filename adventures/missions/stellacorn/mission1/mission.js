@@ -1,4 +1,7 @@
 export function createMission(runtime, ui) {
+  const PROGRESS_KEY = "WF_PROGRESS_V1";
+  const MISSION_ID = "WF_M1";
+
   const state = {
     objective: "Deliver salt to the deer.",
     objectiveProgress: "",
@@ -22,6 +25,11 @@ export function createMission(runtime, ui) {
       deerHealed: false,
       bloodTrailVisible: false,
       bloodTrailInvestigated: false,
+      bearHealed: false,
+      bearDialogOpen: false,
+      bearDialogComplete: false,
+      missionCompleteOpen: false,
+      missionCompleteDone: false,
     },
   };
 
@@ -91,6 +99,9 @@ export function createMission(runtime, ui) {
   };
 
   Object.values(trails).forEach((trail) => hideTrail(trail));
+  [trails.hedgehog, trails.fox, trails.owl, trails.badger, trails.deer, trails.bear].forEach(
+    (trail) => blockTrail(trail)
+  );
   if (clues.bloodTrail) {
     runtime.setHidden(clues.bloodTrail, true);
   }
@@ -145,7 +156,8 @@ export function createMission(runtime, ui) {
     },
     "animal-bear-sick": {
       healedType: "animal-bear-healed",
-      message: "",
+      message:
+        "Someone has been laying traps all over the forest. I tried to find them and punish them, but I was hurt doing so.",
       counts: false,
     },
   };
@@ -169,6 +181,7 @@ export function createMission(runtime, ui) {
   setInvestigateInteraction(clues.deerHoofprints, "deer-trail");
 
   runtime.blockTile(5, 33);
+  blockRect(2, 24, 8, 26);
   updateObjective(state.objective, state.objectiveProgress);
   renderQuests();
 
@@ -186,6 +199,31 @@ export function createMission(runtime, ui) {
 
   runtime.setVisibilityHandler(() => {
     if (runtime.isDialogOpen?.()) return;
+
+    if (state.triggered.missionCompleteOpen) {
+      state.triggered.missionCompleteOpen = false;
+      state.triggered.missionCompleteDone = true;
+      markMissionCleared();
+      runtime.returnToWorldMap?.();
+      if (!runtime.returnToWorldMap) {
+        window.location.href = "world-map.html";
+      }
+      return;
+    }
+
+    if (state.triggered.bearDialogOpen) {
+      state.triggered.bearDialogOpen = false;
+      state.triggered.bearDialogComplete = true;
+    }
+
+    if (
+      state.triggered.bearDialogComplete &&
+      !state.triggered.missionCompleteDone &&
+      allCriteriaMet()
+    ) {
+      openMissionCompleteDialog();
+      return;
+    }
 
     if (triggerClue(
       clues.hedgehogBerries,
@@ -256,8 +294,12 @@ export function createMission(runtime, ui) {
     state.triggered.saltDropped = true;
     runtime.setObjectType(target, "prop-salt-dropoff-with-salt");
     runtime.setInteraction(target, null);
+    const hero = target?.asset
+      ? { src: target.asset, alt: target.name || "Salt" }
+      : null;
     runtime.openDialog(
-      "I left the salt, but the deer are gone. They are always here, and they love the salt. Where did they run off to?"
+      "I left the salt, but the deer are gone. They are always here, and they love the salt. Where did they run off to?",
+      hero
     );
     addWorry(10);
     updateObjective("Find the deer.", "");
@@ -269,8 +311,12 @@ export function createMission(runtime, ui) {
     if (state.triggered.rabbitFootprints) return;
     state.triggered.rabbitFootprints = true;
     runtime.setInteraction(target, null);
+    const hero = target?.asset
+      ? { src: target.asset, alt: target.name || "Clue" }
+      : null;
     runtime.openDialog(
-      "Those rabbit footprints look odd, as if the rabbit were limping or dragging a foot."
+      "Those rabbit footprints look odd, as if the rabbit were limping or dragging a foot.",
+      hero
     );
     addWorry(10);
     revealTrail(trails.rabbit);
@@ -303,7 +349,10 @@ export function createMission(runtime, ui) {
       updateObjective("Find the bear.", "");
     }
     if (entry.message) {
-      runtime.openDialog(entry.message);
+      const hero = target?.asset
+        ? { src: target.asset, alt: target.name || "Creature" }
+        : null;
+      runtime.openDialog(entry.message, hero);
     }
     if (
       entry.counts &&
@@ -313,7 +362,13 @@ export function createMission(runtime, ui) {
       triggerBloodTrail();
     }
     if (wasType === "animal-bear-sick") {
+      state.triggered.bearHealed = true;
       setQuestStatus("findBear", "complete");
+      if (entry.message) {
+        state.triggered.bearDialogOpen = true;
+      } else {
+        state.triggered.bearDialogComplete = true;
+      }
     }
   }
 
@@ -362,6 +417,7 @@ export function createMission(runtime, ui) {
     if (state.triggered.bloodTrailInvestigated) return;
     state.triggered.bloodTrailInvestigated = true;
     runtime.setInteraction(target, null);
+    revealTrail(trails.bear);
     unlockTrail(trails.bear);
   }
 
@@ -377,7 +433,6 @@ export function createMission(runtime, ui) {
         action: "bear-trail",
       });
     }
-    revealTrail(trails.bear);
     addWorry(20);
     updateObjective("Find the bear.", "");
     setQuestStatus("findBear", "active");
@@ -397,7 +452,10 @@ export function createMission(runtime, ui) {
     if (!target || state.triggered[key]) return false;
     if (!runtime.isTileVisible(target.tx, target.ty)) return false;
     state.triggered[key] = true;
-    runtime.openDialog(message);
+    const hero = target?.asset
+      ? { src: target.asset, alt: target.name || "Clue" }
+      : null;
+    runtime.openDialog(message, hero);
     addWorry(worry);
     if (onReveal) onReveal();
     return true;
@@ -428,13 +486,33 @@ export function createMission(runtime, ui) {
   }
 
   function unlockTrail(trail) {
-    trail.tiles.forEach((tile) => runtime.allowTile(tile.tx, tile.ty));
+    trail.tiles.forEach((tile) => {
+      runtime.unblockTile(tile.tx, tile.ty);
+      runtime.allowTile(tile.tx, tile.ty);
+    });
+  }
+
+  function blockTrail(trail) {
+    trail.tiles.forEach((tile) => {
+      runtime.blockTile(tile.tx, tile.ty);
+      runtime.disallowTile(tile.tx, tile.ty);
+    });
   }
 
   function unlockRect(startX, startY, endX, endY) {
     for (let ty = startY; ty <= endY; ty += 1) {
       for (let tx = startX; tx <= endX; tx += 1) {
+        runtime.unblockTile(tx, ty);
         runtime.allowTile(tx, ty);
+      }
+    }
+  }
+
+  function blockRect(startX, startY, endX, endY) {
+    for (let ty = startY; ty <= endY; ty += 1) {
+      for (let tx = startX; tx <= endX; tx += 1) {
+        runtime.blockTile(tx, ty);
+        runtime.disallowTile(tx, ty);
       }
     }
   }
@@ -498,5 +576,35 @@ export function createMission(runtime, ui) {
         `;
       })
       .join("");
+  }
+
+  function allCriteriaMet() {
+    return (
+      state.triggered.saltDropped &&
+      state.triggered.deerHealed &&
+      state.triggered.bearHealed &&
+      state.healed >= state.healGoal
+    );
+  }
+
+  function openMissionCompleteDialog() {
+    state.triggered.missionCompleteOpen = true;
+    const hero = saltDropoff?.asset
+      ? { src: saltDropoff.asset, alt: saltDropoff.name || "Salt" }
+      : null;
+    runtime.openDialog("Mission complete: The Missing Deer.", hero);
+  }
+
+  function markMissionCleared() {
+    try {
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      const parsed = raw ? JSON.parse(raw) : { cleared: {}, unlocked: {} };
+      parsed.cleared = parsed.cleared || {};
+      parsed.unlocked = parsed.unlocked || {};
+      parsed.cleared[MISSION_ID] = true;
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(parsed));
+    } catch (error) {
+      console.warn("Unable to save mission progress.", error);
+    }
   }
 }

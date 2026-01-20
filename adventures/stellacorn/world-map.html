@@ -98,6 +98,26 @@
         color: #cfe2d8;
         font-size: 0.9rem;
       }
+      #toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(12, 18, 16, 0.92);
+        border: 1px solid rgba(198, 214, 205, 0.3);
+        color: #e6efe9;
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      #toast.active {
+        opacity: 1;
+      }
       @media (max-width: 980px) {
         #map-shell {
           grid-template-columns: 1fr;
@@ -133,6 +153,7 @@
       </button>
       <input type="file" id="import-file" accept="application/json" hidden />
     </div>
+    <div id="toast" hidden></div>
     <script type="module" src="../../assets/js/stellacorn/world-map.js"></script>
   </body>
 </html>

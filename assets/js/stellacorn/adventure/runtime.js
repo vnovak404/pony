@@ -388,10 +388,30 @@ export async function loadRuntime({
     elements.actionFillEl.style.width = `${Math.floor(ratio * 100)}%`;
   }
 
-  function openDialog(text) {
+  function openDialog(text, hero) {
     if (!elements.dialogEl || !elements.dialogTextEl) return;
     dialogOpen = true;
-    elements.dialogTextEl.textContent = text || "...";
+    let message = text;
+    let heroData = hero || null;
+    if (typeof text === "object" && text !== null) {
+      message = text.text;
+      heroData = text.hero || null;
+    }
+    elements.dialogTextEl.textContent = message || "...";
+    if (elements.dialogHeroEl && elements.dialogHeroImg) {
+      const heroSrc =
+        typeof heroData === "string" ? heroData : heroData?.src;
+      if (heroSrc) {
+        elements.dialogHeroImg.src = heroSrc;
+        elements.dialogHeroImg.alt =
+          heroData?.alt || heroData?.name || "Creature";
+        elements.dialogHeroEl.removeAttribute("hidden");
+      } else {
+        elements.dialogHeroEl.setAttribute("hidden", "true");
+        elements.dialogHeroImg.removeAttribute("src");
+        elements.dialogHeroImg.alt = "";
+      }
+    }
     elements.dialogEl.classList.add("active");
     elements.promptEl?.setAttribute("hidden", "true");
   }
@@ -399,6 +419,11 @@ export async function loadRuntime({
   function closeDialog() {
     if (!elements.dialogEl) return;
     elements.dialogEl.classList.remove("active");
+    if (elements.dialogHeroEl && elements.dialogHeroImg) {
+      elements.dialogHeroEl.setAttribute("hidden", "true");
+      elements.dialogHeroImg.removeAttribute("src");
+      elements.dialogHeroImg.alt = "";
+    }
     dialogOpen = false;
     updatePrompt();
   }
@@ -642,6 +667,7 @@ export async function loadRuntime({
     closeDialog,
     isDialogOpen,
     updatePrompt,
+    returnToWorldMap,
     getMissionConfig: () => missionConfig,
     resolveMissionUrl,
   };

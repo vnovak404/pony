@@ -386,10 +386,28 @@
   animation: rise 0.8s ease both;
 }
 
+.adventure.muted {
+  opacity: 0.6;
+  filter: grayscale(1);
+  background: #f4f4f6;
+  border-color: rgba(44, 33, 54, 0.12);
+  box-shadow: 0 8px 18px rgba(44, 33, 54, 0.08);
+}
+
+.adventure.muted h3,
+.adventure.muted p {
+  color: var(--ink-soft);
+}
+
 .adventure-link {
   color: inherit;
   display: block;
   text-decoration: none;
+}
+
+.adventure-link.muted {
+  pointer-events: none;
+  cursor: default;
 }
 
 .adventure:nth-child(1) {
