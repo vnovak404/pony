@@ -2,6 +2,7 @@ export function drawFrame(state) {
   if (!state.ctx || !state.canvas) return;
   state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
   drawTiles(state);
+  drawInteractionHalo(state);
   drawObjects(state);
   drawPlayer(state);
 }
@@ -109,6 +110,25 @@ function drawObjects(state) {
     ctx.fill();
     ctx.stroke();
   });
+}
+
+function drawInteractionHalo(state) {
+  const { ctx, interactable, camera, tileSize, time } = state;
+  if (!ctx || !interactable) return;
+  const centerX = (interactable.tx + 0.5) * tileSize - camera.x;
+  const centerY = (interactable.ty + 0.5) * tileSize - camera.y;
+  const pulse = 0.85 + 0.1 * Math.sin((time || 0) / 220);
+  const radius = tileSize * 0.48 * pulse;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle = "rgba(242, 248, 255, 0.75)";
+  ctx.lineWidth = 3;
+  ctx.shadowColor = "rgba(248, 252, 255, 0.45)";
+  ctx.shadowBlur = 12;
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
 }
 
 function drawPlayer(state) {

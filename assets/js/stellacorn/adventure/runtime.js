@@ -6,6 +6,9 @@ const BASE_SPEED = 120;
 const FOG_RADIUS = 3;
 const FOG_DIM_ALPHA = 0.55;
 const FOG_HIDDEN_ALPHA = 0.92;
+const IS_TOUCH_DEVICE =
+  typeof window !== "undefined" &&
+  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
 export async function loadRuntime({
   missionPath,
@@ -44,6 +47,10 @@ export async function loadRuntime({
   let hoverTarget = null;
   let heldKeys = new Set();
   let holdState = null;
+  let touchHoldActive = false;
+  let touchHoldPointerId = null;
+  let touchHoldTileKey = null;
+  let suppressClick = false;
   let interactionHandler = null;
   let visibilityHandler = null;
 
@@ -73,6 +80,8 @@ export async function loadRuntime({
     playerSprite,
     playerScale: PLAYER_SCALE,
     activePath,
+    interactable: null,
+    time: 0,
     isTileDiscovered,
     isTileVisible,
     fogHiddenAlpha: FOG_HIDDEN_ALPHA,
@@ -81,6 +90,11 @@ export async function loadRuntime({
   };
 
   canvas.addEventListener("click", handleClick);
+  canvas.addEventListener("pointerdown", handlePointerDown);
+  canvas.addEventListener("pointermove", handlePointerMove);
+  canvas.addEventListener("pointerup", handlePointerUp);
+  canvas.addEventListener("pointercancel", handlePointerUp);
+  canvas.addEventListener("pointerleave", handlePointerUp);
   canvas.addEventListener("mousemove", handleHover);
   canvas.addEventListener("mouseleave", clearHover);
   window.addEventListener("keydown", handleKeyDown);
@@ -258,6 +272,7 @@ export async function loadRuntime({
     const delta = lastFrameTime ? (timestamp - lastFrameTime) / 1000 : 1 / 60;
     lastFrameTime = timestamp;
     update(delta);
+    renderState.time = timestamp;
     drawFrame(renderState);
     requestAnimationFrame(loop);
   }
@@ -315,19 +330,24 @@ export async function loadRuntime({
       if (!isTileVisible(obj.tx, obj.ty)) continue;
       const dx = Math.abs(player.tx - obj.tx);
       const dy = Math.abs(player.ty - obj.ty);
-      if (Math.max(dx, dy) <= 1) {
-        interactable = obj;
-        break;
-      }
+    if (Math.max(dx, dy) <= 1) {
+      interactable = obj;
+      break;
     }
+  }
+    renderState.interactable = interactable;
     updatePrompt();
   }
 
   function updatePrompt() {
     if (!elements.promptEl) return;
     if (interactable && !dialogOpen) {
-      elements.promptEl.textContent =
-        interactable.interaction?.label || "Hold I to act";
+      const baseLabel = interactable.interaction?.label || "Hold I to act";
+      elements.promptEl.textContent = IS_TOUCH_DEVICE
+        ? baseLabel
+            .replace(/^Hold [A-Z] to /, "Press and hold to ")
+            .replace(/^Hold [a-z] to /, "Press and hold to ")
+        : baseLabel;
       elements.promptEl.removeAttribute("hidden");
     } else {
       elements.promptEl.setAttribute("hidden", "true");
@@ -371,6 +391,9 @@ export async function loadRuntime({
   function cancelHold() {
     updateActionProgress("", 0, true);
     holdState = null;
+    touchHoldActive = false;
+    touchHoldPointerId = null;
+    touchHoldTileKey = null;
   }
 
   function updateActionProgress(label, ratio, hidden = false) {
@@ -437,6 +460,10 @@ export async function loadRuntime({
   }
 
   function handleClick(event) {
+    if (suppressClick) {
+      suppressClick = false;
+      return;
+    }
     if (dialogOpen) return;
     const targetTile = screenToTile(event);
     if (!targetTile) return;
@@ -448,6 +475,60 @@ export async function loadRuntime({
     );
     activePath = path.length ? path.slice(1) : [];
     renderState.activePath = activePath;
+  }
+
+  function handlePointerDown(event) {
+    if (dialogOpen) return;
+    if (event.pointerType === "mouse") return;
+    const tile = screenToTile(event);
+    if (!tile) return;
+    const target = objects.find(
+      (obj) =>
+        !obj.hidden &&
+        obj.interaction &&
+        isTileVisible(obj.tx, obj.ty) &&
+        obj.tx === tile.tx &&
+        obj.ty === tile.ty
+    );
+    if (!target) return;
+    const dx = Math.abs(player.tx - target.tx);
+    const dy = Math.abs(player.ty - target.ty);
+    if (Math.max(dx, dy) > 1) return;
+    startHold(target);
+    touchHoldActive = true;
+    touchHoldPointerId = event.pointerId;
+    touchHoldTileKey = tileKey(tile.tx, tile.ty);
+    suppressClick = true;
+    if (canvas.setPointerCapture) {
+      canvas.setPointerCapture(event.pointerId);
+    }
+    event.preventDefault();
+  }
+
+  function handlePointerMove(event) {
+    if (!touchHoldActive) return;
+    if (touchHoldPointerId !== null && event.pointerId !== touchHoldPointerId) {
+      return;
+    }
+    const tile = screenToTile(event);
+    if (!tile) {
+      cancelHold();
+      return;
+    }
+    if (tileKey(tile.tx, tile.ty) !== touchHoldTileKey) {
+      cancelHold();
+    }
+  }
+
+  function handlePointerUp(event) {
+    if (!touchHoldActive) return;
+    if (touchHoldPointerId !== null && event.pointerId !== touchHoldPointerId) {
+      return;
+    }
+    if (canvas.releasePointerCapture) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
+    cancelHold();
   }
 
   function handleHover(event) {
