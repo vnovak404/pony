@@ -1,0 +1,15 @@
+{
+  "id": "WF_MISSION_2",
+  "title": "Investigating the Forest",
+  "subtitle": "Whispering Forest (Deeper Interior)",
+  "map": "./adventures/maps/_drafts/stellacorn-mission2-map-1.json",
+  "tiles": "./data/adventure_tiles.json",
+  "objects": "./data/adventure_objects.json",
+  "assetRoot": "./adventures",
+  "logic": "./mission.js",
+  "tileSize": 64,
+  "spawn": {
+    "tx": 7,
+    "ty": 40
+  }
+}

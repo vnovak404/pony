@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pony Parade Asset Forge</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="glow"></div>
+    <div class="gridlines"></div>
+
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-mark">AF</div>
+        <div>
+          <div class="brand-title">Asset Forge</div>
+          <div class="brand-subtitle">Library Inspector</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a class="button ghost" href="../dev-tools/index.html">Back to Deck</a>
+        <button class="button primary" id="refresh-manifest" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Centralized Assets</div>
+          <h1>Inspect every generated map asset in one place.</h1>
+          <p>
+            Browse tilesets, minimaps, overlays, and exports with full metadata. The library is
+            driven by a single manifest so your pipeline can stay fast and consistent.
+          </p>
+        </div>
+        <div class="hero-panel">
+          <div class="panel-stat">
+            <div class="stat-label">Total Assets</div>
+            <div class="stat-value" id="asset-count">0</div>
+          </div>
+          <div class="panel-stat">
+            <div class="stat-label">Manifest</div>
+            <div class="stat-value" id="manifest-status">Waiting</div>
+          </div>
+          <div class="panel-note" id="manifest-message">
+            Start the local server to load the asset manifest.
+          </div>
+        </div>
+      </section>
+
+      <section class="generator">
+        <div class="generator-card">
+          <div class="generator-header">
+            <div class="eyebrow">Generation Bay</div>
+            <h2>Generate new assets on demand.</h2>
+            <p>
+              Trigger API-backed generation for tiles, sprites, icons, and minimaps. Successful
+              runs land in the library manifest automatically.
+            </p>
+          </div>
+          <form class="generator-form" id="asset-generate-form">
+            <label class="control">
+              <span>Provider</span>
+              <select id="generate-provider">
+                <option value="openai">OpenAI (configured)</option>
+                <option value="xai" disabled>xAI (coming soon)</option>
+                <option value="nano-banana" disabled>Google Nano-Banana (coming soon)</option>
+                <option value="retrodiffusion" disabled>Retrodiffusion (coming soon)</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>Type</span>
+              <select id="generate-type">
+                <option value="tile">Tile</option>
+                <option value="sprite">Sprite</option>
+                <option value="icon">Icon</option>
+                <option value="overlay">Overlay</option>
+                <option value="hero">Hero</option>
+                <option value="minimap">Minimap</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>Title</span>
+              <input id="generate-title" type="text" placeholder="Twisted oak sprite" />
+            </label>
+            <label class="control">
+              <span>System</span>
+              <input id="generate-system" type="text" value="adventure_map" />
+            </label>
+            <label class="control">
+              <span>Collection</span>
+              <input id="generate-collection" type="text" value="asset_forge" />
+            </label>
+            <label class="control">
+              <span>Stage</span>
+              <select id="generate-stage">
+                <option value="generated">Generated</option>
+                <option value="draft">Draft</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>Request size</span>
+              <input id="generate-request-size" type="text" value="1024" />
+            </label>
+            <label class="control">
+              <span>Output size</span>
+              <input id="generate-target-size" type="number" value="64" min="16" step="1" />
+            </label>
+            <label class="control full">
+              <span>Prompt</span>
+              <textarea id="generate-prompt" rows="4" placeholder="Describe the asset in detail..."></textarea>
+            </label>
+            <div class="generator-actions">
+              <button class="button primary" type="submit" id="generate-asset">Generate Asset</button>
+              <button class="button ghost" type="button" id="reset-generate">Reset</button>
+              <div class="generate-status" id="generate-status">Idle</div>
+            </div>
+          </form>
+        </div>
+        <div class="generator-preview">
+          <div class="preview-card">
+            <div class="preview-label">Working Sprite</div>
+            <div class="working-sprite" id="working-sprite">
+              <img id="working-sprite-img" alt="Working sprite" />
+            </div>
+            <div class="preview-meta" id="working-label">Ready to generate.</div>
+            <div class="preview-hint">A placeholder sprite animates while the API call is running.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls">
+        <label class="control">
+          <span>Search</span>
+          <input id="search-input" type="search" placeholder="Type to filter assets..." />
+        </label>
+        <label class="control">
+          <span>Type</span>
+          <select id="filter-type">
+            <option value="all">All</option>
+          </select>
+        </label>
+        <label class="control">
+          <span>Stage</span>
+          <select id="filter-stage">
+            <option value="all">All</option>
+          </select>
+        </label>
+        <label class="control">
+          <span>System</span>
+          <select id="filter-system">
+            <option value="all">All</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="selection-bar">
+        <div class="selection-count">
+          <span id="selected-count">0</span> selected
+        </div>
+        <div class="selection-actions">
+          <button class="button ghost" id="copy-selected-prompts" type="button">Copy Prompt Set</button>
+          <button class="button ghost" id="copy-selected-commands" type="button">Copy Regenerate Commands</button>
+          <button class="button" id="clear-selection" type="button">Clear</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="manifest-panel">
+          <h2>Manifest</h2>
+          <dl id="manifest-meta" class="meta-list"></dl>
+          <div class="hint">
+            Manifest file: <code>assets/library/manifest.json</code>
+          </div>
+        </aside>
+
+        <section class="gallery">
+          <div id="asset-grid" class="asset-grid"></div>
+        </section>
+
+        <aside class="detail-panel">
+          <div id="asset-details" class="detail-empty">
+            <div class="detail-title">Select an asset</div>
+            <div class="detail-body">Click any card to inspect metadata, files, and previews.</div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

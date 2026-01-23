@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adventure Designer</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="top-bar">
+        <div class="brand">Adventure Designer</div>
+        <div class="mode-toggle">
+          <button id="mode-sketch" type="button" class="is-active">Sketch Mode</button>
+          <button id="mode-tile" type="button">Tile Mode</button>
+        </div>
+        <div class="controls">
+          <button id="undo-btn" type="button">Undo</button>
+          <button id="redo-btn" type="button">Redo</button>
+          <button id="export-btn" type="button">Save Draft</button>
+          <button id="import-btn" type="button">Import Draft</button>
+          <input id="import-input" type="file" accept="application/json" hidden />
+        </div>
+      </header>
+
+      <div class="main">
+        <aside class="panel left">
+          <section>
+            <h2>Tools</h2>
+            <div class="tool-buttons">
+              <button type="button" data-tool="intent">Intent</button>
+              <button type="button" data-tool="paint" class="is-active">Paint</button>
+              <button type="button" data-tool="fill">Fill</button>
+              <button type="button" data-tool="road">Road</button>
+              <button type="button" data-tool="river">River</button>
+              <button type="button" data-tool="lasso">Lasso</button>
+              <button type="button" data-tool="delete">Delete</button>
+              <button type="button" data-tool="note">Note</button>
+              <button type="button" data-tool="object">Object</button>
+            </div>
+          </section>
+
+          <section>
+            <h2>Brush</h2>
+            <div class="brush">
+              <input id="brush-size" type="range" min="1" max="10" step="1" value="1" />
+              <div id="brush-size-label">1</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Zoom</h2>
+            <div class="brush">
+              <input id="zoom-level" type="range" min="0.5" max="4" step="0.1" value="1" />
+              <div id="zoom-label">100%</div>
+            </div>
+          </section>
+
+          <section id="sketch-palette-section">
+            <h2>Sketch Palette</h2>
+            <div id="sketch-palette" class="palette"></div>
+          </section>
+
+          <section id="tile-palette-section" class="is-hidden">
+            <h2>Tiles</h2>
+            <div id="tile-palette" class="palette"></div>
+          </section>
+
+          <section id="object-palette-section" class="is-hidden">
+            <h2>Objects</h2>
+            <div id="object-palette" class="palette"></div>
+          </section>
+        </aside>
+
+        <main class="canvas-wrap">
+          <div id="viewport"></div>
+          <div id="status" class="status">Loading map...</div>
+        </main>
+
+        <aside class="panel right">
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Workflow</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <button id="workflow-generate-tiles" type="button">Generate Tiles from Sketch</button>
+              <button id="workflow-prettify-tiles" type="button">Prettify Forest Edge</button>
+            </div>
+          </section>
+
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Map Notes</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <textarea id="note-text" rows="3" placeholder="Placeables, story beats, encounters..."></textarea>
+              <div class="note-size">
+                <label>
+                  W
+                  <input id="note-width" type="number" min="1" max="99" step="1" value="4" />
+                </label>
+                <label>
+                  H
+                  <input id="note-height" type="number" min="1" max="99" step="1" value="4" />
+                </label>
+              </div>
+              <div class="muted">Select the Note tool and click the map to place a note.</div>
+              <div id="notes-list" class="notes-list"></div>
+            </div>
+          </section>
+
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Refine</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <div class="refine-grid">
+                <label>
+                  Target W
+                  <input id="refine-target-width" type="number" min="1" step="1" />
+                </label>
+                <label>
+                  Target H
+                  <input id="refine-target-height" type="number" min="1" step="1" />
+                </label>
+              </div>
+              <div id="refine-base" class="muted">Base: --</div>
+              <label class="refine-field">
+                Tileset
+                <input id="refine-tileset" type="text" value="stellacorn_adventure" />
+              </label>
+              <label class="refine-field">
+                Decor Style
+                <input id="refine-decor" type="text" value="storybook_fantasy" />
+              </label>
+              <label class="refine-field">
+                Seed
+                <input id="refine-seed" type="text" value="auto" />
+              </label>
+              <button id="workflow-refine-map" type="button">Refine Map</button>
+              <div class="muted">Requires <code>python3 scripts/pony_server.py</code>.</div>
+            </div>
+          </section>
+
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Intent</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <textarea id="intent-input" rows="5" placeholder="Describe the intent for the selected region..."></textarea>
+              <button id="intent-run" type="button">Generate Proposal</button>
+            </div>
+          </section>
+
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Proposal</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <div id="proposal-summary" class="muted">No proposals yet.</div>
+              <div class="proposal-actions">
+                <button id="proposal-apply" type="button" disabled>Apply</button>
+                <button id="proposal-reject" type="button" disabled>Reject</button>
+              </div>
+              <ul id="proposal-list" class="proposal-list"></ul>
+            </div>
+          </section>
+
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Minimap</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <canvas id="minimap" class="minimap" width="200" height="200"></canvas>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

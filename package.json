@@ -3,6 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint .",
+    "test:server": "python3 -c \"import sys; sys.path.insert(0, 'scripts'); import pony_server.app\"",
+    "test:py": "python3 -m py_compile scripts/pony_server/*.py scripts/*.py",
+    "test:all": "npm run lint && npm run test && npm run test:server && npm run test:py"
+  },
+  "devDependencies": {
+    "eslint": "^9.9.0",
+    "globals": "^15.10.0"
   }
 }

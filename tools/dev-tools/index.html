@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pony Parade Dev Tools</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="aurora"></div>
+    <div class="grain"></div>
+
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-mark">PP</div>
+        <div>
+          <div class="brand-title">Pony Parade</div>
+          <div class="brand-subtitle">Dev Tools Deck</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="chip">Build 0.9.7</span>
+        <button class="ghost" type="button">Back to Menu</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Studio Ops</div>
+          <h1>Everything a map, mission, and asset needs to ship.</h1>
+          <p>
+            Sketch intent in minutes, refine into structured tiles, and decorate with deterministic
+            rules. The stack is built for iteration and replayable worlds.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="../adventure-designer/index.html">Launch Adventure Designer</a>
+            <button class="ghost" type="button">Open Docs</button>
+          </div>
+          <div class="status-row">
+            <div class="status-pill">
+              <span class="status-dot"></span>
+              Local server ready
+            </div>
+            <div class="status-pill muted">Refine engine ready</div>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="hero-panel-header">
+            <div class="hero-panel-title">Pipeline Snapshot</div>
+            <span class="chip">Resolution-agnostic</span>
+          </div>
+          <ol class="pipeline">
+            <li>
+              <span class="step-index">01</span>
+              <div>
+                <div class="step-title">Intent Sketch</div>
+                <div class="step-detail">Paint biome macros + notes.</div>
+              </div>
+            </li>
+            <li>
+              <span class="step-index">02</span>
+              <div>
+              <div class="step-title">Procedural Refinement</div>
+                <div class="step-detail">Structured layers + decor rules.</div>
+              </div>
+            </li>
+            <li>
+              <span class="step-index">03</span>
+              <div>
+                <div class="step-title">Deterministic Decor</div>
+                <div class="step-detail">Seeded placement, swappable tilesets.</div>
+              </div>
+            </li>
+            <li>
+              <span class="step-index">04</span>
+              <div>
+                <div class="step-title">Mission Ready</div>
+                <div class="step-detail">Exportable JSON, stable diffs.</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="tools-grid">
+        <article class="tool-card accent-teal">
+          <div class="tool-header">
+            <span class="tool-badge">AD</span>
+            <div>
+              <h3>Adventure Designer</h3>
+              <p>Sketch-first map editor, palettes, roads, and notes.</p>
+            </div>
+          </div>
+          <div class="tool-meta">
+            <span>Sketch + Tile Modes</span>
+            <span>Undo + Export</span>
+          </div>
+          <a class="button" href="../adventure-designer/index.html">Open</a>
+        </article>
+
+        <article class="tool-card accent-amber disabled">
+          <div class="tool-header">
+            <span class="tool-badge">RF</span>
+            <div>
+              <h3>Map Refinement</h3>
+              <p>Intent map -> structured layers + decor rules.</p>
+            </div>
+          </div>
+          <div class="tool-meta">
+            <span>Any resolution</span>
+            <span>Seeded output</span>
+          </div>
+          <button class="button" type="button" disabled>Coming Soon</button>
+        </article>
+
+        <article class="tool-card accent-forest">
+          <div class="tool-header">
+            <span class="tool-badge">AF</span>
+            <div>
+              <h3>Asset Forge</h3>
+              <p>Sprites, structures, and WebP conversion pipeline.</p>
+            </div>
+          </div>
+          <div class="tool-meta">
+            <span>OpenAI images</span>
+            <span>Batch tooling</span>
+          </div>
+          <a class="button" href="../asset-forge/index.html">Open</a>
+        </article>
+
+        <article class="tool-card accent-slate disabled">
+          <div class="tool-header">
+            <span class="tool-badge">WD</span>
+            <div>
+              <h3>World Director</h3>
+              <p>Server-authoritative world rules and live state.</p>
+            </div>
+          </div>
+          <div class="tool-meta">
+            <span>State saves</span>
+            <span>Runtime tuning</span>
+          </div>
+          <button class="button" type="button" disabled>Coming Soon</button>
+        </article>
+
+        <article class="tool-card accent-stone disabled">
+          <div class="tool-header">
+            <span class="tool-badge">IM</span>
+            <div>
+              <h3>Instance Map Editor</h3>
+              <p>Handcraft mission layouts + interaction anchors.</p>
+            </div>
+          </div>
+          <div class="tool-meta">
+            <span>Story zones</span>
+            <span>Encounter hooks</span>
+          </div>
+          <button class="button" type="button" disabled>Coming Soon</button>
+        </article>
+
+        <article class="tool-card accent-crimson disabled">
+          <div class="tool-header">
+            <span class="tool-badge">MB</span>
+            <div>
+              <h3>Mission Builder</h3>
+              <p>Author mission flow and objectives.</p>
+            </div>
+          </div>
+          <div class="tool-meta">
+            <span>Objectives</span>
+            <span>Flow</span>
+          </div>
+          <button class="button" type="button" disabled>Coming Soon</button>
+        </article>
+
+      </section>
+
+      <section class="cta">
+        <div>
+          <h2>Ready to brag?</h2>
+          <p>Ship a screenshot, a pipeline bullet list, and the mission map preview in one go.</p>
+        </div>
+        <button class="primary" type="button">Capture Deck</button>
+      </section>
+    </main>
+  </body>
+</html>

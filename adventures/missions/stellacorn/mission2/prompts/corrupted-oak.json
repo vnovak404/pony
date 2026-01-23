@@ -1,0 +1,28 @@
+{
+  "name": "corrupted-oak",
+  "request_size": "1024x1024",
+  "output_size": 1024,
+  "base_prompt": "Large corrupted oak tree sprite for a 2D game, centered, full tree visible from roots to branches, twisted branches, dark sickly leaves, corrupted acorns dripping, evil runes carved into bark glowing faintly, gnarled roots, storybook dark fantasy style, clean silhouette, transparent background, no characters, no text, no border.",
+  "variants": [
+    {
+      "id": "01",
+      "prompt": "Rune glow is pale green, bark veins radiate from the runes, faint emerald mist near the roots."
+    },
+    {
+      "id": "02",
+      "prompt": "Rune glow is deep violet, acorns ooze black sap, branches curl like claws, heavier shadowed canopy."
+    },
+    {
+      "id": "03",
+      "prompt": "Rune glow is cold blue, cracked bark plates, twisted root flare, sparse leaves that look burnt at the edges."
+    },
+    {
+      "id": "04",
+      "prompt": "Rune glow is ember orange, thorny offshoots, clusters of swollen corrupted acorns, mossy roots."
+    },
+    {
+      "id": "05",
+      "prompt": "Rune glow is sickly yellow, gnarled knots on the trunk, hanging acorns drip green resin, scattered dark leaves."
+    }
+  ]
+}

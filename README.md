@@ -73,6 +73,13 @@ python3 scripts/pony_server.py
 If you want to generate new assets, create a `.env` with `OPENAI_API_KEY` and use
 the scripts in `scripts/` (portraits, sprites, structures, UI icons).
 
+## Lint + Test
+- JS lint: `npm run lint`
+- JS tests: `npm test`
+- Python smoke import (server): `npm run test:server`
+- Python syntax check: `npm run test:py`
+- All checks: `npm run test:all`
+
 ## Deploy (static)
 To build a minimal deployable folder:
 

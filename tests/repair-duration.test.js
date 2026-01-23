@@ -12,11 +12,21 @@ const readFile = (relativePath) =>
   fs.readFileSync(path.join(rootDir, relativePath), "utf8");
 
 test("repair duration is 30–50 seconds", () => {
-  const actorsCore = readFile("assets/js/map/actors/core.js");
-  const pattern = /repairTime\s*=\s*30000\s*\+\s*Math\.random\(\)\s*\*\s*20000/;
+  const actionsWork = readFile("assets/js/map/actors/actions-work.js");
+  const minPattern = /const\s+minRepair\s*=\s*Number\.isFinite\(REPAIR_DURATION_MIN\)\s*\?\s*REPAIR_DURATION_MIN\s*:\s*30000/;
+  const maxPattern = /const\s+maxRepair\s*=\s*Number\.isFinite\(REPAIR_DURATION_MAX\)\s*\?\s*REPAIR_DURATION_MAX\s*:\s*50000/;
+  const repairPattern = /const\s+repairTime\s*=\s*minRepair\s*\+\s*Math\.random\(\)\s*\*\s*Math\.max\(0,\s*maxRepair\s*-\s*minRepair\)/;
 
   assert.ok(
-    pattern.test(actorsCore),
-    "Expected repairTime to be 30000 + Math.random() * 20000"
+    minPattern.test(actionsWork),
+    "Expected repair min fallback to 30000"
+  );
+  assert.ok(
+    maxPattern.test(actionsWork),
+    "Expected repair max fallback to 50000"
+  );
+  assert.ok(
+    repairPattern.test(actionsWork),
+    "Expected repairTime calculation from min/max"
   );
 });

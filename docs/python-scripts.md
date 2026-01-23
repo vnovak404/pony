@@ -48,8 +48,14 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--env-file` `.env` path for `OPENAI_API_KEY`.
   - `--map` path to the Ponyville map JSON.
   - `--state` path for runtime state persistence.
+  - `--asset-manifest` path to the asset library manifest JSON.
 - Behavior:
   - On pony creation, runs sprite generation, spritesheet packing, house assets, and pony lore generation.
+  - `POST /api/map/refine` accepts a low-res intent map + legend + refinement params, runs a deterministic in-process refiner, and returns structured map layers + decor rules (no images).
+    - The refiner expands macro-cells to the target resolution and applies a seeded boundary jitter + smoothing pass.
+  - `POST /api/assets/generate` accepts asset payloads (type, prompt, provider, sizes), writes a WebP into the asset library, and appends a manifest entry.
+    - Supports provider `openai` only; writes raw PNGs to `../pony_generated_assets/asset_forge/`.
+  - `GET /api/assets/manifest` returns the asset library manifest JSON (read from disk each request).
 
 ## `scripts/generate_pony_sprites.py`
 
@@ -81,6 +87,14 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `python3 scripts/generate_pony_sprites.py --pony golden-violet --actions idle,walk`
   - `python3 scripts/generate_pony_sprites.py --pony golden-violet --use-portrait`
   - `python3 scripts/generate_pony_sprites.py --dry-run`
+
+## `scripts/pony_server/asset_generation.py`
+
+- Purpose: API-backed asset generation helper for Asset Forge (`POST /api/assets/generate`).
+- Supports: provider `openai` only (uses `scripts/sprites/images_api.py`).
+- Outputs: WebP files in `assets/library/maps/<type>/<stage>/` and raw PNGs in `../pony_generated_assets/asset_forge/`.
+- Key function:
+  - `generate_asset(payload, manifest_path, library_root, generated_root, env_file)` — validates payload, generates/converts image, appends manifest entry.
 
 ## `scripts/pack_spritesheet.py`
 
@@ -138,6 +152,18 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--clean` delete output directory before copying
 - Example usage:
   - `python3 scripts/build_public.py --clean`
+
+## `scripts/build_asset_manifest.py`
+
+- Purpose: build the centralized asset library manifest consumed by Asset Forge.
+- Output: `assets/library/manifest.json`.
+- Reads: asset files under `assets/library/maps/` and prompt dictionaries in `scripts/generate_adventure_assets.py`.
+- Includes: per-asset prompts, prompt profiles, and regeneration commands when available.
+- CLI:
+  - `--output` output manifest path (default `assets/library/manifest.json`).
+  - `--library-root` asset library root (default `assets/library/maps`).
+- Example usage:
+  - `.venv/bin/python scripts/build_asset_manifest.py`
 
 ## `scripts/convert_assets_webp.py`
 
@@ -448,6 +474,23 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `.venv/bin/python scripts/generate_adventure_assets.py --overlays --force`
   - `.venv/bin/python scripts/generate_adventure_assets.py --heroes --force`
   - `.venv/bin/python scripts/generate_adventure_assets.py --dry-run`
+
+## `scripts/generate_prompt_variations.py`
+
+- Purpose: generate image variations from a JSON prompt list (mission-specific assets).
+- Uses: `scripts/sprites/images_api.py`.
+- Output:
+  - Original PNGs: `../pony_generated_assets/adventure_assets/sprites/mission2` (default).
+  - WebP outputs: `adventures/missions/stellacorn/mission2/adventures/sprites/mission2` (default).
+- CLI:
+  - `--prompt-json` path to the JSON prompt file.
+  - `--source-image` optional reference image for edit-based generation.
+  - `--generated-root`, `--target-root` override output folders.
+  - `--force` overwrite existing outputs.
+  - `--dry-run` print prompts only.
+- Example usage:
+  - `.venv/bin/python scripts/generate_prompt_variations.py --prompt-json adventures/missions/stellacorn/mission2/prompts/corrupted-oak.json --dry-run`
+  - `.venv/bin/python scripts/generate_prompt_variations.py --prompt-json adventures/missions/stellacorn/mission2/prompts/corrupted-oak.json --source-image ../pony_generated_assets/stellacorn/corrupted-oak-source.png`
 
 ## `scripts/pony_server.py`
 

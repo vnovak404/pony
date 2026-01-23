@@ -12,14 +12,14 @@ const readFile = (relativePath) =>
   fs.readFileSync(path.join(rootDir, relativePath), "utf8");
 
 test("house status uses desperately_needs_repair and Ruined label", () => {
-  const mapCore = readFile("assets/js/map/core.js");
+  const houses = readFile("assets/js/map/houses.js");
 
   assert.ok(
-    mapCore.includes('state.status = "desperately_needs_repair"'),
+    houses.includes('state.status = "desperately_needs_repair"'),
     "Expected desperately_needs_repair status assignment"
   );
   assert.ok(
-    mapCore.includes('return "Ruined"'),
+    houses.includes('return "Ruined"'),
     "Expected Ruined label in formatHouseStatus"
   );
 });

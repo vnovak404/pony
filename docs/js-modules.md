@@ -361,3 +361,87 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 - Purpose: shared A* pathfinding helpers for Stellacorn missions.
 - `findPath(start, goal, { neighbors, isWalkable, heuristic })` — returns a tile path using callbacks for grid rules.
+
+## Adventure Designer (`tools/adventure-designer/`)
+
+### `tools/adventure-designer/index.html`
+- Purpose: Adventure Designer entrypoint markup.
+
+### `tools/adventure-designer/src/app.js`
+- Purpose: boots the Adventure Designer UI, loads data, manages Sketch/Tile mode, and wires workflow actions.
+
+### `tools/adventure-designer/src/context.js`
+- Purpose: central DOM/state registry for the editor.
+
+### `tools/adventure-designer/src/data.js`
+- `getEditorConfig()` — resolves `tiles`, `objects`, `map` query params.
+- `loadJson(path, fallback)` — fetches JSON with fallback.
+- `loadPhaserIfAvailable()` — loads Phaser if present under `node_modules`.
+
+### `tools/adventure-designer/src/editor.js`
+- `createEditorHandlers(context, helpers)` — pointer + tool handlers for paint, fill, roads, rivers, lasso, delete, notes.
+
+### `tools/adventure-designer/src/io.js`
+- `exportDraft(context)` — downloads the current map JSON.
+- `importDraft(context, file, helpers)` — imports map JSON and refreshes state.
+- `normalizeImportedMap(data)` — validates and normalizes map shape.
+- `createEmptyMap()` — fallback blank map.
+
+### `tools/adventure-designer/src/intent-engine.js`
+- `interpretIntent(description)` — keyword-to-tag mapper.
+- `suggestTilesFromIntent(selection, map, intentTags, tilesByName)` — intent-to-tile edits.
+
+### `tools/adventure-designer/src/minimap.js`
+- `updateMinimap(context)` — renders tile or sketch minimap + note overlays.
+- `jumpToMinimap(context, event)` — pans view to minimap click.
+
+### `tools/adventure-designer/src/palette.js`
+- `buildPalettes(context, setTool)` — tile/object palette UI.
+- `updatePaletteActive(container, key, value)` — palette selection UI helper.
+
+### `tools/adventure-designer/src/notes.js`
+- `ensureNotesLayer(map)` — ensures `map.notes` exists.
+- `readNoteDraft(context)` — pulls note text + size from the UI.
+- `addNoteAt(context, grid)` — adds a note at the grid coordinate.
+- `removeNote(context, noteId)` — deletes a note.
+- `renderNotesList(context, handlers)` — renders notes list UI + remove wiring.
+- `normalizeNotes(notes)` — normalizes raw note arrays.
+- `formatNoteLabel(note)` — formats note list labels.
+
+### `tools/adventure-designer/src/refine.js`
+- `syncRefineDefaults(context)` — syncs base/target resolution inputs.
+- `requestMapRefine(context)` — POSTs intent map + refinement params to `/api/map/refine`.
+- `applyRefinedMap(context, refined)` — converts refined layers + decor rules into map data.
+
+### `tools/adventure-designer/src/refine-decor.js`
+- `applyDecorRules({ context, refined, terrainGrid, roadGrid, waterGrid, normalizeToken, isRoadToken, isWaterToken })` — deterministic decor placement from decor rules.
+
+### `tools/adventure-designer/src/proposals.js`
+- `runIntentProposal(context, helpers)` — generates local intent proposals.
+- `applyProposal(context, helpers)` — applies proposal edits to the map.
+- `clearProposal(context)` — clears proposal UI.
+
+### `tools/adventure-designer/src/renderer/*`
+- Purpose: Canvas/Phaser renderers for map preview.
+
+### `tools/adventure-designer/src/selection.js`
+- Purpose: selection + lasso helpers.
+
+### `tools/adventure-designer/src/sketch.js`
+- Purpose: sketch palette, sketch tile painting, and sketch-to-tile conversion helpers.
+
+### `tools/adventure-designer/src/status.js`
+- Purpose: status/hover readouts + zoom label updates.
+
+### `tools/adventure-designer/src/ui.js`
+- Purpose: binds DOM events to editor handlers.
+
+### `tools/adventure-designer/src/utils.js`
+- `clamp(value, min, max)` — numeric clamp.
+- `interpolateLinePoints(start, end)` — line rasterization for roads/rivers.
+
+### `tools/adventure-designer/src/store.js`
+- Purpose: map state container + mutation helpers.
+
+### `tools/adventure-designer/src/undo.js`
+- Purpose: simple undo/redo stack.

@@ -12,19 +12,19 @@ const readFile = (relativePath) =>
   fs.readFileSync(path.join(rootDir, relativePath), "utf8");
 
 test("repair animation frames are wired", () => {
-  const mapCore = readFile("assets/js/map/core.js");
-  const actorsCore = readFile("assets/js/map/actors/core.js");
+  const assets = readFile("assets/js/map/assets.js");
+  const actorsDraw = readFile("assets/js/map/actors/draw.js");
 
   assert.ok(
-    mapCore.includes("repairFrames"),
+    assets.includes("repairFrames"),
     "Expected repairFrames in sprite assembly"
   );
   assert.ok(
-    mapCore.includes("meta.animations.repair"),
+    assets.includes("meta.animations.repair"),
     "Expected repair animation lookup in sprite assembly"
   );
   assert.ok(
-    actorsCore.includes("sprite.repairFrames"),
+    actorsDraw.includes("sprite.repairFrames"),
     "Expected repair frames usage in actor render loop"
   );
 });

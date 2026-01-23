@@ -1,7 +1,14 @@
 import argparse
 from http.server import ThreadingHTTPServer
 
-from .config import DEFAULT_DATA, DEFAULT_ENV_FILE, DEFAULT_MAP_PATH, DEFAULT_OUTPUT_DIR, DEFAULT_STATE_PATH
+from .config import (
+    DEFAULT_ASSET_MANIFEST,
+    DEFAULT_DATA,
+    DEFAULT_ENV_FILE,
+    DEFAULT_MAP_PATH,
+    DEFAULT_OUTPUT_DIR,
+    DEFAULT_STATE_PATH,
+)
 from .handler import PonyHandler
 
 
@@ -16,6 +23,7 @@ def parse_args():
     parser.add_argument("--env-file", default=DEFAULT_ENV_FILE)
     parser.add_argument("--map", default=DEFAULT_MAP_PATH)
     parser.add_argument("--state", default=DEFAULT_STATE_PATH)
+    parser.add_argument("--asset-manifest", default=DEFAULT_ASSET_MANIFEST)
     return parser.parse_args()
 
 
@@ -29,6 +37,7 @@ def main():
         env_file=args.env_file,
         map_path=args.map,
         state_path=args.state,
+        asset_manifest_path=args.asset_manifest,
         **handler_kwargs,
     )
 

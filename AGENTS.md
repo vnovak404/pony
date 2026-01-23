@@ -63,6 +63,7 @@ Do not commit secrets. Store local configuration in `.env` files and add them to
 - Before editing frontend JavaScript, read `docs/js-modules.md` and keep it updated with module/function changes.
 - Before editing Python scripts, read `docs/python-scripts.md` and keep it updated with module/function changes.
 - When running Python scripts from the repo, use the local virtual environment interpreter (e.g. `.venv/bin/python`) to ensure required libraries are available.
+- For any substantial change requested, add tests that validate the new functionality and ensure the tests are sufficient.
 - For new visuals, you may generate images/textures via the OpenAI image API. Convert any asset to `.webp` for use in-repo, and move the original source file outside the repo into `../pony_generated_assets`. Avoid SVG creation except for basic filler (e.g., simple grass).
 - For world map/minimap UX, use mission-map logistics: node grid with unlock/complete states; explicit progress save/load UI (file export/import plus localStorage); per-node hover/selection metadata (mission title, lock/clear state, and 1-2 key stats in a hover card or side panel).
 - When providing the after-action-report, first provide it normally, then on a new line preface with ">>> For a 7 year old >>>" and provide a concise version summarized for a girl with the intellectual level of a 9-10 year old.

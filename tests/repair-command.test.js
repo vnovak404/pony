@@ -13,22 +13,22 @@ const readFile = (relativePath) =>
 
 test("repair command wiring exists", () => {
   const indexHtml = readFile("index.html");
-  const mapCore = readFile("assets/js/map/core.js");
+  const tasks = readFile("assets/js/map/tasks.js");
 
   assert.ok(
     indexHtml.includes('data-command="repair"'),
     "Expected repair button in index.html"
   );
   assert.ok(
-    mapCore.includes('command === "repair"'),
-    "Expected repair command handler in map core"
+    tasks.includes('command === "repair"'),
+    "Expected repair command handler in tasks"
   );
   assert.ok(
-    mapCore.includes("taticorn"),
+    tasks.includes("taticorn"),
     "Expected repair handler to gate on Taticorn"
   );
   assert.ok(
-    mapCore.includes('type: "repair", houseId: target.id, manual: true'),
+    tasks.includes("createRepairTask(target.id, { manual: true })"),
     "Expected repair task assignment"
   );
 });
