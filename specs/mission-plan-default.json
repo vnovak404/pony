@@ -1,0 +1,242 @@
+{
+  "vibe": "Quietly wrong woods with a gentle owl guide and healing magic.",
+  "seed": "default",
+  "title": "The Quietly Wrong Woods",
+  "subtitle": "A gentle mystery in the trees",
+  "summary": "Stellacorn follows a wise owl into a forest where two animals need healing.",
+  "tileSize": 64,
+  "layout": {
+    "biome": "forest",
+    "size": {
+      "w": 24,
+      "h": 18
+    },
+    "notes": "Small forest clearing with two animal targets and one owl guide."
+  },
+  "objectives": [
+    {
+      "type": "talk_count",
+      "label": "Speak with Hushfeather the Owl",
+      "targetCount": 1,
+      "targetId": null,
+      "targetIds": ["npc_owl_1"],
+      "targetCategory": null
+    },
+    {
+      "type": "heal_count",
+      "label": "Heal woodland friends",
+      "targetCount": 2,
+      "targetId": null,
+      "targetIds": ["animal_deer_1", "animal_fox_1"],
+      "targetCategory": "animal"
+    }
+  ],
+  "interactions": [
+    {
+      "targetId": "npc_owl_1",
+      "action": "talk",
+      "dialog": "d_owl_intro",
+      "duration": null
+    },
+    {
+      "targetId": "animal_deer_1",
+      "action": "heal",
+      "dialog": "d_heal_deer",
+      "duration": 2
+    },
+    {
+      "targetId": "animal_fox_1",
+      "action": "heal",
+      "dialog": "d_heal_fox",
+      "duration": 2
+    }
+  ],
+  "zones": [
+    {
+      "id": "zone_entry",
+      "label": "Forest Edge",
+      "rect": {
+        "x": 0,
+        "y": 10,
+        "w": 10,
+        "h": 8
+      }
+    },
+    {
+      "id": "zone_clearing",
+      "label": "Quiet Clearing",
+      "rect": {
+        "x": 8,
+        "y": 4,
+        "w": 10,
+        "h": 8
+      }
+    }
+  ],
+  "triggers": {
+    "onEnterZones": [
+      {
+        "id": "t_entry",
+        "zoneId": "zone_entry",
+        "dialog": "d_owl_intro"
+      },
+      {
+        "id": "t_clearing",
+        "zoneId": "zone_clearing",
+        "dialog": "d_clearing"
+      }
+    ]
+  },
+  "dialog": {
+    "entry": "d_owl_intro",
+    "startByTarget": [
+      {
+        "targetId": "npc_owl_1",
+        "dialogId": "d_owl_intro"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "d_owl_intro",
+        "speaker": "Hushfeather",
+        "text": [
+          "The forest feels a little misfiled today. Will you help the hurt ones?"
+        ],
+        "choices": [
+          {
+            "text": "I will help.",
+            "to": "d_owl_task",
+            "conditions": [],
+            "setFlags": [],
+            "setGlobalFlags": []
+          }
+        ]
+      },
+      {
+        "id": "d_owl_task",
+        "speaker": "Hushfeather",
+        "text": [
+          "Find the deer and the fox. A calm horn can soothe their aches."
+        ],
+        "choices": [
+          {
+            "text": "On my way.",
+            "to": null,
+            "conditions": [],
+            "setFlags": [],
+            "setGlobalFlags": []
+          }
+        ]
+      },
+      {
+        "id": "d_heal_deer",
+        "speaker": "Deer",
+        "text": [
+          "Thank you. The fog in my mind is lifting."
+        ],
+        "choices": [
+          {
+            "text": "Rest now.",
+            "to": null,
+            "conditions": [],
+            "setFlags": [],
+            "setGlobalFlags": []
+          }
+        ]
+      },
+      {
+        "id": "d_heal_fox",
+        "speaker": "Fox",
+        "text": [
+          "The forest feels brighter. I can run again."
+        ],
+        "choices": [
+          {
+            "text": "Stay safe.",
+            "to": null,
+            "conditions": [],
+            "setFlags": [],
+            "setGlobalFlags": []
+          }
+        ]
+      },
+      {
+        "id": "d_clearing",
+        "speaker": "Narrator",
+        "text": [
+          "A hush settles over the clearing, like someone turned down the wind."
+        ],
+        "choices": [
+          {
+            "text": "Continue.",
+            "to": null,
+            "conditions": [],
+            "setFlags": [],
+            "setGlobalFlags": []
+          }
+        ]
+      },
+      {
+        "id": "d_owl_outro",
+        "speaker": "Hushfeather",
+        "text": [
+          "You brought calm back to these paths. The woods thank you."
+        ],
+        "choices": [
+          {
+            "text": "Until next time.",
+            "to": null,
+            "conditions": [],
+            "setFlags": [],
+            "setGlobalFlags": []
+          }
+        ]
+      }
+    ]
+  },
+  "narrative": {
+    "intro": {
+      "text": [
+        "Stellacorn steps into the woods as the leaves settle into a quiet, uneasy hush."
+      ],
+      "dialog": "d_owl_intro"
+    },
+    "outro": {
+      "text": [
+        "The forest exhales, and the quiet feels kind again."
+      ],
+      "dialog": "d_owl_outro"
+    },
+    "onEnterZones": [
+      {
+        "zoneId": "zone_clearing",
+        "text": [
+          "The clearing glows with soft green light."
+        ],
+        "dialog": "d_clearing"
+      }
+    ],
+    "onInteract": []
+  },
+  "flags": {
+    "local": [],
+    "global": []
+  },
+  "checkpoints": [
+    {
+      "id": "cp_start",
+      "label": "Forest edge",
+      "tx": 2,
+      "ty": 14,
+      "targetId": null
+    },
+    {
+      "id": "cp_owl",
+      "label": "Hushfeather",
+      "tx": 6,
+      "ty": 12,
+      "targetId": "npc_owl_1"
+    }
+  ],
+  "assetRequests": []
+}

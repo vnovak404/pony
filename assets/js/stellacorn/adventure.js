@@ -6,6 +6,8 @@ const PLAYER_SPRITE_META_URL =
   "../../assets/ponies/stellacorn/sheets/spritesheet.json";
 const PLAYER_SPRITE_SHEET_URL =
   "../../assets/ponies/stellacorn/sheets/spritesheet.webp";
+const CANVAS_WIDTH = 1600;
+const CANVAS_HEIGHT = 960;
 
 const elements = {
   canvas: document.getElementById("adventureCanvas"),
@@ -18,6 +20,8 @@ const elements = {
   dialogTextEl: document.getElementById("dialog-text"),
   dialogHeroEl: document.getElementById("dialog-hero"),
   dialogHeroImg: document.getElementById("dialog-hero-img"),
+  dialogChoicesEl: document.getElementById("dialog-choices"),
+  dialogNextBtn: document.getElementById("dialog-next"),
   dialogCloseBtn: document.getElementById("dialog-close"),
   hoverCardEl: document.getElementById("hover-card"),
   hoverNameEl: document.getElementById("hover-name"),
@@ -37,6 +41,8 @@ const ui = {
 init();
 
 async function init() {
+  fitCanvasToViewport();
+  window.addEventListener("resize", fitCanvasToViewport);
   const runtime = await loadRuntime({
     missionPath: null,
     defaultMission: DEFAULT_MISSION,
@@ -59,4 +65,19 @@ async function init() {
     }
   }
   runtime.start();
+}
+
+function fitCanvasToViewport() {
+  const canvas = elements.canvas;
+  if (!canvas) return;
+  const topBar = document.querySelector(".top-bar");
+  const topBarHeight = topBar ? topBar.getBoundingClientRect().height : 0;
+  const padding = 32;
+  const maxWidth = Math.max(320, window.innerWidth - padding);
+  const maxHeight = Math.max(240, window.innerHeight - topBarHeight - padding);
+  const scale = Math.min(maxWidth / CANVAS_WIDTH, maxHeight / CANVAS_HEIGHT, 1);
+  const width = Math.floor(CANVAS_WIDTH * scale);
+  const height = Math.floor(CANVAS_HEIGHT * scale);
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
 }

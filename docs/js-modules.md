@@ -337,14 +337,29 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ## `assets/js/stellacorn/adventure.js`
 
-- Purpose: entrypoint for Stellacorn missions; boots the runtime + mission script.
+- Purpose: entrypoint for Stellacorn missions; boots the runtime + mission script and fits the canvas to the viewport.
 - Functions: none (module script).
+- Behavior: scales the canvas CSS size to fit within the viewport while preserving the 1600x960 internal resolution.
 
 ## `assets/js/stellacorn/adventure/runtime.js`
 
 - Purpose: mission runtime engine (map load, fog-of-war, movement, interactions, and render loop).
 - `loadRuntime({...})` — loads mission config + assets, wires input, and returns a runtime API.
-- Runtime API note: `openDialog(text, hero)` accepts an optional hero image, and `returnToWorldMap()` navigates back to the Whispering Forest map.
+- Runtime API note: `openDialog(text, hero)` accepts an optional hero image, `returnToWorldMap()` navigates back to the Whispering Forest map, and `setPlayerTile(tx, ty, force)` teleports the player (used for debug checkpoints; `force=true` ignores walkability). When `debug=1` is set in the URL, the runtime API is also exposed on `window.__PONY_RUNTIME` for automated testing.
+
+## `assets/js/stellacorn/adventure/dialog_state.js`
+
+- Purpose: dialog condition evaluation + flag updates for mission dialog graphs.
+- `evaluateConditions(conditions, state)` — true/false evaluator for flags, events, and first-time checks.
+- Condition types: `flag`, `event`, `first_time`, `first_time_speaking`, or `first_time_speaking_to` (uses `targetId`).
+- `applyFlagUpdates(updates, state)` — apply local/global flag updates.
+- `markTalkedTo(targetId, state)` — mark first-time conversations.
+- `seedFirstTimeFlags(targetIds, state)` — initializes first-time flags for targets.
+
+## `assets/js/stellacorn/adventure/generic-mission.js`
+
+- Purpose: generic mission logic runner for generated missions (objectives, dialogs, triggers, flags).
+- `createMission(runtime, ui)` — hooks runtime interactions to mission JSON data, handles dialogs/narrative, objectives, and debug checkpoints.
 
 ## `adventures/missions/stellacorn/*/mission.js`
 
@@ -445,3 +460,35 @@ This repository uses ES modules under `assets/js/`. Keep this file up to date wh
 
 ### `tools/adventure-designer/src/undo.js`
 - Purpose: simple undo/redo stack.
+
+## Mission Generator (`tools/mission-generator/`)
+
+### `tools/mission-generator/index.html`
+- Purpose: mission generator UI (inputs, preview, minimap, asset approval, dialog graph, force-live toggle).
+
+### `tools/mission-generator/app.js`
+- Purpose: mission generator entrypoint (plan/generate/validate/save, cache vs live plan selection, busy overlay, editor handoff).
+
+### `tools/mission-generator/state.js`
+- Purpose: shared mission generator state container (includes renderAssets toggle).
+
+### `tools/mission-generator/dom.js`
+- Purpose: DOM element references + canvas contexts/constants (includes renderAssets + forceLive toggles).
+
+### `tools/mission-generator/utils.js`
+- Purpose: UI helpers (clamp, slugify, batch parsing, action labels).
+
+### `tools/mission-generator/render.js`
+- Purpose: map/minimap rendering + playtest interaction loop (optional asset rendering).
+
+### `tools/mission-generator/errors.js`
+- Purpose: error modal helpers (show/hide/copy).
+
+### `tools/mission-generator/dialog.js`
+- Purpose: dialog graph editor rendering + node editing helpers.
+
+### `tools/mission-generator/mission_ui.js`
+- Purpose: objectives/mission graph/checkpoint UI helpers.
+
+### `tools/mission-generator/mission_meta.js`
+- Purpose: mission metadata editor merge + interaction map rebuild.

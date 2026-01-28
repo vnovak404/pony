@@ -11,6 +11,7 @@ DEFAULT_STATE_PATH = "data/_generated/runtime_state.json"
 DEFAULT_ASSET_MANIFEST = "assets/library/manifest.json"
 DEFAULT_ASSET_LIBRARY_ROOT = "assets/library/maps"
 DEFAULT_ASSET_GENERATED_ROOT = "../pony_generated_assets/asset_forge"
+DEFAULT_MISSION_PROGRESS_PATH = str(Path.home() / "Documents/Games/PonyParade/mission_progress.json")
 HOUSE_SHARE_CHANCE = 0.35
 HOUSE_GROUP_CHANCE = 0.2
 FOOD_PREFERENCES = ["restaurant", "picnic", "bakery"]

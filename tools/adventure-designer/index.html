@@ -181,6 +181,18 @@
               <canvas id="minimap" class="minimap" width="200" height="200"></canvas>
             </div>
           </section>
+
+          <section class="panel-section" data-collapsible>
+            <button class="section-toggle" type="button" aria-expanded="true">
+              <span>Mission Metadata</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="section-body">
+              <textarea id="mission-meta" rows="8" placeholder="Mission metadata JSON (dialog, triggers, flags)..."></textarea>
+              <button id="mission-meta-apply" type="button">Apply Metadata</button>
+              <div class="muted">Stored as <code>missionMeta</code> on the map JSON.</div>
+            </div>
+          </section>
         </aside>
       </div>
     </div>

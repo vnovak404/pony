@@ -7,6 +7,11 @@
       :root {
         color-scheme: dark;
       }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
       body {
         margin: 0;
         padding: 0;
@@ -31,6 +36,31 @@
         justify-content: center;
         gap: 16px;
         padding: 14px 16px 8px;
+      }
+      .debug-checkpoints {
+        position: fixed;
+        bottom: 18px;
+        left: 18px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(12, 18, 16, 0.7);
+        border: 1px solid rgba(176, 208, 192, 0.3);
+        color: #e6efe9;
+        font-size: 0.8rem;
+        z-index: 5;
+      }
+      .debug-checkpoints select,
+      .debug-checkpoints button {
+        font-family: inherit;
+        background: rgba(24, 36, 32, 0.9);
+        color: #e6efe9;
+        border: 1px solid rgba(176, 208, 192, 0.4);
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-size: 0.8rem;
       }
       #adventureCanvas {
         border: 1px solid rgba(198, 214, 205, 0.2);
@@ -64,10 +94,14 @@
         z-index: 15;
       }
       #hud {
-        margin: 10px auto 0;
+        position: fixed;
+        left: 50%;
+        top: 86px;
+        transform: translateX(-50%);
         display: grid;
         gap: 6px;
         max-width: 560px;
+        z-index: 12;
       }
       #objective,
       #objective-progress,
@@ -201,6 +235,24 @@
         margin: 0 0 16px;
         line-height: 1.5;
       }
+      #dialog-choices {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .dialog-choice {
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(198, 214, 205, 0.2);
+        background: rgba(210, 222, 214, 0.2);
+        color: #e6efe9;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .dialog-choice[disabled] {
+        opacity: 0.5;
+        cursor: default;
+      }
       #adventureCanvas {
         touch-action: none;
         user-select: none;
@@ -253,6 +305,8 @@
           <img id="dialog-hero-img" alt="" />
         </div>
         <p id="dialog-text"></p>
+        <div id="dialog-choices"></div>
+        <button class="btn" id="dialog-next" hidden>Continue</button>
         <button class="btn" id="dialog-close">Close</button>
       </div>
     </div>

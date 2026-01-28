@@ -369,7 +369,7 @@ export class PhaserRenderer {
   drawRoads(g) {
     const lineWidth = Math.max(3, Math.floor(this.tileSize / 6));
     g.lineStyle(lineWidth, hexToNumber("#7a4d2b"), 1);
-    this.map.roads.forEach((road) => {
+    (this.map.roads || []).forEach((road) => {
       if (!road.points || road.points.length < 2) {
         return;
       }

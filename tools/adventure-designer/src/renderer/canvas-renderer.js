@@ -278,7 +278,7 @@ export class CanvasRenderer {
   drawRoads(ctx) {
     ctx.strokeStyle = "#7a4d2b";
     ctx.lineWidth = Math.max(3, Math.floor(this.tileSize / 6));
-    this.map.roads.forEach((road) => {
+    (this.map.roads || []).forEach((road) => {
       if (!road.points || road.points.length < 2) {
         return;
       }

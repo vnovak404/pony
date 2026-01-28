@@ -51,8 +51,8 @@ test("asset forge generation panel lists providers", () => {
 });
 
 test("map refinement is wired to the programmatic refiner", () => {
-  const handler = readFile("scripts/pony_server/handler.py");
-  assert.ok(handler.includes("refine_map("), "Expected refine_map call in handler");
+  const handler = readFile("scripts/pony_server/handlers/maps.py");
+  assert.ok(handler.includes("refine_map("), "Expected refine_map call in map handler");
   assert.equal(handler.includes("openai_client"), false);
   assert.ok(fs.existsSync(path.join(rootDir, "scripts/pony_server/map_refine.py")));
 });

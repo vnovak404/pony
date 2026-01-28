@@ -87,7 +87,10 @@ export function normalizeImportedMap(data) {
     meta: data.meta && typeof data.meta === "object" ? data.meta : { name: "Imported Map" },
     draftMeta: data.draftMeta && typeof data.draftMeta === "object"
       ? data.draftMeta
-      : { author: "import" }
+      : { author: "import" },
+    missionMeta: data.missionMeta && typeof data.missionMeta === "object"
+      ? data.missionMeta
+      : {}
   };
 }
 
@@ -109,6 +112,7 @@ export function createEmptyMap() {
     refinement: null,
     seed: "seed",
     meta: { name: "Empty Map" },
-    draftMeta: { author: "mapella" }
+    draftMeta: { author: "mapella" },
+    missionMeta: {}
   };
 }

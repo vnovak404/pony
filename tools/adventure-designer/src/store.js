@@ -79,6 +79,9 @@ export function createStore(initialMap) {
           return { ...river, points };
         })
         .filter((river) => river.points.length >= 2);
+    },
+    setMissionMeta(meta) {
+      state.missionMeta = meta;
     }
   };
 }

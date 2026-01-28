@@ -1,7 +1,9 @@
 .env
 .DS_Store
 .venv/
+node_modules/
 logs/
+test-results/
 __pycache__/
 **/__pycache__/
 data/_generated/runtime_state.json
@@ -48,3 +50,4 @@ assets/ui/icons/*
 assets/ui/**/.DS_Store
 public/
 certs/
+adventures/maps/_drafts/

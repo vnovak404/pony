@@ -7,7 +7,7 @@ import { buildPalettes } from "./palette.js";
 import { createEditorHandlers } from "./editor.js";
 import { applyProposal, clearProposal, runIntentProposal } from "./proposals.js";
 import { updateMinimap, jumpToMinimap } from "./minimap.js";
-import { exportDraft, importDraft, createEmptyMap } from "./io.js";
+import { exportDraft, importDraft, createEmptyMap, normalizeImportedMap } from "./io.js";
 import {
   buildSketchPalette,
   ensureSketchLayer,
@@ -32,11 +32,19 @@ async function boot() {
 
 async function init() {
   const config = getEditorConfig();
-  const [tilesData, objectsData, mapData] = await Promise.all([
+  const [tilesData, objectsData, rawMapData] = await Promise.all([
     loadJson(config.tilesPath, { tiles: [] }),
     loadJson(config.objectsPath, { objects: [] }),
-    loadJson(config.mapPath, createEmptyMap())
+    loadJson(config.mapPath, null)
   ]);
+  const mapData = normalizeImportedMap(rawMapData) || createEmptyMap();
+  if (config.mapPath && !rawMapData) {
+    setStatus(context, `Map failed to load. Check map path: ${config.mapPath}`);
+  }
+
+  if (!Array.isArray(tilesData.tiles) || tilesData.tiles.length === 0) {
+    setStatus(context, `Tiles failed to load. Check tiles path: ${config.tilesPath}`);
+  }
 
   tilesData.tiles.forEach((tile) => {
     context.tilesById[tile.id] = tile;
@@ -78,11 +86,25 @@ async function init() {
     );
   };
 
+  const warnMissingTiles = () => {
+    const tiles = context.store.getState().tiles || [];
+    const missing = new Set();
+    tiles.forEach((id) => {
+      if (context.tilesById[id] === undefined) {
+        missing.add(id);
+      }
+    });
+    if (missing.size > 0) {
+      setStatusFn(`Tile ids missing in tileset: ${[...missing].slice(0, 6).join(", ")}.`);
+    }
+  };
+
   const refresh = () => {
     syncSketchLayer();
     context.renderer.setMap(context.store.getState(), context.tilesById, context.objectsByType);
     updateMinimapFn();
     updateStatusFn();
+    warnMissingTiles();
   };
 
   const handleRemoveNote = (note) => {
@@ -90,6 +112,30 @@ async function init() {
     removeNote(context, note.id);
     renderNotesList(context, { onRemove: handleRemoveNote });
     refresh();
+  };
+
+  const syncMissionMeta = () => {
+    if (!context.dom.missionMetaInput) {
+      return;
+    }
+    const map = context.store.getState();
+    const meta = map.missionMeta || {};
+    context.dom.missionMetaInput.value = JSON.stringify(meta, null, 2);
+  };
+
+  const applyMissionMeta = () => {
+    if (!context.dom.missionMetaInput) {
+      return;
+    }
+    try {
+      const nextMeta = JSON.parse(context.dom.missionMetaInput.value || "{}");
+      context.undoStack.push();
+      context.store.setMissionMeta(nextMeta);
+      setStatusFn("Mission metadata updated.");
+      refresh();
+    } catch (error) {
+      setStatusFn("Mission metadata JSON is invalid.");
+    }
   };
 
   const editorHandlers = createEditorHandlers(context, {
@@ -226,6 +272,7 @@ async function init() {
           renderNotesList(context, { onRemove: handleRemoveNote });
           setMode(context.state.mode);
           syncRefineDefaults(context);
+          syncMissionMeta();
         }
       }),
     syncZoomControls: syncZoomControlsFn,
@@ -242,4 +289,8 @@ async function init() {
   updateMinimapFn();
   renderNotesList(context, { onRemove: handleRemoveNote });
   syncRefineDefaults(context);
+  syncMissionMeta();
+  if (context.dom.missionMetaApply) {
+    context.dom.missionMetaApply.addEventListener("click", applyMissionMeta);
+  }
 }

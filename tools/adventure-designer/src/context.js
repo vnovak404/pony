@@ -39,7 +39,9 @@ export function createContext() {
     noteText: document.getElementById("note-text"),
     noteWidth: document.getElementById("note-width"),
     noteHeight: document.getElementById("note-height"),
-    notesList: document.getElementById("notes-list")
+    notesList: document.getElementById("notes-list"),
+    missionMetaInput: document.getElementById("mission-meta"),
+    missionMetaApply: document.getElementById("mission-meta-apply")
   };
 
   dom.minimapCtx = dom.minimapCanvas ? dom.minimapCanvas.getContext("2d") : null;

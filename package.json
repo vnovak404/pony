@@ -7,9 +7,13 @@
     "lint": "eslint .",
     "test:server": "python3 -c \"import sys; sys.path.insert(0, 'scripts'); import pony_server.app\"",
     "test:py": "python3 -m py_compile scripts/pony_server/*.py scripts/*.py",
-    "test:all": "npm run lint && npm run test && npm run test:server && npm run test:py"
+    "test:all": "npm run lint && npm run test && npm run test:server && npm run test:py",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "PWDEBUG=1 playwright test --headed"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "eslint": "^9.9.0",
     "globals": "^15.10.0"
   }

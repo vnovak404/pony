@@ -51,6 +51,7 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `--asset-manifest` path to the asset library manifest JSON.
 - Behavior:
   - On pony creation, runs sprite generation, spritesheet packing, house assets, and pony lore generation.
+  - `POST /api/missions/plan` uses the cached plan in `logs/mission-generator/last-plan.json` by default. If no cache exists, it falls back to `specs/mission-plan-default.json`. Set `forceLive: true` to call OpenAI (costs credits). Set `cacheOnly: true` to fail fast if neither cache nor default is present.
   - `POST /api/map/refine` accepts a low-res intent map + legend + refinement params, runs a deterministic in-process refiner, and returns structured map layers + decor rules (no images).
     - The refiner expands macro-cells to the target resolution and applies a seeded boundary jitter + smoothing pass.
   - `POST /api/assets/generate` accepts asset payloads (type, prompt, provider, sizes), writes a WebP into the asset library, and appends a manifest entry.
@@ -511,7 +512,21 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
   - `POST /api/map/objects/<id>` — persist drag/drop map changes.
   - `GET /api/state` — fetch persisted runtime state.
   - `POST /api/state` — save runtime state payload.
-  - `GET /api/health` — health check (returns `{ "ok": true }`).
+  - `GET /api/mission-progress` — fetch global mission progress (saved to `~/Documents/Games/PonyParade`).
+  - `POST /api/mission-progress` — save global mission progress payload.
+  - `GET /api/adventures` — list existing adventure folders with world maps.
+- `POST /api/missions/plan` — LLM mission plan from vibe + manifest (returns mission spec + asset requests).
+- `POST /api/missions/generate` — deterministic map/object bundle from plan + seed (runs validation).
+- `POST /api/missions/validate` — validate a mission bundle payload.
+- `POST /api/missions/save` — write mission bundle into repo and update world map (supports `adventureId` + new adventure scaffolds).
+  - Optional payload fields: `adventureId`, `adventureTitle`, `adventureHero`, `adventureActions`, `adventureBackground`, `createAdventure`.
+  - `POST /api/missions/draft` — save a temporary draft map/tiles/objects for the editor.
+- `GET /api/health` — health check (returns `{ "ok": true }`).
+- Logs:
+  - `logs/server/requests.jsonl` + `logs/server/responses.jsonl` — API request/response envelopes.
+  - `logs/server/events.jsonl` — per-endpoint timing/event logs.
+  - `logs/mission-generator/llm-requests.jsonl` + `llm-responses.jsonl` + `llm-errors.jsonl` — mission planner LLM calls.
+  - `logs/mission-generator/*-request.jsonl` + `*-response.jsonl` — mission plan/generate/validate/save/draft payloads.
 - Modules:
   - `scripts/pony_server/config.py` — defaults + constants.
   - `scripts/pony_server/utils.py` — `slugify`, `sanitize_value`, `normalize_name`.
@@ -521,6 +536,13 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
     - Auto sprite pipeline now skips interpolation and packs from `frames/` only.
   - `scripts/pony_server/handler.py` — `PonyHandler` endpoints.
   - `scripts/pony_server/app.py` — `parse_args()` / `main()`.
+- `scripts/pony_server/mission_generator.py` — mission planning, deterministic generation, and validation helpers (thin exports).
+- `scripts/pony_server/mission_plan.py` — Responses API planner with strict tool schema.
+- `scripts/pony_server/mission_plan_schema.py` — strict tool schema for mission plans.
+- `scripts/pony_server/mission_core.py` — mission bundle assembly.
+- `scripts/pony_server/mission_validate.py` — mission validator.
+- `scripts/pony_server/mission_validate_helpers.py` — validator helper routines.
+- `scripts/pony_server/mission_save.py` — mission/adventure persistence.
 - Example usage:
   - `python3 scripts/pony_server.py`
   - `python3 scripts/pony_server.py --port 8001`
@@ -599,3 +621,11 @@ Update this file whenever a script changes behavior, CLI flags, or function sign
 ## `scripts/sprites/__init__.py`
 
 - Purpose: marks `scripts/sprites/` as a Python package (empty file).
+
+## Mission Generator Tests
+
+- The mission generator validator has Python unit tests.
+- Run all tests:
+  - `.venv/bin/python -m unittest tests/mission_generator_test.py`
+- Run a single test (example):
+  - `.venv/bin/python -m unittest tests.mission_generator_test.MissionGeneratorValidationTests.test_dialog_reachability`

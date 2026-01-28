@@ -19,6 +19,8 @@ export async function loadRuntime({
   playerSpriteMetaUrl,
   playerSpriteSheetUrl,
 }) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const holdScale = normalizeHoldScale(urlParams.get("holdScale"));
   const canvas = elements.canvas;
   const ctx = elements.ctx || (canvas ? canvas.getContext("2d") : null);
   if (!canvas || !ctx) return null;
@@ -38,6 +40,8 @@ export async function loadRuntime({
   let activePath = [];
   let interactable = null;
   let dialogOpen = false;
+  let dialogChoiceHandler = null;
+  let dialogNextHandler = null;
   let playerSprite = null;
   let lastFrameTime = 0;
   let visibleTiles = new Set();
@@ -103,6 +107,13 @@ export async function loadRuntime({
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
   elements.dialogCloseBtn?.addEventListener("click", closeDialog);
+  elements.dialogNextBtn?.addEventListener("click", () => {
+    if (dialogNextHandler) {
+      dialogNextHandler();
+      return;
+    }
+    closeDialog();
+  });
   elements.returnBtn?.addEventListener("click", returnToWorldMap);
 
   try {
@@ -148,6 +159,13 @@ export async function loadRuntime({
     return url.toString();
   }
 
+  function normalizeHoldScale(value) {
+    if (value === null || value === undefined) return 1;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) return 1;
+    return Math.min(Math.max(parsed, 0.05), 5);
+  }
+
   async function fetchJson(url) {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
@@ -159,11 +177,14 @@ export async function loadRuntime({
   function resolveAssetPath(asset) {
     if (!asset || !assetRootUrl) return "";
     if (asset.startsWith("data:") || asset.startsWith("http")) return asset;
+    if (asset.startsWith("/assets/")) {
+      return new URL(asset, window.location.origin).toString();
+    }
     if (asset.startsWith("/adventures/")) {
       return new URL(asset.slice("/adventures/".length), assetRootUrl).toString();
     }
     if (asset.startsWith("/")) {
-      return new URL(asset.slice(1), assetRootUrl).toString();
+      return new URL(asset, window.location.origin).toString();
     }
     return new URL(asset, assetRootUrl).toString();
   }
@@ -318,14 +339,35 @@ export async function loadRuntime({
   function updateCamera() {
     const mapPixelWidth = mapWidth * tileSize;
     const mapPixelHeight = mapHeight * tileSize;
-    camera.x = player.px - canvas.width / 2;
-    camera.y = player.py - canvas.height / 2;
-    camera.x = Math.max(0, Math.min(camera.x, mapPixelWidth - canvas.width));
-    camera.y = Math.max(0, Math.min(camera.y, mapPixelHeight - canvas.height));
+    const targetX = player.px - canvas.width / 2;
+    const targetY = player.py - canvas.height / 2;
+    const minX = -canvas.width / 2;
+    const minY = -canvas.height / 2;
+    const maxX = mapPixelWidth - canvas.width / 2;
+    const maxY = mapPixelHeight - canvas.height / 2;
+    camera.x = clamp(targetX, minX, maxX);
+    camera.y = clamp(targetY, minY, maxY);
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
   }
 
   function updateInteractable() {
     if (dialogOpen) return;
+    if (holdState) {
+      const heldTarget = objects.find((obj) => obj.id === holdState.targetId);
+      if (heldTarget && !heldTarget.hidden && isTileVisible(heldTarget.tx, heldTarget.ty)) {
+        const dx = Math.abs(player.tx - heldTarget.tx);
+        const dy = Math.abs(player.ty - heldTarget.ty);
+        if (Math.max(dx, dy) <= 1) {
+          interactable = heldTarget;
+          renderState.interactable = interactable;
+          updatePrompt();
+          return;
+        }
+      }
+    }
     interactable = null;
     for (const obj of objects) {
       if (obj.hidden) continue;
@@ -380,11 +422,13 @@ export async function loadRuntime({
 
   function startHold(target, options = {}) {
     if (!target?.interaction) return;
+    const baseDuration = target.interaction.durationMs || 0;
+    const scaledDuration = Math.max(150, Math.round(baseDuration * holdScale));
     holdState = {
       targetId: target.id,
       key: target.interaction.key,
       label: target.interaction.label,
-      durationMs: target.interaction.durationMs,
+      durationMs: scaledDuration,
       action: target.interaction.action || "",
       startedAt: performance.now(),
       requiresKey: options.requiresKey ?? true,
@@ -441,6 +485,49 @@ export async function loadRuntime({
     }
     elements.dialogEl.classList.add("active");
     elements.promptEl?.setAttribute("hidden", "true");
+    clearDialogChoices();
+  }
+
+  function clearDialogChoices() {
+    if (elements.dialogChoicesEl) {
+      elements.dialogChoicesEl.innerHTML = "";
+    }
+    if (elements.dialogNextBtn) {
+      elements.dialogNextBtn.setAttribute("hidden", "true");
+    }
+    dialogChoiceHandler = null;
+    dialogNextHandler = null;
+  }
+
+  function renderDialogChoices(choices, onChoice, onNext) {
+    if (!elements.dialogChoicesEl) return;
+    elements.dialogChoicesEl.innerHTML = "";
+    dialogChoiceHandler = onChoice || null;
+    dialogNextHandler = onNext || null;
+    if (!choices || !choices.length) {
+      if (elements.dialogNextBtn && onNext) {
+        elements.dialogNextBtn.removeAttribute("hidden");
+      }
+      return;
+    }
+    choices.forEach((choice) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "dialog-choice";
+      button.textContent = choice.label || choice.text || "Continue";
+      button.addEventListener("click", () => {
+        if (dialogChoiceHandler) {
+          dialogChoiceHandler(choice);
+        }
+      });
+      elements.dialogChoicesEl.appendChild(button);
+    });
+  }
+
+  function openDialogNode(payload) {
+    if (!payload) return;
+    openDialog(payload.text || payload.message || "...", payload.hero || null);
+    renderDialogChoices(payload.choices, payload.onChoice, payload.onNext);
   }
 
   function closeDialog() {
@@ -452,6 +539,7 @@ export async function loadRuntime({
       elements.dialogHeroImg.alt = "";
     }
     dialogOpen = false;
+    clearDialogChoices();
     updatePrompt();
   }
 
@@ -461,6 +549,22 @@ export async function loadRuntime({
 
   function returnToWorldMap() {
     window.location.href = "world-map.html";
+  }
+
+  function setPlayerTile(tx, ty, force = false) {
+    if (!Number.isInteger(tx) || !Number.isInteger(ty)) return false;
+    if (!force && !isWalkable(tx, ty)) return false;
+    player.tx = tx;
+    player.ty = ty;
+    player.px = (tx + 0.5) * tileSize;
+    player.py = (ty + 0.5) * tileSize;
+    activePath = [];
+    renderState.activePath = [];
+    updateFogOfWar();
+    updateCamera();
+    updateInteractable();
+    drawFrame(renderState);
+    return true;
   }
 
   function handleClick(event) {
@@ -769,13 +873,21 @@ export async function loadRuntime({
     isTileVisible,
     isTileDiscovered,
     openDialog,
+    openDialogNode,
     closeDialog,
     isDialogOpen,
     updatePrompt,
     returnToWorldMap,
+    setPlayerTile,
     getMissionConfig: () => missionConfig,
     resolveMissionUrl,
+    getPlayerTile: () => ({ tx: player.tx, ty: player.ty }),
   };
+
+  const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+  if (debugMode) {
+    window.__PONY_RUNTIME = runtimeApi;
+  }
 
   return runtimeApi;
 }

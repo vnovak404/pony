@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pony Parade - Mission Generator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hud">
+        <div class="brand">
+          <div class="brand__name">PONY PARADE</div>
+          <div class="brand__tag">Mission Generator</div>
+        </div>
+        <div class="status">
+          <span class="pill" id="mission-pill">Mission Draft</span>
+          <span class="pill" id="validation-pill">Validation: Pending</span>
+          <span class="pill" id="checkpoint-pill">Checkpoint: Start</span>
+          <span class="pill pill--ok" id="api-pill">API: Local</span>
+        </div>
+      </header>
+
+      <div class="content">
+        <aside class="panel control-panel">
+          <h2>Mission Inputs</h2>
+          <label class="field">
+            <span>Mission Vibe</span>
+            <textarea id="mission-vibe" rows="5" placeholder="Whispering woods at dusk, lost foals, healing magic..."></textarea>
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span>Seed</span>
+              <input id="mission-seed" type="text" placeholder="auto" />
+            </label>
+            <label class="field">
+              <span>Variants</span>
+              <input id="mission-variants" type="number" min="1" max="8" value="1" />
+            </label>
+          </div>
+          <label class="field">
+            <span>Batch List (numbered)</span>
+            <textarea id="mission-batch" rows="6" placeholder="1. The river is frozen and the otters are missing\n2. Fog valley with sleepy sprites...\n"></textarea>
+          </label>
+          <label class="toggle">
+            <input id="force-live" type="checkbox" />
+            <span>Force Live LLM (costs credits)</span>
+          </label>
+          <div class="muted">Unchecked uses the last cached plan, if available.</div>
+          <div class="button-row">
+            <button id="plan-button" class="btn">Plan Mission</button>
+            <button id="generate-button" class="btn">Generate Map</button>
+            <button id="validate-button" class="btn">Validate</button>
+          </div>
+          <div class="button-row">
+            <button id="save-button" class="btn btn--accent">Save Mission</button>
+            <button id="force-save-button" class="btn btn--danger">Force Save</button>
+          </div>
+          <h2>Adventure Setup</h2>
+          <label class="field">
+            <span>Mode</span>
+            <select id="adventure-mode" class="select">
+              <option value="existing">Add to Existing Adventure</option>
+              <option value="new">Create New Adventure</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Existing Adventures</span>
+            <select id="adventure-select" class="select">
+              <option value="stellacorn">stellacorn</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Adventure ID</span>
+            <input id="adventure-id" type="text" placeholder="stellacorn" value="stellacorn" />
+          </label>
+          <label class="field">
+            <span>Adventure Title</span>
+            <input id="adventure-title" type="text" placeholder="Whispering Forest" />
+          </label>
+          <label class="field">
+            <span>Primary Unicorn Name</span>
+            <input id="adventure-hero-name" type="text" placeholder="Stellacorn" />
+          </label>
+          <label class="field">
+            <span>Hero Sprite Meta URL</span>
+            <input id="adventure-hero-meta" type="text" placeholder="../../assets/ponies/stellacorn/sheets/spritesheet.json" />
+          </label>
+          <label class="field">
+            <span>Hero Sprite Sheet URL</span>
+            <input id="adventure-hero-sheet" type="text" placeholder="../../assets/ponies/stellacorn/sheets/spritesheet.webp" />
+          </label>
+          <label class="field">
+            <span>Hero Actions (JSON)</span>
+            <textarea id="adventure-actions" rows="5" placeholder='[{\"id\":\"heal\",\"key\":\"h\",\"label\":\"Heal\"}]'></textarea>
+          </label>
+          <label class="field">
+            <span>World Map Background (optional)</span>
+            <input id="adventure-bg" type="text" placeholder="../missions/stellacorn/stellacorn-whispering-forest.webp" />
+          </label>
+          <div class="dock">
+            <div class="dock__title">Key Dock</div>
+            <div class="dock__row">
+              <span class="dock__key">WASD</span>
+              <span>Move (Playtest)</span>
+            </div>
+            <div class="dock__row">
+              <span class="dock__key">Arrows</span>
+              <span>Pan camera</span>
+            </div>
+            <div class="dock__row">
+              <span class="dock__key">H</span>
+              <span>Heal</span>
+            </div>
+            <div class="dock__row">
+              <span class="dock__key">I</span>
+              <span>Interact / Talk</span>
+            </div>
+          </div>
+        </aside>
+
+        <main class="panel board">
+          <div class="board__top">
+            <div>
+              <h2>Mission Preview</h2>
+              <p id="mission-summary">Generate a mission to see the map and objectives.</p>
+            </div>
+            <div class="board__controls">
+              <button id="toggle-graph" class="btn">Mission Graph</button>
+              <button id="playtest-button" class="btn">Playtest</button>
+              <label class="toggle">
+                <input id="render-assets" type="checkbox" />
+                <span>Render Assets</span>
+              </label>
+              <select id="checkpoint-select" class="select">
+                <option value="">Checkpoint</option>
+              </select>
+              <button id="jump-checkpoint" class="btn">Jump</button>
+              <button id="open-editor" class="btn">Open in Editor</button>
+            </div>
+          </div>
+          <div id="mission-graph" class="mission-graph" hidden></div>
+          <div class="preview-grid">
+            <div class="preview-main">
+              <div class="preview-label">Map View</div>
+              <div class="canvas-frame">
+                <canvas id="mission-canvas" width="1200" height="720"></canvas>
+              </div>
+            </div>
+            <div class="preview-mini">
+              <div class="preview-label">Minimap</div>
+              <div class="minimap-frame">
+                <canvas id="minimap" width="240" height="180"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="action-bar" id="action-bar" hidden>
+            <div class="action-bar__label" id="action-label">Hold I to interact</div>
+            <div class="action-bar__meter"><div class="action-bar__fill" id="action-fill"></div></div>
+          </div>
+          <section class="dialog-section">
+            <div class="dialog-head">
+              <h2>Dialog Graph</h2>
+              <div class="dialog-toolbar">
+                <button id="add-node" class="btn btn--small">Add Node</button>
+                <button id="add-choice" class="btn btn--small">Add Choice</button>
+              </div>
+            </div>
+            <div class="dialog-graph" id="dialog-graph">
+              <svg class="dialog-edges" id="dialog-edges"></svg>
+              <div class="dialog-nodes" id="dialog-nodes"></div>
+            </div>
+            <div class="dialog-editor">
+              <label class="field">
+                <span>Selected Node</span>
+                <input id="node-id" type="text" placeholder="node_id" />
+              </label>
+              <label class="field">
+                <span>Speaker</span>
+                <input id="node-speaker" type="text" placeholder="Wise Owl" />
+              </label>
+              <label class="field">
+                <span>Text</span>
+                <textarea id="node-text" rows="4" placeholder="Dialog lines..."></textarea>
+              </label>
+              <label class="field">
+                <span>Choices (JSON)</span>
+                <textarea id="node-choices" rows="4" placeholder='[{"text":"Ask about tracks","to":"node_tracks","conditions":[]}]'></textarea>
+              </label>
+              <button id="update-node" class="btn btn--small">Update Node</button>
+            </div>
+          </section>
+        </main>
+
+        <aside class="panel dossier">
+          <h2>Mission Dossier</h2>
+          <div class="dossier-block">
+            <div class="dossier-title">Objectives</div>
+            <div id="objective-list" class="objective-list"></div>
+          </div>
+          <div class="dossier-block">
+            <div class="dossier-title">Asset Requests</div>
+            <div id="asset-list" class="asset-list"></div>
+            <button id="generate-assets" class="btn">Generate Selected Assets</button>
+          </div>
+          <div class="dossier-block">
+            <div class="dossier-title">Mission Metadata</div>
+            <textarea id="mission-meta" rows="6" placeholder="Mission metadata JSON (zones, triggers, narrative, flags)..."></textarea>
+            <button id="apply-mission-meta" class="btn btn--small">Apply Metadata</button>
+            <div class="muted">Merged into the mission bundle and editor draft.</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div class="busy-overlay" id="busy-overlay" hidden>
+      <div class="busy-card">
+        <div class="busy-spinner" aria-hidden="true"></div>
+        <div class="busy-label" id="busy-label">Working...</div>
+      </div>
+    </div>
+    <div class="modal" id="error-modal" hidden>
+      <div class="modal-card" role="dialog" aria-labelledby="error-title" aria-modal="true">
+        <div class="modal-title" id="error-title">Error</div>
+        <pre class="modal-body" id="error-message"></pre>
+        <div class="modal-actions">
+          <button id="error-copy" class="btn btn--small">Copy</button>
+          <button id="error-close" class="btn btn--small">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

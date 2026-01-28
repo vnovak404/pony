@@ -1,0 +1,17 @@
+export const state = {
+  plan: null,
+  bundle: null,
+  dialogNodes: [],
+  selectedNodeId: null,
+  assetRequests: [],
+  batchPlans: [],
+  playtest: false,
+  player: { x: 0, y: 0 },
+  camera: { x: 0, y: 0 },
+  action: { active: false, start: 0, duration: 1400, key: null, target: null },
+  interactions: new Map(),
+  checkpoints: [],
+  missionMetaBaseline: "",
+  onHoldComplete: null,
+  renderAssets: false,
+};

@@ -50,7 +50,8 @@ async function loadWorldMap() {
     if (!response.ok) {
       throw new Error(`World map load failed: ${response.status}`);
     }
-    worldMap = await response.json();
+    const raw = await response.json();
+    worldMap = normalizeWorldMap(raw);
     ensureProgress();
     updatePanel();
     drawMap();
@@ -58,6 +59,47 @@ async function loadWorldMap() {
     console.error(error);
     drawError("Whispering Forest map failed to load.");
   }
+}
+
+function normalizeWorldMap(map) {
+  if (!map || typeof map !== "object") {
+    return { nodes: [], edges: [] };
+  }
+  const nodes = Array.isArray(map.nodes) ? map.nodes : [];
+  const edges = Array.isArray(map.edges) ? map.edges : [];
+  const normalizedNodes = nodes.map((node, index) => {
+    if (!node || typeof node !== "object") return null;
+    const name = node.name || node.label || node.title || node.id || `Node ${index + 1}`;
+    let x = node.x;
+    let y = node.y;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      const layout = autoLayoutPosition(index);
+      x = layout.x;
+      y = layout.y;
+    }
+    return { ...node, name, x, y };
+  }).filter(Boolean);
+  const normalizedEdges = edges
+    .map((edge) => {
+      if (Array.isArray(edge)) return edge;
+      if (edge && typeof edge === "object" && edge.from && edge.to) {
+        return [edge.from, edge.to];
+      }
+      return null;
+    })
+    .filter(Boolean);
+  return { ...map, nodes: normalizedNodes, edges: normalizedEdges };
+}
+
+function autoLayoutPosition(index) {
+  const cols = 5;
+  const spacingX = 140;
+  const spacingY = 90;
+  const startX = 120;
+  const startY = 320;
+  const row = Math.floor(index / cols);
+  const col = index % cols;
+  return { x: startX + col * spacingX, y: startY - row * spacingY };
 }
 
 function ensureProgress() {
